@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS medical_ratings (
     reminder_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-
     CONSTRAINT FK_medical FOREIGN KEY(medical_id)
     REFERENCES medicals(id),
 
