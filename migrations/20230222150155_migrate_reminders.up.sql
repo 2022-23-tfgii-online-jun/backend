@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS reminders (
     notifications json NOT NULL,
     tasks json NOT NULL,
     notes TEXT DEFAULT NULL,
+    is_active BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT FK_user FOREIGN KEY(user_id)
