@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS activity_users (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     activity_id INT NOT NULL,
     user_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT FK_user FOREIGN KEY(user_id)
     REFERENCES users(id),

@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS recipes (
     ingredients TEXT DEFAULT NULL,
     elaboration TEXT DEFAULT NULL,
     time TIMESTAMP DEFAULT NULL,
-    rating CHAR(1) NOT NULL,
     is_published BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

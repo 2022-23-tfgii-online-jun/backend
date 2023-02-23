@@ -5,6 +5,5 @@ CREATE TABLE IF NOT EXISTS health_services_ratings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT FK_health_service FOREIGN KEY(health_services_id)
-    REFERENCES health_services(id),
-
+    REFERENCES health_services(id)
 );

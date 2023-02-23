@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS article_categories (
     image TEXT DEFAULT NULL,
     content TEXT DEFAULT NULL,
     is_published BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT FK_categorie FOREIGN KEY(category_id)
     REFERENCES categories(id),
