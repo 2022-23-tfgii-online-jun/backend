@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS activitie_user;
+DROP TABLE IF EXISTS activity_users;

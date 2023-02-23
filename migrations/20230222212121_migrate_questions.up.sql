@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS questions (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    user_id INT NOT NULL,
+    text TEXT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT FK_user FOREIGN KEY(user_id)
+    REFERENCES users(id)
+);
