@@ -64,3 +64,28 @@ func encryptPassword(password string) (string, error) {
 	}
 	return string(hash), nil
 }
+
+// UpdateUser is a method that updates an existing user in the database,
+// performing data validation and transformations before persisting the updated record.
+func (s *service) UpdateUser(updateData *entity.UpdateUser) (int, error) {
+
+	// Step 2: Modify data before saving to the database.
+	user := &entity.User{
+		ID:          1,
+		FirstName:   *updateData.FirstName,
+		LastName:    *updateData.LastName,
+		DateOfBirth: *updateData.DateOfBirth,
+		Sex:         *updateData.Sex,
+		UserType:    *updateData.UserType,
+		City:        *updateData.City,
+		Country:     *updateData.Country,
+	}
+
+	// Step 3: Save the user record to the database.
+	err := s.repo.Update(user)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}

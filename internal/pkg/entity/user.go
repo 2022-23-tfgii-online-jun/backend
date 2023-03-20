@@ -25,7 +25,7 @@ type User struct {
 	FirstName    string     `gorm:"Column:first_name" json:"first_name" binding:"required,min=3,max=100"`
 	LastName     string     `gorm:"Column:last_name" json:"last_name" binding:"required,min=3,max=100"`
 	ProfileImage string     `gorm:"Column:profile_image" json:"profile_image"`
-	DateOfBirth  time.Time  `gorm:"Column:date_of_birth" json:"date_of_birth" binding:"required"`
+	DateOfBirth  string     `gorm:"Column:date_of_birth" json:"date_of_birth" binding:"required"`
 	Sex          string     `gorm:"Column:sex" json:"sex" binding:"required"`
 	Email        string     `gorm:"Column:email" binding:"required,email" json:"email"`
 	Password     string     `gorm:"Column:password" sql:"DEFAULT:NULL" validate:"required" binding:"required" json:"password"`
@@ -43,4 +43,16 @@ type User struct {
 type SignUp struct {
 	Email    string `gorm:"Column:email" binding:"required,email" json:"email"`
 	Password string `gorm:"Column:password" json:"password" validate:"required" binding:"required"`
+}
+
+// UpdateUser represents a struct for updating a user's properties.
+type UpdateUser struct {
+	ID          int     `gorm:"Column:id;PRIMARY_KEY" json:"-"`
+	FirstName   *string `gorm:"Column:first_name" json:"first_name"`
+	LastName    *string `gorm:"Column:last_name" json:"last_name"`
+	DateOfBirth *string `gorm:"Column:date_of_birth" json:"date_of_birth"`
+	Sex         *string `gorm:"Column:sex" json:"sex"`
+	UserType    *string `gorm:"Column:user_type" json:"user_type"`
+	City        *string `gorm:"Column:city" json:"city"`
+	Country     *string `gorm:"Column:country" json:"country"`
 }

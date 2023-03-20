@@ -43,3 +43,16 @@ func (c *Client) CreateWithOmit(omitColumns string, value interface{}) error {
 	}
 	return nil
 }
+
+// Update updates an existing record in the database using the given value.
+// This function updates an existing record in the database using the given value and returns an error if the operation fails.
+func (c *Client) Update(value interface{}) error {
+	if value == nil {
+		return errors.New("input value cannot be nil")
+	}
+	err := c.db.Updates(value).Error
+	if err != nil {
+		return errors.New("failed to update record: " + err.Error())
+	}
+	return nil
+}
