@@ -8,6 +8,9 @@ import (
 
 // RegisterRoutes registers all the application routes.
 func RegisterRoutes(e *gin.Engine) {
+	// Add the Sentry middleware
+	e.Use(SentryMiddleware())
+
 	// Registering a route for checking the health of the microservice
 	// It is recommended to use a dedicated health check package for this purpose
 	e.GET("/health", healthcheck.Default())
