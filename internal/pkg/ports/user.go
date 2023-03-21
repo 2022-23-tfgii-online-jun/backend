@@ -1,8 +1,12 @@
 package ports
 
 import (
+	"errors"
+
 	"github.com/emur-uy/backend/internal/pkg/entity"
 )
+
+var ErrUserNotFound = errors.New("user not found")
 
 // UserRepository is an interface that represents the contract that any data access
 // implementation must satisfy in order to interact with user data.
@@ -15,6 +19,10 @@ type UserRepository interface {
 	// UpdateUser updates an existing user record with the provided user data.
 	// Returns an error if the operation fails.
 	Update(value interface{}) error
+
+	// First retrieves the first record that matches the given conditions from the database
+	// Returns an error if the operation fails.
+	First(out interface{}, conditions ...interface{}) error
 }
 
 // UserService is an interface that represents the contract for the business logic implementation
@@ -28,4 +36,8 @@ type UserService interface {
 	// UpdateUser updates an existing user record with the provided user data.
 	// Returns an HTTP status code and an error (if any).
 	UpdateUser(updateData *entity.UpdateUser) (int, error)
+
+	// GetUser retrieves user information for the user with the provided UUID.
+	// If the user is not found in the database, the error returned should be `ports.ErrUserNotFound`.
+	GetUser(userUUID string) (*entity.User, error)
 }

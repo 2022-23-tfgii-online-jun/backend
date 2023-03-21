@@ -22,4 +22,5 @@ func RegisterRoutes(e *gin.Engine) {
 	// Step 4: Register the SignUp route with the handler.
 	e.POST("/api/v1/users", handler.SignUp)
 	e.PATCH("/api/v1/users", handler.UpdateUser)
+	e.GET("/api/v1/users", handler.GetUser)
 }

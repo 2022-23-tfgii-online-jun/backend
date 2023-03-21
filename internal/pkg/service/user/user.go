@@ -89,3 +89,19 @@ func (s *service) UpdateUser(updateData *entity.UpdateUser) (int, error) {
 
 	return http.StatusOK, nil
 }
+
+// GetUser is the service for retrieving information about a user.
+func (s *service) GetUser(userUUID string) (*entity.User, error) {
+	// Initialize an empty User entity.
+	user := &entity.User{}
+
+	// Search for a user with the given UUID in the repository.
+	// If a matching user is found, its data will be stored in the `user` variable.
+	if err := s.repo.First(user, "uuid= ?", userUUID); err != nil {
+		// If there's an error during the search, return a nil User pointer and the error.
+		return nil, err
+	}
+
+	// If the user is found successfully, return the User pointer and a nil error.
+	return user, nil
+}

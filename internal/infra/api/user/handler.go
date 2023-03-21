@@ -17,7 +17,7 @@ type userHandler struct {
 }
 
 type ResponseUserData struct {
-	Message *string `json:"message"`
+	Message interface{} `json:"message,omitempty"`
 }
 
 // newHandler returns a new instance of userHandler with the given userService.
@@ -65,6 +65,7 @@ func (u *userHandler) SignUp(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"code":    http.StatusCreated,
 		"message": "User registered successfully",
+		"data":    nil,
 	})
 }
 
@@ -95,24 +96,63 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "User updated successfully",
+		"data":    nil,
 	})
 }
 
-// handleError logs the error and sends an error response to the client.
+// GetUser handles the HTTP request for getting user information.
+func (u *userHandler) GetUser(c *gin.Context) {
+	// Step 1: Get the user UUID from the claims.
+	// The user UUID is stored in the claims of the JWT token.
+	// We use the `MustGet` function to safely retrieve the value from the `Context`.
+	//userUUID := c.MustGet("userUUID").(string)
+	userUUID := "3a793ec2-0685-4708-a861-2f47cc2dd0ff"
+	// Step 2: Get the user from the database.
+	// We call the `GetUser` function from the `UserService` to retrieve the user information from the database.
+	user, err := u.userService.GetUser(userUUID)
+	if err != nil {
+		// If an error occurs while retrieving the user, we return an error response to the client.
+		if errors.Is(err, ports.ErrUserNotFound) {
+			handleUserError(c, http.StatusNotFound, "User not found", err)
+		} else {
+			handleUserError(c, http.StatusInternalServerError, "An error occurred while getting the user", err)
+		}
+		return
+	}
+
+	// Step 3: Return the user information.
+	// We set the `data` field in the response directly to the user information.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "User information retrieved successfully",
+		"data":    user,
+	})
+}
+
 func handleError(c *gin.Context, statusCode int, message string, err error) {
 	log.Printf("[UserHandler]: %s, %v", message, err)
 	c.JSON(statusCode, gin.H{
-		"code":  statusCode,
-		"error": message,
+		"code":    statusCode,
+		"message": message,
+		"data":    nil,
 	})
 }
 
-// handleSignUpError logs the error and sends an error response to the client for SignUp requests.
 func handleSignUpError(c *gin.Context, statusCode int, message string, err error) {
 	log.Printf("[SignUp]: %s, %v", message, err)
 	c.JSON(statusCode, gin.H{
-		"code":  statusCode,
-		"error": message,
+		"code":    statusCode,
+		"message": message,
+		"data":    nil,
+	})
+}
+
+func handleUserError(c *gin.Context, statusCode int, message string, err error) {
+	log.Printf("[UpdateUser]: %s, %v", message, err)
+	c.JSON(statusCode, gin.H{
+		"code":    statusCode,
+		"message": message,
+		"data":    nil,
 	})
 }
 
@@ -122,15 +162,6 @@ func validateUpdateInput(updateData *entity.UpdateUser) error {
 		return errors.New("user data info is either empty or null")
 	}
 	return nil
-}
-
-// handleUserError logs the error and sends an error response to the client for UpdateUser requests.
-func handleUserError(c *gin.Context, statusCode int, message string, err error) {
-	log.Printf("[UpdateUser]: %s, %v", message, err)
-	c.JSON(statusCode, gin.H{
-		"code":  statusCode,
-		"error": message,
-	})
 }
 
 // validateUserInput checks whether the signUpData is valid or not.

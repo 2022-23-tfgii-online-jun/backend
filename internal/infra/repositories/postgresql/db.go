@@ -56,3 +56,16 @@ func (c *Client) Update(value interface{}) error {
 	}
 	return nil
 }
+
+// First returns the first record that matches the given conditions.
+// This function returns the first record that matches the given conditions and returns an error if the operation fails.
+func (c *Client) First(dest interface{}, conditions ...interface{}) error {
+	if dest == nil {
+		return errors.New("destination value cannot be nil")
+	}
+	err := c.db.First(dest, conditions...).Error
+	if err != nil {
+		return errors.New("failed to retrieve first record: " + err.Error())
+	}
+	return nil
+}
