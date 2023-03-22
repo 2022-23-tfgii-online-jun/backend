@@ -161,6 +161,38 @@ func (u *userHandler) SetActiveStatus(c *gin.Context) {
 	})
 }
 
+// SetBannedStatus handles the HTTP request for updating the user's is_banned status
+func (u *userHandler) SetBannedStatus(c *gin.Context) {
+	// Extract the user UUID from the request.
+	//userUUID := c.Param("userUUID")
+	userUUID := "3a793ec2-0685-4708-a861-2f47cc2dd0ff"
+	// Define a struct to hold the request body data.
+	type RequestBody struct {
+		IsBanned bool `json:"is_banned"`
+	}
+
+	// Parse the request body JSON.
+	var requestBody RequestBody
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		handleUserError(c, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	// Update the user's is_banned status in the database.
+	statusCode, err := u.userService.UpdateBannedStatus(userUUID, requestBody.IsBanned)
+	if err != nil {
+		handleUserError(c, statusCode, "An error occurred while updating the user's banned status", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "User banned status updated successfully",
+		"data":    nil,
+	})
+}
+
 // handleError is a generic error handler that logs the error and responds
 func handleError(c *gin.Context, statusCode int, message string, err error) {
 	// Log the error message and the error itself

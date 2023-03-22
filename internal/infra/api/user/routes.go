@@ -23,5 +23,6 @@ func RegisterRoutes(e *gin.Engine) {
 	e.POST("/api/v1/users", handler.SignUp)
 	e.PATCH("/api/v1/users", handler.UpdateUser)
 	e.GET("/api/v1/users", handler.GetUser)
-	e.PUT("/api/v1/users", handler.SetActiveStatus)
+	e.PUT("/api/v1/users/active", handler.SetActiveStatus)
+	e.PUT("/api/v1/users/banned", handler.SetBannedStatus)
 }

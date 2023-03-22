@@ -124,3 +124,22 @@ func (s *service) UpdateActiveStatus(userUUID string, isActive bool) (int, error
 	// Return the HTTP OK status code if the update is successful
 	return http.StatusOK, nil
 }
+
+// UpdateBannedStatus updates the banned status of a user.
+func (s *service) UpdateBannedStatus(userUUID string, isBanned bool) (int, error) {
+	// Find user by UUID
+	user, err := s.repo.FindByUUID(userUUID)
+	if err != nil {
+		// Return error if the user is not found
+		return http.StatusInternalServerError, err
+	}
+
+	// Update the "is_banned" column of the user in the database
+	if err := s.repo.UpdateColumns(user, "is_banned", isBanned); err != nil {
+		// Return error if the update fails
+		return http.StatusInternalServerError, err
+	}
+
+	// Return the HTTP OK status code if the update is successful
+	return http.StatusOK, nil
+}

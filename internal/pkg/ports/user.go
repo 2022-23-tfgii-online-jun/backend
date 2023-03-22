@@ -49,4 +49,8 @@ type UserService interface {
 	// UpdateActiveStatus updates the is_active status of the user with the provided UUID.
 	// Returns an HTTP status code and an error (if any).
 	UpdateActiveStatus(userUUID string, isActive bool) (int, error)
+
+	// UpdateBannedStatus updates the is_banned status of the user with the provided UUID.
+	// Returns an HTTP status code and an error (if any).
+	UpdateBannedStatus(userUUID string, isBanned bool) (int, error)
 }
