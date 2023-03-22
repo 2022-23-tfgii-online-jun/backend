@@ -11,6 +11,7 @@ var ErrUserNotFound = errors.New("user not found")
 // UserRepository is an interface that represents the contract that any data access
 // implementation must satisfy in order to interact with user data.
 type UserRepository interface {
+	FindByUUID(uuid string) (*entity.User, error)
 
 	// CreateWithOmit creates a new user record while omitting specific fields.
 	// Returns an error if the operation fails.
@@ -23,6 +24,10 @@ type UserRepository interface {
 	// First retrieves the first record that matches the given conditions from the database
 	// Returns an error if the operation fails.
 	First(out interface{}, conditions ...interface{}) error
+
+	// UpdateColumns updates specified columns of an existing record in the database using the given value.
+	// Returns an error if the operation fails.
+	UpdateColumns(value interface{}, column string, updateValue interface{}) error
 }
 
 // UserService is an interface that represents the contract for the business logic implementation
@@ -40,4 +45,8 @@ type UserService interface {
 	// GetUser retrieves user information for the user with the provided UUID.
 	// If the user is not found in the database, the error returned should be `ports.ErrUserNotFound`.
 	GetUser(userUUID string) (*entity.User, error)
+
+	// UpdateActiveStatus updates the is_active status of the user with the provided UUID.
+	// Returns an HTTP status code and an error (if any).
+	UpdateActiveStatus(userUUID string, isActive bool) (int, error)
 }

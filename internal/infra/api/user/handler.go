@@ -129,8 +129,44 @@ func (u *userHandler) GetUser(c *gin.Context) {
 	})
 }
 
+// SetActiveStatus handles the HTTP request for updating the user's is_active status
+func (u *userHandler) SetActiveStatus(c *gin.Context) {
+	// Extract the user UUID from the request.
+	//userUUID := c.Param("userUUID")
+	userUUID := "3a793ec2-0685-4708-a861-2f47cc2dd0ff"
+	// Define a struct to hold the request body data.
+	type RequestBody struct {
+		IsActive bool `json:"is_active"`
+	}
+
+	// Parse the request body JSON.
+	var requestBody RequestBody
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		handleUserError(c, http.StatusBadRequest, "Invalid request body", err)
+		return
+	}
+
+	// Update the user's is_active status in the database.
+	statusCode, err := u.userService.UpdateActiveStatus(userUUID, requestBody.IsActive)
+	if err != nil {
+		handleUserError(c, statusCode, "An error occurred while updating the user's active status", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "User active status updated successfully",
+		"data":    nil,
+	})
+}
+
+// handleError is a generic error handler that logs the error and responds
 func handleError(c *gin.Context, statusCode int, message string, err error) {
+	// Log the error message and the error itself
 	log.Printf("[UserHandler]: %s, %v", message, err)
+
+	// Send the JSON response with the status code and error message
 	c.JSON(statusCode, gin.H{
 		"code":    statusCode,
 		"message": message,
@@ -138,8 +174,12 @@ func handleError(c *gin.Context, statusCode int, message string, err error) {
 	})
 }
 
+// handleSignUpError is an error handler specific to the sign-up process
 func handleSignUpError(c *gin.Context, statusCode int, message string, err error) {
+	// Log the error message and the error itself
 	log.Printf("[SignUp]: %s, %v", message, err)
+
+	// Send the JSON response with the status code and error message
 	c.JSON(statusCode, gin.H{
 		"code":    statusCode,
 		"message": message,
@@ -147,8 +187,12 @@ func handleSignUpError(c *gin.Context, statusCode int, message string, err error
 	})
 }
 
+// handleUserError is an error handler specific to updating user information
 func handleUserError(c *gin.Context, statusCode int, message string, err error) {
+	// Log the error message and the error itself
 	log.Printf("[UpdateUser]: %s, %v", message, err)
+
+	// Send the JSON response with the status code and error message
 	c.JSON(statusCode, gin.H{
 		"code":    statusCode,
 		"message": message,

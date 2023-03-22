@@ -30,8 +30,8 @@ type User struct {
 	Email        string     `gorm:"Column:email" binding:"required,email" json:"email"`
 	Password     string     `gorm:"Column:password" sql:"DEFAULT:NULL" validate:"required" binding:"required" json:"password"`
 	UserType     string     `gorm:"Column:user_type" json:"user_type" binding:"required"`
-	IsActive     bool       `gorm:"Column:is_active" sql:"DEFAULT:0" json:"is_active"`
-	IsBanned     bool       `gorm:"Column:is_banned" sql:"DEFAULT:false" json:"is_banned"`
+	IsActive     bool       `gorm:"column:is_active" json:"is_active"`
+	IsBanned     bool       `gorm:"Column:is_banned" json:"is_banned"`
 	City         string     `gorm:"Column:city" json:"city" binding:"required"`
 	Country      string     `gorm:"Column:country" json:"country" binding:"required"`
 	CreatedAt    time.Time  `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"-"`
@@ -55,4 +55,8 @@ type UpdateUser struct {
 	UserType    *string `gorm:"Column:user_type" json:"user_type"`
 	City        *string `gorm:"Column:city" json:"city"`
 	Country     *string `gorm:"Column:country" json:"country"`
+}
+
+type UpdateUserIsActive struct {
+	IsActive bool `gorm:"column:is_active" json:"is_active"`
 }

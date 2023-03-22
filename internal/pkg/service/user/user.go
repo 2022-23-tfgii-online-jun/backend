@@ -105,3 +105,22 @@ func (s *service) GetUser(userUUID string) (*entity.User, error) {
 	// If the user is found successfully, return the User pointer and a nil error.
 	return user, nil
 }
+
+// UpdateActiveStatus updates the active status of a user.
+func (s *service) UpdateActiveStatus(userUUID string, isActive bool) (int, error) {
+	// Find user by UUID
+	user, err := s.repo.FindByUUID(userUUID)
+	if err != nil {
+		// Return error if the user is not found
+		return http.StatusInternalServerError, err
+	}
+
+	// Update the "is_active" column of the user in the database
+	if err := s.repo.UpdateColumns(user, "is_active", isActive); err != nil {
+		// Return error if the update fails
+		return http.StatusInternalServerError, err
+	}
+
+	// Return the HTTP OK status code if the update is successful
+	return http.StatusOK, nil
+}

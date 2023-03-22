@@ -2,7 +2,9 @@ package postgresql
 
 import (
 	"errors" // Importing errors package for error handling
+	"fmt"
 
+	"github.com/emur-uy/backend/internal/pkg/entity"
 	"gorm.io/gorm" // Importing gorm package for database ORM
 )
 
@@ -16,6 +18,19 @@ func NewClient() *Client {
 	return &Client{
 		db: Db,
 	}
+}
+
+func (r *Client) FindByUUID(uuid string) (*entity.User, error) {
+	user := &entity.User{}
+	err := r.db.Where("uuid = ?", uuid).First(user).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+	return user, nil
 }
 
 // Create stores a new record in the database.
@@ -50,11 +65,18 @@ func (c *Client) Update(value interface{}) error {
 	if value == nil {
 		return errors.New("input value cannot be nil")
 	}
-	err := c.db.Updates(value).Error
+	err := c.db.Save(value).Error
 	if err != nil {
 		return errors.New("failed to update record: " + err.Error())
 	}
 	return nil
+}
+
+// UpdateColumns updates a specific column of a record in the database.
+// Returns an error if something goes wrong.
+func (c *Client) UpdateColumns(value interface{}, column string, updateValue interface{}) error {
+	err := c.db.Model(value).Update(column, updateValue).Error
+	return err
 }
 
 // First returns the first record that matches the given conditions.
