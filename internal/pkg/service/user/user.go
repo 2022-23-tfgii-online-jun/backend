@@ -1,12 +1,12 @@
 package user
 
 import (
+	"fmt"
+	"github.com/emur-uy/backend/internal/pkg/entity"
+	"github.com/emur-uy/backend/internal/pkg/ports"
 	"log"
 	"net/http"
 	"net/mail"
-
-	"github.com/emur-uy/backend/internal/pkg/entity"
-	"github.com/emur-uy/backend/internal/pkg/ports"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -68,6 +68,10 @@ func encryptPassword(password string) (string, error) {
 // UpdateUser is a method that updates an existing user in the database,
 // performing data validation and transformations before persisting the updated record.
 func (s *service) UpdateUser(updateData *entity.UpdateUser) (int, error) {
+
+	if updateData == nil || updateData.City == nil || updateData.Country == nil {
+		return http.StatusInternalServerError, fmt.Errorf("invalid data to update")
+	}
 
 	// Step 2: Modify data before saving to the database.
 	user := &entity.User{
