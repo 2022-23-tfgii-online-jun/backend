@@ -34,6 +34,9 @@ type UserRepository interface {
 // related to user operations. This is the primary port in the hexagonal architecture.
 type UserService interface {
 
+	// Login authenticates a user and returns a JWT token if successful, or an error if not.
+	Login(credentials *entity.DefaultCredentials) (string, error)
+
 	// CreateUser creates a new user with the provided user data.
 	// Returns an HTTP status code and an error (if any).
 	CreateUser(user *entity.User) (int, error)

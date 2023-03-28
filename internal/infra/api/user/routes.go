@@ -20,6 +20,7 @@ func RegisterRoutes(e *gin.Engine) {
 	handler := newHandler(service)
 
 	// Step 4: Register the SignUp route with the handler.
+	e.GET("/api/v1/users/login", handler.Login)
 	e.POST("/api/v1/users", handler.SignUp)
 	e.PATCH("/api/v1/users", handler.UpdateUser)
 	e.GET("/api/v1/users", handler.GetUser)

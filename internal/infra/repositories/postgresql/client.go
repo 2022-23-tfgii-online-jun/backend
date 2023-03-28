@@ -15,10 +15,7 @@ var Db *gorm.DB // Defining a global variable for gorm DB object
 func Connect() {
 
 	// Fetching database credentials from the config package
-	conf, err := config.Get()
-	if err != nil {
-		log.Fatalf("Error getting config: %v\n", err)
-	}
+	conf := config.Get()
 	dbHost := conf.DatabaseHost
 	dbPort := conf.DatabasePort
 	dbName := conf.DatabaseName

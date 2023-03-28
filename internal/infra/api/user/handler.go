@@ -2,12 +2,14 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
+	"github.com/getsentry/sentry-go"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +27,47 @@ func newHandler(userService ports.UserService) *userHandler {
 	return &userHandler{
 		userService: userService,
 	}
+}
+
+// Login handles user authentication and token generation.
+func (u *userHandler) Login(c *gin.Context) {
+	credentials := &entity.DefaultCredentials{}
+
+	// 1. Bind the JSON payload to a DefaultCredentials struct.
+	if err := c.ShouldBindJSON(credentials); err != nil {
+		handleErrorLogin(c, http.StatusBadRequest, "invalid input", err)
+		return
+	}
+
+	// 2. Authenticate the user and generate a JWT token.
+	token, err := u.userService.Login(credentials)
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "failed to generate token", err)
+		return
+	}
+
+	// 3. Return the generated token in the response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":  http.StatusOK,
+		"token": token,
+	})
+}
+
+// handleError is a utility function to handle errors, log them, and return an appropriate HTTP response.
+func handleErrorLogin(c *gin.Context, httpCode int, errMsg string, err error) {
+	// Check if the error message should be replaced with the actual error.
+	if strings.Contains(err.Error(), "user not found") || strings.Contains(err.Error(), "incorrect/mismatch password") {
+		errMsg = err.Error()
+	}
+
+	// Log the error message using Sentry.
+	sentry.CaptureMessage(fmt.Sprintf("[Login]: %s, %v", errMsg, err))
+
+	// Return an HTTP response with the error message.
+	c.JSON(httpCode, gin.H{
+		"code":  httpCode,
+		"error": errMsg,
+	})
 }
 
 // SignUp handles the HTTP request for registering a new user.

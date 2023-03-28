@@ -2,11 +2,17 @@ package user
 
 import (
 	"fmt"
-	"github.com/emur-uy/backend/internal/pkg/entity"
-	"github.com/emur-uy/backend/internal/pkg/ports"
 	"log"
 	"net/http"
 	"net/mail"
+	"time"
+
+	"github.com/emur-uy/backend/config"
+	"github.com/emur-uy/backend/internal/pkg/entity"
+	"github.com/emur-uy/backend/internal/pkg/ports"
+	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,6 +29,71 @@ func NewService(repo ports.UserRepository) *service {
 	return &service{
 		repo: repo,
 	}
+}
+
+// Login authenticates a user against the database.
+func (s *service) Login(credentials *entity.DefaultCredentials) (string, error) {
+	user, err := s.findUserByEmail(credentials.Email)
+	if err != nil {
+		return "", err
+	}
+
+	if err := s.verifyPassword(user.Password, credentials.Password); err != nil {
+		return "", err
+	}
+
+	return s.generateJWTToken(user)
+}
+
+// findUserByEmail retrieves a user from the database by email.
+func (s *service) findUserByEmail(email string) (*entity.User, error) {
+	user := &entity.User{}
+	if err := s.repo.First(user, "email = ?", email); err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, err
+	}
+	return user, nil
+}
+
+// verifyPassword checks if the provided password matches the stored hash.
+func (s *service) verifyPassword(userPassword, credentialsPassword string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(credentialsPassword)); err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return fmt.Errorf("incorrect/mismatch password")
+		}
+		return err
+	}
+	return nil
+}
+
+// generateJWTToken generates a JWT token with custom claims for the authenticated user.
+func (s *service) generateJWTToken(user *entity.User) (string, error) {
+	type jwtCustomClaims struct {
+		Email    string    `json:"email"`
+		UserUIID uuid.UUID `json:"user_uuid"`
+		jwt.StandardClaims
+	}
+
+	jwtKey := []byte(config.Get().JWTTokenKey)
+	expirationTime := time.Now().Add(time.Duration(config.Get().JWTTokenExpired) * time.Hour)
+
+	claims := &jwtCustomClaims{
+		user.Email,
+		user.UUID,
+		jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	strToken, err := jwtToken.SignedString(jwtKey)
+	if err != nil {
+		return "", err
+	}
+
+	return "Bearer " + strToken, nil
 }
 
 // CreateUser is a method that creates a new user in the database, performing data validation
