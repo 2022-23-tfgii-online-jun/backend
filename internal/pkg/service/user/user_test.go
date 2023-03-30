@@ -2,7 +2,9 @@ package user_test
 
 import (
 	"errors"
+	"github.com/spf13/viper"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -11,10 +13,17 @@ import (
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/service/user"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // Define a test UUID for testing purposes.
 var testUuid = uuid.MustParse("24df3f36-ca63-11ed-afa1-0242ac120002")
+
+// Define a test email for testing purposes.
+const testEmail = "test@example.com"
+
+// Define a test password for testing purposes.
+const testPassword = "$2a$08$dawrvtxhIXVQZ0pz7o809uSsNkSaZp2gW2vwNQERHn37bwFOWIku." // bcrypt hash for "password"
 
 // MockUserRepository is a mock implementation of the UserRepository interface for testing.
 type MockUserRepository struct{}
@@ -33,6 +42,16 @@ func (m *MockUserRepository) Update(value interface{}) error {
 func (m *MockUserRepository) First(out interface{}, conditions ...interface{}) error {
 	if conditions[0] == "uuid= ?" && conditions[1] == testUuid.String() {
 		out.(*entity.User).UUID = testUuid
+		return nil
+	}
+	if conditions[0] == "email = ?" && conditions[1] == testEmail {
+		out.(*entity.User).ID = 1
+		out.(*entity.User).UUID = testUuid
+		out.(*entity.User).Email = testEmail
+		out.(*entity.User).Password = testPassword
+		out.(*entity.User).IsActive = true
+		out.(*entity.User).CreatedAt = time.Now()
+		out.(*entity.User).UpdatedAt = time.Now()
 		return nil
 	}
 	return errors.New("user not found")
@@ -57,6 +76,83 @@ func (m *MockUserRepository) FindByUUID(userUUID string) (*entity.User, error) {
 		}, nil
 	}
 	return nil, errors.New("user not found")
+}
+
+func TestLogin(t *testing.T) {
+
+	// Initialize the mock repository and service.
+	mockRepo := &MockUserRepository{}
+
+	s := user.NewService(mockRepo)
+
+	// Config.Get is expecting env file to read env variables, so we need to mock that
+	// Write test data to the temporary file
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp("./", "dev.env")
+	if err != nil {
+		t.Fatal(err)
+	}
+	testData := []byte("DB_HOST=localhost\n" +
+		"DB_USER=test\n" +
+		"DB_PASS=test\n" +
+		"DB_NAME=test\n" +
+		"DB_PORT=25060\n" +
+		"DB_TLS=require\n" +
+		"SENTRY_KEY=test\n" +
+		"GIN_MODE=debug\n" +
+		"APP_ENV=dev\n" +
+		"SECRET_KEY=test\n" +
+		"JWT_TOKEN_KEY=07bdb5e4afedc99c756075c6403122b622e070bb314eb4e8e2127c22794a392acda82ab9bb61b246015404bd58d38aab3b4488eb087d944a837b2da0d15ceb5b\n" +
+		"JWT_TOKEN_EXPIRED=24\n")
+	_, err = tmpFile.Write(testData)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Close the temporary file to flush its contents to disk
+	err = tmpFile.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Defer cleanup of the temporary file
+	defer os.Remove(tmpFile.Name())
+
+	// Mock the environment variable to use the temporary file
+	viper.Set("APP_ENV", tmpFile.Name())
+
+	t.Run("successful login", func(t *testing.T) {
+		credentials := &entity.DefaultCredentials{
+			Email:    "test@example.com",
+			Password: "password",
+		}
+
+		token, err := s.Login(credentials)
+		require.NoError(t, err)
+		assert.NotEmpty(t, token)
+	})
+
+	t.Run("failed login - incorrect email", func(t *testing.T) {
+		credentials := &entity.DefaultCredentials{
+			Email:    "nonexistent@example.com",
+			Password: "password",
+		}
+
+		token, err := s.Login(credentials)
+		require.Error(t, err)
+		assert.Empty(t, token)
+	})
+
+	t.Run("failed login - incorrect password", func(t *testing.T) {
+		credentials := &entity.DefaultCredentials{
+			Email:    "test@example.com",
+			Password: "wrong_password",
+		}
+
+		token, err := s.Login(credentials)
+		require.Error(t, err)
+		assert.Empty(t, token)
+	})
 }
 
 // TestCreateUser tests the CreateUser method of the UserService.
@@ -165,6 +261,7 @@ func TestUpdateBannedStatus(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusInternalServerError, status)
 }
+
 func stringPtr(s string) *string {
 	return &s
 }
