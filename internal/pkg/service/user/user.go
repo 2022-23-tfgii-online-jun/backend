@@ -73,15 +73,28 @@ func (s *service) generateJWTToken(user *entity.User) (string, error) {
 	type jwtCustomClaims struct {
 		Email    string    `json:"email"`
 		UserUIID uuid.UUID `json:"user_uuid"`
+		Role     string    `json:"role"`
 		jwt.StandardClaims
 	}
 
 	jwtKey := []byte(config.Get().JWTTokenKey)
 	expirationTime := time.Now().Add(time.Duration(config.Get().JWTTokenExpired) * time.Hour)
 
+	userRoleData, _ := s.GetUserRole(user.ID)
+	var roleData *entity.Role
+	if userRoleData != nil {
+		roleData, _ = s.GetRole(userRoleData.RoleID)
+	}
+
+	var role string
+	if roleData != nil {
+		role = roleData.Role
+	}
+
 	claims := &jwtCustomClaims{
 		user.Email,
 		user.UUID,
+		role,
 		jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -122,6 +135,8 @@ func (s *service) CreateUser(user *entity.User) (int, error) {
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
+
+	log.Printf("Creating user with values: %+v", user)
 	return http.StatusCreated, nil
 }
 
@@ -146,10 +161,10 @@ func (s *service) UpdateUser(updateData *entity.UpdateUser) (int, error) {
 
 	// Step 2: Modify data before saving to the database.
 	user := &entity.User{
-		ID:          1,
+		ID:          updateData.ID,
 		FirstName:   *updateData.FirstName,
 		LastName:    *updateData.LastName,
-		DateOfBirth: *updateData.DateOfBirth,
+		DateOfBirth: updateData.DateOfBirth,
 		Sex:         *updateData.Sex,
 		UserType:    *updateData.UserType,
 		City:        *updateData.City,
@@ -217,4 +232,36 @@ func (s *service) UpdateBannedStatus(userUUID string, isBanned bool) (int, error
 
 	// Return the HTTP OK status code if the update is successful
 	return http.StatusOK, nil
+}
+
+// GetUserRole is the service for retrieving information about a user role.
+func (s *service) GetUserRole(userID int) (*entity.UserRole, error) {
+	// Initialize an empty UserRole entity.
+	userRole := &entity.UserRole{}
+
+	// Search for a user role with the given ID in the repository.
+	// If a matching user role is found, its data will be stored in the `userRole` variable.
+	if err := s.repo.First(userRole, "user_id = ?", userID); err != nil {
+		// If there's an error during the search, return a nil UserRole pointer and the error.
+		return nil, err
+	}
+
+	// If the user role is found successfully, return the UserRole pointer and a nil error.
+	return userRole, nil
+}
+
+// GetRole is the service for retrieving information about a role.
+func (s *service) GetRole(roleID int) (*entity.Role, error) {
+	// Initialize an empty Role entity.
+	role := &entity.Role{}
+
+	// Search for a role with the given ID in the repository.
+	// If a matching role is found, its data will be stored in the `role` variable.
+	if err := s.repo.First(role, "id = ?", roleID); err != nil {
+		// If there's an error during the search, return a nil role pointer and the error.
+		return nil, err
+	}
+
+	// If the role is found successfully, return the role pointer and a nil error.
+	return role, nil
 }

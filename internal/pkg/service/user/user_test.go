@@ -54,7 +54,15 @@ func (m *MockUserRepository) First(out interface{}, conditions ...interface{}) e
 		out.(*entity.User).UpdatedAt = time.Now()
 		return nil
 	}
-	return errors.New("user not found")
+	if conditions[0] == "user_id = ?" && conditions[1] == 1 {
+		out.(*entity.UserRole).UserID = 1
+		return nil
+	}
+	if conditions[0] == "id = ?" && conditions[1] == 1 {
+		out.(*entity.Role).ID = 1
+		return nil
+	}
+	return errors.New("not found")
 }
 
 // UpdateColumns is a mock implementation of the UpdateColumns method.
@@ -186,7 +194,7 @@ func TestUpdateUser(t *testing.T) {
 	mockRepo := &MockUserRepository{}
 	s := user.NewService(mockRepo)
 
-	dateOfBirth := "12-12-2022"
+	dateOfBirth := time.Now()
 
 	// Case 1: Valid update data, should return HTTP status 200.
 	updateData := &entity.UpdateUser{
@@ -260,6 +268,34 @@ func TestUpdateBannedStatus(t *testing.T) {
 	status, err = s.UpdateBannedStatus("not-found-uuid", true)
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusInternalServerError, status)
+}
+
+func TestGetUserRole(t *testing.T) {
+	mockRepo := &MockUserRepository{}
+	s := user.NewService(mockRepo)
+	// Test case 1: user role found
+	mockUserRole, err := s.GetUserRole(1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, mockUserRole.UserID)
+
+	// Test case 2: user role not found
+	mockUserRole, err = s.GetUserRole(91)
+	assert.NotNil(t, err)
+	assert.Nil(t, mockUserRole)
+}
+
+func TestGetRole(t *testing.T) {
+	mockRepo := &MockUserRepository{}
+	s := user.NewService(mockRepo)
+	// Test case 1: role found
+	mockRole, err := s.GetRole(1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, mockRole.ID)
+
+	// Test case 2: role not found
+	mockRole, err = s.GetRole(-1)
+	assert.NotNil(t, err)
+	assert.Nil(t, mockRole)
 }
 
 func stringPtr(s string) *string {

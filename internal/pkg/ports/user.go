@@ -56,4 +56,10 @@ type UserService interface {
 	// UpdateBannedStatus updates the is_banned status of the user with the provided UUID.
 	// Returns an HTTP status code and an error (if any).
 	UpdateBannedStatus(userUUID string, isBanned bool) (int, error)
+
+	// GetUserRole retrieves user role information for the user with the provided ID.
+	GetUserRole(userID int) (*entity.UserRole, error)
+
+	// GetRole retrieves role information with the provided role ID.
+	GetRole(userID int) (*entity.Role, error)
 }
