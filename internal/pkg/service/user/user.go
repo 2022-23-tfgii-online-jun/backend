@@ -17,6 +17,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// JWTCost is the cost factor for hashing passwords using bcrypt.
+const JWTCost = 8
+
 // service is a private struct implementing the ports.UserService interface, which
 // encapsulates the business logic related to user operations.
 type service struct {
@@ -92,10 +95,10 @@ func (s *service) generateJWTToken(user *entity.User) (string, error) {
 	}
 
 	claims := &jwtCustomClaims{
-		user.Email,
-		user.UUID,
-		role,
-		jwt.StandardClaims{
+		Email:    user.Email,
+		UserUIID: user.UUID,
+		Role:     role,
+		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
@@ -143,8 +146,7 @@ func (s *service) CreateUser(user *entity.User) (int, error) {
 // encryptPassword is a helper function that takes a plain-text password and returns
 // its bcrypt hash. This function is used to securely store user passwords.
 func encryptPassword(password string) (string, error) {
-	cost := 8 // Use bcrypt's default cost of 8 for hashing the password.
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), JWTCost)
 	if err != nil {
 		return "", err
 	}

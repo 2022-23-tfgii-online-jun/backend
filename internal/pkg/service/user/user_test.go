@@ -2,11 +2,12 @@ package user_test
 
 import (
 	"errors"
-	"github.com/spf13/viper"
 	"net/http"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/spf13/viper"
 
 	"github.com/google/uuid"
 
@@ -86,20 +87,20 @@ func (m *MockUserRepository) FindByUUID(userUUID string) (*entity.User, error) {
 	return nil, errors.New("user not found")
 }
 
+// TestLogin checks the Login method of the UserService.
+// This test function verifies that the UserService's Login method works as expected.
 func TestLogin(t *testing.T) {
-
-	// Initialize the mock repository and service.
+	// Set up the mock repository and service.
 	mockRepo := &MockUserRepository{}
-
 	s := user.NewService(mockRepo)
 
-	// Config.Get is expecting env file to read env variables, so we need to mock that
-	// Write test data to the temporary file
-	// Create a temporary file
+	// Prepare environment variables for testing.
+	// Create a temporary file for the environment variables.
 	tmpFile, err := os.CreateTemp("./", "dev.env")
 	if err != nil {
 		t.Fatal(err)
 	}
+	// Write test data to the temporary file.
 	testData := []byte("DB_HOST=localhost\n" +
 		"DB_USER=test\n" +
 		"DB_PASS=test\n" +
@@ -116,51 +117,47 @@ func TestLogin(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Close the temporary file to flush its contents to disk
+	// Close the temporary file to flush its contents to disk.
 	err = tmpFile.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Defer cleanup of the temporary file
+	// Defer cleanup of the temporary file.
 	defer os.Remove(tmpFile.Name())
 
-	// Mock the environment variable to use the temporary file
+	// Mock the environment variable to use the temporary file.
 	viper.Set("APP_ENV", tmpFile.Name())
 
-	t.Run("successful login", func(t *testing.T) {
-		credentials := &entity.DefaultCredentials{
-			Email:    "test@example.com",
-			Password: "password",
-		}
+	// Define test cases.
+	testCases := []struct {
+		name        string
+		credentials *entity.DefaultCredentials
+		expectError bool
+	}{
+		{"successful login", &entity.DefaultCredentials{Email: "test@example.com", Password: "password"}, false},
+		{"failed login - incorrect email", &entity.DefaultCredentials{Email: "nonexistent@example.com", Password: "password"}, true},
+		{"failed login - incorrect password", &entity.DefaultCredentials{Email: "test@example.com", Password: "wrong_password"}, true},
+	}
 
-		token, err := s.Login(credentials)
-		require.NoError(t, err)
-		assert.NotEmpty(t, token)
-	})
-
-	t.Run("failed login - incorrect email", func(t *testing.T) {
-		credentials := &entity.DefaultCredentials{
-			Email:    "nonexistent@example.com",
-			Password: "password",
-		}
-
-		token, err := s.Login(credentials)
-		require.Error(t, err)
-		assert.Empty(t, token)
-	})
-
-	t.Run("failed login - incorrect password", func(t *testing.T) {
-		credentials := &entity.DefaultCredentials{
-			Email:    "test@example.com",
-			Password: "wrong_password",
-		}
-
-		token, err := s.Login(credentials)
-		require.Error(t, err)
-		assert.Empty(t, token)
-	})
+	// Execute test cases.
+	// Iterate through each test case and run the corresponding test.
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Call the Login method with the test case's credentials.
+			token, err := s.Login(tc.credentials)
+			// Check the result based on the test case's expected error state.
+			if tc.expectError {
+				// If an error is expected, ensure there is an error returned and the token is empty.
+				require.Error(t, err)
+				assert.Empty(t, token)
+			} else {
+				// If no error is expected, ensure there is no error returned and the token is not empty.
+				require.NoError(t, err)
+				assert.NotEmpty(t, token)
+			}
+		})
+	}
 }
 
 // TestCreateUser tests the CreateUser method of the UserService.
