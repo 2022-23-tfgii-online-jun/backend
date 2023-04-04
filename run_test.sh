@@ -16,8 +16,6 @@ while IFS= read -r line; do
         echo -e "${GREEN}[OK]${RESET} $line"
     elif [[ $line == *"--- FAIL"* ]]; then
         echo -e "${RED}[ERROR]${RESET} $line"
-    else
-        echo "$line"
     fi
 done <<< "$output"
 
