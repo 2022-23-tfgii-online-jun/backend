@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS answers (
     id BIGSERIAL NOT NULL PRIMARY KEY,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     user_id INT NOT NULL,
     question_id INT NOT NULL,
     response TEXT DEFAULT NULL,

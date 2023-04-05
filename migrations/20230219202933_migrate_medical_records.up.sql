@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS medical_records (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     user_id INT NOT NULL,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(), 
     health_care_provider_type BOOLEAN NOT NULL,
     health_care_provider_name VARCHAR(100) NOT NULL,
     emergency_medical_service BOOLEAN NOT NULL,
