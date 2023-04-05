@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS recipes (
     id BIGSERIAL NOT NULL PRIMARY KEY,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     category_id INT NOT NULL,
     user_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,

@@ -1,9 +1,16 @@
 package user
 
 import (
+	"github.com/emur-uy/backend/internal/infra/api/middlewares"
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
 	"github.com/emur-uy/backend/internal/pkg/service/user"
 	"github.com/gin-gonic/gin"
+)
+
+// Define roles
+const (
+	RoleAdmin = "admin"
+	RoleUser  = "user"
 )
 
 // RegisterRoutes is a function that sets up the user-related routes on the given gin.Engine instance.
@@ -20,6 +27,16 @@ func RegisterRoutes(e *gin.Engine) {
 	handler := newHandler(service)
 
 	// Step 4: Register the SignUp route with the handler.
+	e.GET("/api/v1/users/login", handler.Login)
 	e.POST("/api/v1/users", handler.SignUp)
+
+	//these below APIs need authentication and authorization
+	e.Use(middlewares.Authenticate())
+	e.Use(middlewares.Authorize(RoleUser))
 	e.PATCH("/api/v1/users", handler.UpdateUser)
+	e.GET("/api/v1/users", handler.GetUser)
+
+	e.Use(middlewares.Authorize(RoleAdmin))
+	e.PUT("/api/v1/users/active", handler.SetActiveStatus)
+	e.PUT("/api/v1/users/banned", handler.SetBannedStatus)
 }

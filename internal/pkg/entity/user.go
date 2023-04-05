@@ -7,11 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	// RoleUser represents the default role for regular users.
-	RoleUser = "user"
-)
-
 // TableName returns the name of the table corresponding to the User entity in the database.
 func (*User) TableName() string {
 	return "users"
@@ -25,13 +20,13 @@ type User struct {
 	FirstName    string     `gorm:"Column:first_name" json:"first_name" binding:"required,min=3,max=100"`
 	LastName     string     `gorm:"Column:last_name" json:"last_name" binding:"required,min=3,max=100"`
 	ProfileImage string     `gorm:"Column:profile_image" json:"profile_image"`
-	DateOfBirth  string     `gorm:"Column:date_of_birth" json:"date_of_birth" binding:"required"`
+	DateOfBirth  *time.Time `gorm:"Column:date_of_birth;default:NULL" json:"date_of_birth"`
 	Sex          string     `gorm:"Column:sex" json:"sex" binding:"required"`
 	Email        string     `gorm:"Column:email" binding:"required,email" json:"email"`
-	Password     string     `gorm:"Column:password" sql:"DEFAULT:NULL" validate:"required" binding:"required" json:"password"`
+	Password     string     `gorm:"Column:password" validate:"required" binding:"required" json:"password"`
 	UserType     string     `gorm:"Column:user_type" json:"user_type" binding:"required"`
-	IsActive     bool       `gorm:"Column:is_active" sql:"DEFAULT:0" json:"is_active"`
-	IsBanned     bool       `gorm:"Column:is_banned" sql:"DEFAULT:false" json:"is_banned"`
+	IsActive     bool       `gorm:"column:is_active" json:"is_active"`
+	IsBanned     bool       `gorm:"Column:is_banned" json:"is_banned"`
 	City         string     `gorm:"Column:city" json:"city" binding:"required"`
 	Country      string     `gorm:"Column:country" json:"country" binding:"required"`
 	CreatedAt    time.Time  `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"-"`
@@ -47,12 +42,16 @@ type SignUp struct {
 
 // UpdateUser represents a struct for updating a user's properties.
 type UpdateUser struct {
-	ID          int     `gorm:"Column:id;PRIMARY_KEY" json:"-"`
-	FirstName   *string `gorm:"Column:first_name" json:"first_name"`
-	LastName    *string `gorm:"Column:last_name" json:"last_name"`
-	DateOfBirth *string `gorm:"Column:date_of_birth" json:"date_of_birth"`
-	Sex         *string `gorm:"Column:sex" json:"sex"`
-	UserType    *string `gorm:"Column:user_type" json:"user_type"`
-	City        *string `gorm:"Column:city" json:"city"`
-	Country     *string `gorm:"Column:country" json:"country"`
+	ID          int        `gorm:"Column:id;PRIMARY_KEY" json:"-"`
+	FirstName   *string    `gorm:"Column:first_name" json:"first_name"`
+	LastName    *string    `gorm:"Column:last_name" json:"last_name"`
+	DateOfBirth *time.Time `gorm:"Column:date_of_birth" json:"date_of_birth"`
+	Sex         *string    `gorm:"Column:sex" json:"sex"`
+	UserType    *string    `gorm:"Column:user_type" json:"user_type"`
+	City        *string    `gorm:"Column:city" json:"city"`
+	Country     *string    `gorm:"Column:country" json:"country"`
+}
+
+type UpdateUserIsActive struct {
+	IsActive bool `gorm:"column:is_active" json:"is_active"`
 }

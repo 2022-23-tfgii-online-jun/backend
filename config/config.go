@@ -31,7 +31,19 @@ type Config struct {
 
 // Get returns the configuration instance.
 // It uses 'sync.Once' to ensure the configuration is loaded only once.
-func Get() (Config, error) {
+func Get() *Config {
+	// Use 'doOnce' to ensure the configuration is loaded only once
+	doOnce.Do(func() {
+		if err := loadConfig(); err != nil {
+			log.Fatalf("Error loading config: %v", err)
+		}
+	})
+
+	// Return the configuration instance
+	return &cfg
+}
+
+func loadConfig() error {
 	// Configure Viper to read environment variables and configuration files
 	viper.AddConfigPath(".")
 	viper.SetConfigType("env")
@@ -53,23 +65,20 @@ func Get() (Config, error) {
 		log.Printf("[ReadENV]: cannot read env file (%s): %v\n", env, err)
 	}
 
-	// Use 'doOnce' to ensure the configuration is loaded only once
-	doOnce.Do(func() {
-		// Deserialize the environment variables into the 'Config' structure
-		err = viper.Unmarshal(&cfg)
-		if err != nil {
-			// If there is an error, log the error message
-			log.Printf("Error unmarshalling config: %v\n", err)
-		}
-	})
+	// Deserialize the environment variables into the 'Config' structure
+	err = viper.Unmarshal(&cfg)
+	if err != nil {
+		// If there is an error, log the error message
+		log.Printf("Error unmarshalling config: %v\n", err)
+		return err
+	}
 
 	// Validate the required configuration variables
 	if err := validateConfig(cfg); err != nil {
-		return Config{}, err
+		return err
 	}
 
-	// Return the configuration instance
-	return cfg, nil
+	return nil
 }
 
 // validateConfig checks if all the required configuration variables are present

@@ -17,10 +17,7 @@ const defaultPort = "8080"
 
 func main() {
 	// Get the configuration instance and handle errors.
-	cfg, err := config.Get()
-	if err != nil {
-		log.Fatalf("Error getting config: %v\n", err)
-	}
+	cfg := config.Get()
 
 	// Establish a database connection and handle errors.
 	postgresql.Connect()
@@ -35,7 +32,7 @@ func main() {
 	gin.SetMode(cfg.GinMode)
 
 	// Initialize Sentry for logging and handle errors.
-	err = sentry.Init(sentry.ClientOptions{
+	err := sentry.Init(sentry.ClientOptions{
 		Dsn:              cfg.SentryKey,
 		TracesSampleRate: 1.0,
 	})
