@@ -183,7 +183,7 @@ func (s *service) UpdateUser(updateData *entity.UpdateUser) (int, error) {
 }
 
 // GetUser is the service for retrieving information about a user.
-func (s *service) GetUser(userUUID string) (*entity.User, error) {
+func (s *service) GetUser(userUUID uuid.UUID) (*entity.User, error) {
 	// Initialize an empty User entity.
 	user := &entity.User{}
 
@@ -199,12 +199,20 @@ func (s *service) GetUser(userUUID string) (*entity.User, error) {
 }
 
 // UpdateActiveStatus updates the active status of a user.
-func (s *service) UpdateActiveStatus(userUUID string, isActive bool) (int, error) {
+func (s *service) UpdateActiveStatus(userUUID uuid.UUID, isActive bool) (int, error) {
+	user := &entity.User{}
+
 	// Find user by UUID
-	user, err := s.repo.FindByUUID(userUUID)
+	foundUser, err := s.repo.FindByUUID(userUUID, user)
 	if err != nil {
 		// Return error if the user is not found
 		return http.StatusInternalServerError, err
+	}
+
+	// Perform type assertion to convert foundUser to *entity.User
+	user, ok := foundUser.(*entity.User)
+	if !ok {
+		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
 	}
 
 	// Update the "is_active" column of the user in the database
@@ -218,12 +226,20 @@ func (s *service) UpdateActiveStatus(userUUID string, isActive bool) (int, error
 }
 
 // UpdateBannedStatus updates the banned status of a user.
-func (s *service) UpdateBannedStatus(userUUID string, isBanned bool) (int, error) {
+func (s *service) UpdateBannedStatus(userUUID uuid.UUID, isBanned bool) (int, error) {
+	user := &entity.User{}
+
 	// Find user by UUID
-	user, err := s.repo.FindByUUID(userUUID)
+	foundUser, err := s.repo.FindByUUID(userUUID, user)
 	if err != nil {
 		// Return error if the user is not found
 		return http.StatusInternalServerError, err
+	}
+
+	// Perform type assertion to convert foundUser to *entity.User
+	user, ok := foundUser.(*entity.User)
+	if !ok {
+		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
 	}
 
 	// Update the "is_banned" column of the user in the database

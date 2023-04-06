@@ -10,6 +10,7 @@ import (
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
 	"github.com/getsentry/sentry-go"
+	"github.com/google/uuid"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,23 +51,6 @@ func (u *userHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":  http.StatusOK,
 		"token": token,
-	})
-}
-
-// handleError is a utility function to handle errors, log them, and return an appropriate HTTP response.
-func handleErrorLogin(c *gin.Context, httpCode int, errMsg string, err error) {
-	// Check if the error message should be replaced with the actual error.
-	if strings.Contains(err.Error(), "user not found") || strings.Contains(err.Error(), "incorrect/mismatch password") {
-		errMsg = err.Error()
-	}
-
-	// Log the error message using Sentry.
-	sentry.CaptureMessage(fmt.Sprintf("[Login]: %s, %v", errMsg, err))
-
-	// Return an HTTP response with the error message.
-	c.JSON(httpCode, gin.H{
-		"code":  httpCode,
-		"error": errMsg,
 	})
 }
 
@@ -145,11 +129,9 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 
 // GetUser handles the HTTP request for getting user information.
 func (u *userHandler) GetUser(c *gin.Context) {
-	// Step 1: Get the user UUID from the claims.
-	// The user UUID is stored in the claims of the JWT token.
-	// We use the `MustGet` function to safely retrieve the value from the `Context`.
-	//userUUID := c.MustGet("userUUID").(string)
-	userUUID := "3a793ec2-0685-4708-a861-2f47cc2dd0ff"
+	//  1. Get user uuid from context
+	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+
 	// Step 2: Get the user from the database.
 	// We call the `GetUser` function from the `UserService` to retrieve the user information from the database.
 	user, err := u.userService.GetUser(userUUID)
@@ -174,9 +156,9 @@ func (u *userHandler) GetUser(c *gin.Context) {
 
 // SetActiveStatus handles the HTTP request for updating the user's is_active status
 func (u *userHandler) SetActiveStatus(c *gin.Context) {
-	// Extract the user UUID from the request.
-	//userUUID := c.Param("userUUID")
-	userUUID := "3a793ec2-0685-4708-a861-2f47cc2dd0ff"
+	//  Get user uuid from context
+	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+
 	// Define a struct to hold the request body data.
 	type RequestBody struct {
 		IsActive bool `json:"is_active"`
@@ -206,9 +188,9 @@ func (u *userHandler) SetActiveStatus(c *gin.Context) {
 
 // SetBannedStatus handles the HTTP request for updating the user's is_banned status
 func (u *userHandler) SetBannedStatus(c *gin.Context) {
-	// Extract the user UUID from the request.
-	//userUUID := c.Param("userUUID")
-	userUUID := "3a793ec2-0685-4708-a861-2f47cc2dd0ff"
+	// Get user uuid from context
+	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+
 	// Define a struct to hold the request body data.
 	type RequestBody struct {
 		IsBanned bool `json:"is_banned"`
@@ -259,6 +241,23 @@ func handleSignUpError(c *gin.Context, statusCode int, message string, err error
 		"code":    statusCode,
 		"message": message,
 		"data":    nil,
+	})
+}
+
+// handleError is a utility function to handle errors, log them, and return an appropriate HTTP response.
+func handleErrorLogin(c *gin.Context, httpCode int, errMsg string, err error) {
+	// Check if the error message should be replaced with the actual error.
+	if strings.Contains(err.Error(), "user not found") || strings.Contains(err.Error(), "incorrect/mismatch password") {
+		errMsg = err.Error()
+	}
+
+	// Log the error message using Sentry.
+	sentry.CaptureMessage(fmt.Sprintf("[Login]: %s, %v", errMsg, err))
+
+	// Return an HTTP response with the error message.
+	c.JSON(httpCode, gin.H{
+		"code":  httpCode,
+		"error": errMsg,
 	})
 }
 

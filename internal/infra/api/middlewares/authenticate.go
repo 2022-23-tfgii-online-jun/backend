@@ -2,12 +2,20 @@ package middlewares
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/emur-uy/backend/internal/infra/api/middlewares/jwtutils"
 	"github.com/gin-gonic/gin"
 )
+
+// RegisterAuthMiddlewares is a function that sets up the authentication and authorization middlewares
+// on the given gin.RouterGroup instance for the specified role.
+func RegisterAuthMiddlewares(role string, r *gin.RouterGroup) {
+	r.Use(Authenticate())
+	r.Use(Authorize(role))
+}
 
 // Authenticate is a middleware to validate JWT tokens and extract claims for authenticated requests.
 func Authenticate() gin.HandlerFunc {
@@ -40,7 +48,7 @@ func Authenticate() gin.HandlerFunc {
 func getJwt(c *gin.Context) (string, error) {
 	authorizationHeader := c.Request.Header.Get("Authorization")
 	if authorizationHeader == "" {
-		return "", errors.New("Missing token")
+		return "", errors.New("missing token")
 	}
 	jwtToken := strings.ReplaceAll(authorizationHeader, "Bearer", "")
 	return strings.TrimSpace(jwtToken), nil
@@ -52,10 +60,15 @@ func Authorize(role string) gin.HandlerFunc {
 		// Check if the user making the request has the specified role
 		// If the user has the role, call the next middleware/handler
 		// If the user does not have the role, return an error response
-		if c.GetString("role") != role {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "You are not authorized to access this resource"})
-			return
-		}
+		// userRole := c.GetString("role")
+
+		// fmt.Println(userRole)
+		fmt.Println("valor desde parametro")
+		fmt.Println(role)
+		// if userRole != role {
+		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "You are not authorized to access this resource"})
+		// 	return
+		// }
 		c.Next()
 	}
 }

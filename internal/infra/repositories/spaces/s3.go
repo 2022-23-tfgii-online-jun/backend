@@ -1,12 +1,15 @@
 package aws
 
 import (
-	configs "backend/config"
+	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	configs "github.com/emur-uy/backend/config"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
 
@@ -18,11 +21,11 @@ import (
 )
 
 // Digital Ocean Spaces Configs
-var endpoint = configs.Get().AWSENDPOINT
-var region = configs.Get().AWSREGIONAME
-var accessKey = configs.Get().AWSACCESSKEY
-var secretKey = configs.Get().AWSSECRETKEY
-var bucketName = configs.Get().AWSBUCKETNAME
+var endpoint = configs.Get().AwsEndpoint
+var region = configs.Get().AwsRegionName
+var accessKey = configs.Get().AwsAccessKey
+var secretKey = configs.Get().AwsSecretKey
+var bucketName = configs.Get().AwsBucketName
 
 var sess *session.Session
 
@@ -56,7 +59,7 @@ func UploadFileToS3(fileName, uploadPath string) (string, error) {
 	contentType := GetHeaderType(fileName)
 	file, err := os.Open(fileName)
 	if err != nil {
-		return "", fmt.Errorf("File open failed for %v, err %v", fileName, err.Error())
+		return "", fmt.Errorf("file open failed for %v, err %v", fileName, err.Error())
 	}
 	defer file.Close()
 	uploader := s3manager.NewUploader(sess)
@@ -70,9 +73,39 @@ func UploadFileToS3(fileName, uploadPath string) (string, error) {
 			// Digital Ocean Spaces encrypts data at rest automatically, no additional settings needed
 		})
 	if err != nil {
-		return "", fmt.Errorf("Unable to upload %q to %q, err %v", fileName, bucketName, err)
+		return "", fmt.Errorf("unable to upload %q to %q, err %v", fileName, bucketName, err)
 	}
 	return fmt.Sprintf("https://%s.%s.digitaloceanspaces.com/%s", bucketName, endpoint, uploadPath), nil
+}
+
+// UploadFileToS3Stream uploads a file to S3 using a stream.
+// UploadFileToS3Stream uploads a file to S3 using a stream.
+func UploadFileToS3Stream(file io.Reader, uploadPath string) (string, error) {
+	// Create a new S3 service client
+	s3Client := s3.New(sess)
+
+	// Read the entire file into a buffer (this assumes the file is not too large to fit in memory)
+	buffer := new(bytes.Buffer)
+	if _, err := io.Copy(buffer, file); err != nil {
+		return "", fmt.Errorf("failed to read file into buffer: %v", err)
+	}
+
+	// Upload the file to S3
+	input := &s3.PutObjectInput{
+		Bucket: aws.String(bucketName),
+		Key:    aws.String(uploadPath),
+		Body:   bytes.NewReader(buffer.Bytes()),
+	}
+
+	_, err := s3Client.PutObject(input)
+	if err != nil {
+		return "", fmt.Errorf("failed to upload file to S3: %v", err)
+	}
+
+	// Generate the URL of the uploaded file
+	fileURL := fmt.Sprintf("https://%s.%s.digitaloceanspaces.com/%s", bucketName, endpoint, uploadPath)
+
+	return fileURL, nil
 }
 
 // GetFileLinkUsingKey generates a pre-signed URL for the specified bucket path (uploadPath) with an expiration time
@@ -86,7 +119,7 @@ func GetFileLinkUsingKey(uploadPath string, expirySeconds int) (string, error) {
 	urlStr, err := req.Presign(time.Duration(expirySeconds) * time.Second)
 
 	if err != nil {
-		return "", fmt.Errorf("Unable to get presigned link for %q, err %v", uploadPath, err)
+		return "", fmt.Errorf("unable to get presigned link for %q, err %v", uploadPath, err)
 	}
 	return urlStr, err
 }
@@ -97,7 +130,7 @@ func GetFileFromS3(fileName, outPath string) (string, error) {
 	outFile := filepath.Join(outPath, fileName)
 	file, err := os.Create(outFile)
 	if err != nil {
-		return "", fmt.Errorf("Not able to create file, err : %v", err)
+		return "", fmt.Errorf("not able to create file, err : %v", err)
 	}
 	defer file.Close()
 	_, err = downloader.Download(file,
@@ -106,7 +139,7 @@ func GetFileFromS3(fileName, outPath string) (string, error) {
 			Key:    aws.String(fileName),
 		})
 	if err != nil {
-		return "", fmt.Errorf("Unable to get %q from %q, err %v", fileName, bucketName, err)
+		return "", fmt.Errorf("unable to get %q from %q, err %v", fileName, bucketName, err)
 	}
 	return outFile, nil
 }
@@ -117,7 +150,7 @@ func GetFileFromS3WithFileName(fileName, outPath, customFileName string) (string
 	outFile := filepath.Join(outPath, customFileName)
 	file, err := os.Create(outFile)
 	if err != nil {
-		return "", fmt.Errorf("Not able to create file, err : %v", err)
+		return "", fmt.Errorf("not able to create file, err : %v", err)
 	}
 	defer file.Close()
 	_, err = downloader.Download(file,
@@ -126,7 +159,7 @@ func GetFileFromS3WithFileName(fileName, outPath, customFileName string) (string
 			Key:    aws.String(fileName),
 		})
 	if err != nil {
-		return "", fmt.Errorf("Unable to get %q from %q, err %v", fileName, bucketName, err)
+		return "", fmt.Errorf("unable to get %q from %q, err %v", fileName, bucketName, err)
 	}
 	return outFile, nil
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
+	aws "github.com/emur-uy/backend/internal/infra/repositories/spaces"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,11 +20,17 @@ func RunServer(address string) {
 	// Set CORS configuration as default for all routes
 	server.Use(CORS())
 
+	//start aws services
+	err := aws.Init()
+	if err != nil {
+		log.Fatalf("error initializing aws services: %s", err)
+	}
+
 	// Register all API routes
 	RegisterRoutes(server)
 
 	// Start running the server on the specified address
-	err := server.Run(address)
+	err = server.Run(address)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

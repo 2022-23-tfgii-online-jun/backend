@@ -27,6 +27,12 @@ type Config struct {
 	SecretKey        string `mapstructure:"SECRET_KEY"`
 	JWTTokenKey      string `mapstructure:"JWT_TOKEN_KEY"`
 	JWTTokenExpired  int    `mapstructure:"JWT_TOKEN_EXPIRED"`
+	AwsBucketName    string `mapstructure:"AWS_BUCKET_NAME"`
+	AwsFolderName    string `mapstructure:"AWS_FOLDER_NAME"`
+	AwsRegionName    string `mapstructure:"AWS_REGION_NAME"`
+	AwsAccessKey     string `mapstructure:"AWS_ACCESS_KEY"`
+	AwsSecretKey     string `mapstructure:"AWS_SECRET_KEY"`
+	AwsEndpoint      string `mapstructure:"AWS_ENDPOINT"`
 }
 
 // Get returns the configuration instance.

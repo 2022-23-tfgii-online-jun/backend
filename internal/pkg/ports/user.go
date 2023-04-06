@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
+	"github.com/google/uuid"
 )
 
 var ErrUserNotFound = errors.New("user not found")
@@ -11,7 +12,7 @@ var ErrUserNotFound = errors.New("user not found")
 // UserRepository is an interface that represents the contract that any data access
 // implementation must satisfy in order to interact with user data.
 type UserRepository interface {
-	FindByUUID(uuid string) (*entity.User, error)
+	FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error)
 
 	// CreateWithOmit creates a new user record while omitting specific fields.
 	// Returns an error if the operation fails.
@@ -47,15 +48,15 @@ type UserService interface {
 
 	// GetUser retrieves user information for the user with the provided UUID.
 	// If the user is not found in the database, the error returned should be `ports.ErrUserNotFound`.
-	GetUser(userUUID string) (*entity.User, error)
+	GetUser(userUUID uuid.UUID) (*entity.User, error)
 
 	// UpdateActiveStatus updates the is_active status of the user with the provided UUID.
 	// Returns an HTTP status code and an error (if any).
-	UpdateActiveStatus(userUUID string, isActive bool) (int, error)
+	UpdateActiveStatus(userUUID uuid.UUID, isActive bool) (int, error)
 
 	// UpdateBannedStatus updates the is_banned status of the user with the provided UUID.
 	// Returns an HTTP status code and an error (if any).
-	UpdateBannedStatus(userUUID string, isBanned bool) (int, error)
+	UpdateBannedStatus(userUUID uuid.UUID, isBanned bool) (int, error)
 
 	// GetUserRole retrieves user role information for the user with the provided ID.
 	GetUserRole(userID int) (*entity.UserRole, error)

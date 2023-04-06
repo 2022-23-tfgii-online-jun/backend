@@ -72,9 +72,9 @@ func (m *MockUserRepository) UpdateColumns(value interface{}, column string, upd
 }
 
 // FindByUUID is a mock implementation of the FindByUUID method.
-func (m *MockUserRepository) FindByUUID(userUUID string) (*entity.User, error) {
+func (m *MockUserRepository) FindByUUID(userUUID string, out interface{}) (interface{}, error) {
 	if userUUID == testUuid.String() {
-		return &entity.User{
+		user := &entity.User{
 			ID:        1,
 			UUID:      testUuid,
 			Email:     "test@example.com",
@@ -82,7 +82,15 @@ func (m *MockUserRepository) FindByUUID(userUUID string) (*entity.User, error) {
 			IsActive:  true,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-		}, nil
+		}
+		out.(*entity.User).ID = user.ID
+		out.(*entity.User).UUID = user.UUID
+		out.(*entity.User).Email = user.Email
+		out.(*entity.User).Password = user.Password
+		out.(*entity.User).IsActive = user.IsActive
+		out.(*entity.User).CreatedAt = user.CreatedAt
+		out.(*entity.User).UpdatedAt = user.UpdatedAt
+		return user, nil
 	}
 	return nil, errors.New("user not found")
 }
