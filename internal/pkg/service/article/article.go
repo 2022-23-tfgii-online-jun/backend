@@ -96,7 +96,7 @@ func processUploadRequestFile(s *service, c *gin.Context) (int, string, error) {
 
 	// Upload the image to S3 directly from the source stream
 	uploadPath := fmt.Sprintf("%s/%s", config.Get().AwsFolderName, fmt.Sprintf("%s%s", fileNameUuid.String(), fileExt))
-	url, err := aws.UploadFileToS3Stream(src, uploadPath)
+	url, err := aws.UploadFileToS3Stream(src, uploadPath, true)
 	if err != nil || url == "" {
 		return http.StatusInternalServerError, "", fmt.Errorf("s3 upload error: %s", err.Error())
 	}

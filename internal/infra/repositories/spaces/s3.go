@@ -75,12 +75,11 @@ func UploadFileToS3(fileName, uploadPath string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("unable to upload %q to %q, err %v", fileName, bucketName, err)
 	}
-	return fmt.Sprintf("https://%s.%s.digitaloceanspaces.com/%s", bucketName, endpoint, uploadPath), nil
+	return fmt.Sprintf("https://%s.%s/%s", bucketName, endpoint, uploadPath), nil
 }
 
 // UploadFileToS3Stream uploads a file to S3 using a stream.
-// UploadFileToS3Stream uploads a file to S3 using a stream.
-func UploadFileToS3Stream(file io.Reader, uploadPath string) (string, error) {
+func UploadFileToS3Stream(file io.Reader, uploadPath string, isPublic bool) (string, error) {
 	// Create a new S3 service client
 	s3Client := s3.New(sess)
 
@@ -90,11 +89,18 @@ func UploadFileToS3Stream(file io.Reader, uploadPath string) (string, error) {
 		return "", fmt.Errorf("failed to read file into buffer: %v", err)
 	}
 
+	// Define the ACL based on the isPublic parameter
+	acl := "private"
+	if isPublic {
+		acl = "public-read"
+	}
+
 	// Upload the file to S3
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(uploadPath),
 		Body:   bytes.NewReader(buffer.Bytes()),
+		ACL:    aws.String(acl),
 	}
 
 	_, err := s3Client.PutObject(input)
@@ -103,7 +109,7 @@ func UploadFileToS3Stream(file io.Reader, uploadPath string) (string, error) {
 	}
 
 	// Generate the URL of the uploaded file
-	fileURL := fmt.Sprintf("https://%s.%s.digitaloceanspaces.com/%s", bucketName, endpoint, uploadPath)
+	fileURL := fmt.Sprintf("https://%s.%s/%s", bucketName, endpoint, uploadPath)
 
 	return fileURL, nil
 }
