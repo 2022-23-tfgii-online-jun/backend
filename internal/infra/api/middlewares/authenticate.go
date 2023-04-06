@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -60,15 +59,11 @@ func Authorize(role string) gin.HandlerFunc {
 		// Check if the user making the request has the specified role
 		// If the user has the role, call the next middleware/handler
 		// If the user does not have the role, return an error response
-		// userRole := c.GetString("role")
-
-		// fmt.Println(userRole)
-		fmt.Println("valor desde parametro")
-		fmt.Println(role)
-		// if userRole != role {
-		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "You are not authorized to access this resource"})
-		// 	return
-		// }
+		userRole := c.GetString("role")
+		if userRole != role {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "You are not authorized to access this resource"})
+			return
+		}
 		c.Next()
 	}
 }
