@@ -22,7 +22,7 @@ type ArticleRepository interface {
 	// Returns an error if the operation fails.
 	First(out interface{}, conditions ...interface{}) error
 
-	//Delete(article *entity.Article) error
+	Delete(out interface{}) error
 	//Find(articles *[]entity.Article, query interface{}, args ...interface{}) error
 }
 
@@ -30,7 +30,7 @@ type ArticleRepository interface {
 type ArticleService interface {
 	CreateArticle(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateArticle) (int, error)
 	//UpdateArticle(updateReq *entity.UpdateArticle) error
-	//DeleteArticle(articleID uint) error
+	DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, error)
 	//GetArticleByID(articleID uint) (*entity.Article, error)
 	//GetAllArticles() ([]entity.Article, error)
 }

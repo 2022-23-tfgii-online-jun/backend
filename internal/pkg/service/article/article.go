@@ -63,6 +63,33 @@ func (s *service) CreateArticle(c *gin.Context, userUUID uuid.UUID, createReq *e
 	return http.StatusOK, nil
 }
 
+// DeleteArticle deletes an article from the database by its UUID.
+func (s *service) DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, error) {
+	// Retrieve the article from the repository by its UUID.
+	article := &entity.Article{}
+	foundArticle, err := s.repo.FindByUUID(articleUUID, article)
+	if err != nil {
+		// Return an error response if the article is not found.
+		return http.StatusNotFound, fmt.Errorf("article not found")
+	}
+
+	// Perform type assertion to convert foundArticle to *entity.Article.
+	article, ok := foundArticle.(*entity.Article)
+	if !ok {
+		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+	}
+
+	// Delete the article from the repository.
+	err = s.repo.Delete(article)
+	if err != nil {
+		// Return an error response if there was an issue deleting the article.
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete article")
+	}
+
+	// Return a success response.
+	return http.StatusOK, nil
+}
+
 // processUploadRequestFile processes the file upload request
 func processUploadRequestFile(s *service, c *gin.Context) (int, string, error) {
 	// Parse the multipart form

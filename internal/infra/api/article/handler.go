@@ -49,6 +49,25 @@ func (a *articleHandler) CreateArticle(c *gin.Context) {
 	})
 }
 
+// DeleteArticle handler for deleting an article
+func (a *articleHandler) DeleteArticle(c *gin.Context) {
+	// Get article uuid from path parameter
+	articleUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.Param("uuid")))
+
+	// Delete the article from the database.
+	statusCode, err := a.articleService.DeleteArticle(c, articleUUID)
+	if err != nil {
+		handleError(c, statusCode, "An error occurred while deleting the article", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Article deleted successfully",
+	})
+}
+
 // handleError is a generic error handler that logs the error and responds
 func handleError(c *gin.Context, statusCode int, message string, err error) {
 	// Log the error message and the error itself
