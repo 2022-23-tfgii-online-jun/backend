@@ -94,14 +94,12 @@ func (c *Client) First(dest interface{}, conditions ...interface{}) error {
 	return nil
 }
 
-// Delete deletes a record from the database based on the provided UUID.
-// This function deletes a record from the database using the given UUID and returns an error if the operation fails.
+// Delete deletes a record from the database based on the provided interface{}.
+// This function deletes a record from the database using the given interface{} and returns an error if the operation fails.
 func (c *Client) Delete(out interface{}) error {
-	// Delete the record from the database
 	err := c.db.Delete(out).Error
 	if err != nil {
 		return errors.New("failed to delete record: " + err.Error())
 	}
-
 	return nil
 }
