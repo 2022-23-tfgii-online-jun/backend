@@ -63,6 +63,46 @@ func (s *service) CreateArticle(c *gin.Context, userUUID uuid.UUID, createReq *e
 	return http.StatusOK, nil
 }
 
+// GetAllArticles returns all articles stored in the database
+func (s *service) GetAllArticles() ([]*entity.Article, error) {
+	// Get all articles from the database
+	var articles []*entity.Article
+	if err := s.repo.Find(&articles); err != nil { // Removido .Error después de s.repo.Find()
+		return nil, err
+	}
+
+	return articles, nil
+}
+
+// UpdateArticle is the service for updating an article in the database
+func (s *service) UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequesUpdateArticle) (int, error) {
+	// Find the existing article by UUID
+	article := &entity.Article{}
+	foundArticle, err := s.repo.FindByUUID(articleUUID, article)
+	if err != nil {
+		// Return error if the article is not found
+		return http.StatusNotFound, err
+	}
+	// Perform type assertion to convert foundArticle to *entity.Article
+	article, ok := foundArticle.(*entity.Article)
+	if !ok {
+		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+	}
+
+	// Update the article fields with the new data from the update request
+	article.Title = updateReq.Title
+	article.Content = updateReq.Content
+
+	// Update the article in the database
+	err = s.repo.Update(article)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("error updating article: %s", err)
+	}
+
+	// Return the HTTP OK status code if the update is successful
+	return http.StatusOK, nil
+}
+
 // DeleteArticle deletes an article from the database by its UUID.
 func (s *service) DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, error) {
 	// Retrieve the article from the repository by its UUID.

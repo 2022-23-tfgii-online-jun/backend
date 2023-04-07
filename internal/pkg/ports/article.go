@@ -22,6 +22,8 @@ type ArticleRepository interface {
 	// Returns an error if the operation fails.
 	First(out interface{}, conditions ...interface{}) error
 
+	Find(out interface{}, conditions ...interface{}) error
+
 	Delete(out interface{}) error
 	//Find(articles *[]entity.Article, query interface{}, args ...interface{}) error
 }
@@ -29,8 +31,8 @@ type ArticleRepository interface {
 // ArticleService is the interface that defines the methods for managing articles in the application.
 type ArticleService interface {
 	CreateArticle(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateArticle) (int, error)
-	//UpdateArticle(updateReq *entity.UpdateArticle) error
+	UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequesUpdateArticle) (int, error)
 	DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, error)
 	//GetArticleByID(articleID uint) (*entity.Article, error)
-	//GetAllArticles() ([]entity.Article, error)
+	GetAllArticles() ([]*entity.Article, error)
 }

@@ -49,6 +49,54 @@ func (a *articleHandler) CreateArticle(c *gin.Context) {
 	})
 }
 
+// GetAllArticles handles the HTTP request for getting all articles.
+func (a *articleHandler) GetAllArticles(c *gin.Context) {
+	// Get all articles from the database.
+	articles, err := a.articleService.GetAllArticles()
+	if err != nil {
+		handleError(c, http.StatusInternalServerError, "An error occurred while getting the articles", err)
+		return
+	}
+
+	// Return a successful response with the retrieved articles.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Articles retrieved successfully",
+		"data":    articles,
+	})
+}
+
+// UpdateArticle handler for updating an article
+func (a *articleHandler) UpdateArticle(c *gin.Context) {
+	// Parse the article UUID from the URL parameter.
+	articleUUID, err := uuid.Parse(c.Param("uuid"))
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid UUID format", err)
+		return
+	}
+
+	// Bind the incoming JSON payload to an UpdateArticle struct.
+	reqUpdate := &entity.RequesUpdateArticle{}
+	if err := c.ShouldBind(reqUpdate); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input", err)
+		return
+	}
+
+	// Update the article in the database.
+	updatedArticle, err := a.articleService.UpdateArticle(articleUUID, reqUpdate)
+	if err != nil {
+		handleError(c, http.StatusInternalServerError, "An error occurred while updating the article", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Article updated successfully",
+		"data":    updatedArticle,
+	})
+}
+
 // DeleteArticle handler for deleting an article
 func (a *articleHandler) DeleteArticle(c *gin.Context) {
 	// Get article uuid from path parameter

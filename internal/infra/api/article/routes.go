@@ -28,4 +28,9 @@ func RegisterRoutes(e *gin.Engine) {
 	adminRoutes := articleRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
 	adminRoutes.POST("", handler.CreateArticle)
 	adminRoutes.DELETE("/:uuid", handler.DeleteArticle)
+	adminRoutes.PUT("/:uuid", handler.UpdateArticle)
+
+	// Register route for getting all articles accessible to both admin and user roles.
+	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
+	articleRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllArticles)
 }

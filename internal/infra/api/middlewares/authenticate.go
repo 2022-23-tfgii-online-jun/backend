@@ -54,13 +54,22 @@ func getJwt(c *gin.Context) (string, error) {
 }
 
 // Authorize is Authorization middleware to validate roles for API calls
-func Authorize(role string) gin.HandlerFunc {
+func Authorize(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if the user making the request has the specified role
-		// If the user has the role, call the next middleware/handler
-		// If the user does not have the role, return an error response
+		// Check if the user making the request has any of the specified roles
+		// If the user has any of the roles, call the next middleware/handler
+		// If the user does not have any of the roles, return an error response
 		userRole := c.GetString("role")
-		if userRole != role {
+
+		authorized := false
+		for _, role := range allowedRoles {
+			if userRole == role {
+				authorized = true
+				break
+			}
+		}
+
+		if !authorized {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "You are not authorized to access this resource"})
 			return
 		}

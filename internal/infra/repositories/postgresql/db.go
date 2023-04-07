@@ -94,6 +94,11 @@ func (c *Client) First(dest interface{}, conditions ...interface{}) error {
 	return nil
 }
 
+// Find return records that match given conditions.
+func (c *Client) Find(dest interface{}, conditions ...interface{}) error {
+	return c.db.Find(dest, conditions...).Error
+}
+
 // Delete deletes a record from the database based on the provided interface{}.
 // This function deletes a record from the database using the given interface{} and returns an error if the operation fails.
 func (c *Client) Delete(out interface{}) error {

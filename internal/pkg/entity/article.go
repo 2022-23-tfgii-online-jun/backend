@@ -24,9 +24,14 @@ type Article struct {
 	CreatedAt   time.Time `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
 }
 
-// Article represents a struct for articles
 // RequestCreateArticle represents a struct for creating articles
 type RequestCreateArticle struct {
+	Title   string `form:"title" binding:"required"`
+	Content string `form:"content" binding:"required"`
+}
+
+// RequesUpdateArticle represents a struct for creating articles
+type RequesUpdateArticle struct {
 	Title   string `form:"title" binding:"required"`
 	Content string `form:"content" binding:"required"`
 }
