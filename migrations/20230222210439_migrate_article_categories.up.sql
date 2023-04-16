@@ -1,10 +1,7 @@
-CREATE TABLE IF NOT EXISTS article_categories (
+CREATE TABLE IF NOT EXISTS article_category (
     id BIGSERIAL NOT NULL PRIMARY KEY,
-    category_id INT NOT NULL,
     article_id INT NOT NULL,
-    image TEXT DEFAULT NULL,
-    content TEXT DEFAULT NULL,
-    is_published BOOLEAN DEFAULT false,
+    category_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT FK_categorie FOREIGN KEY(category_id)

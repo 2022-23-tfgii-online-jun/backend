@@ -4,7 +4,7 @@ import (
 	"errors" // Importing errors package for error handling
 	"fmt"
 
-	"github.com/emur-uy/backend/internal/pkg/entity"
+	"github.com/google/uuid"
 	"gorm.io/gorm" // Importing gorm package for database ORM
 )
 
@@ -20,17 +20,19 @@ func NewClient() *Client {
 	}
 }
 
-func (r *Client) FindByUUID(uuid string) (*entity.User, error) {
-	user := &entity.User{}
-	err := r.db.Where("uuid = ?", uuid).First(user).Error
+// FindByUUID retrieves a record from the database based on the provided UUID and assigns the result to the provided out interface.
+// Returns the out interface and an error if the record is not found or if there is any issue during the query execution.
+func (r *Client) FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error) {
+	// Query the database for the record with the specified UUID and store the result in the out interface
+	err := r.db.Where("uuid = ?", uuid).First(out).Error
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("user not found")
+			return nil, fmt.Errorf("record not found")
 		}
 		return nil, err
 	}
-	return user, nil
+	return out, nil
 }
 
 // Create stores a new record in the database.
@@ -88,6 +90,21 @@ func (c *Client) First(dest interface{}, conditions ...interface{}) error {
 	err := c.db.First(dest, conditions...).Error
 	if err != nil {
 		return errors.New("failed to retrieve first record: " + err.Error())
+	}
+	return nil
+}
+
+// Find return records that match given conditions.
+func (c *Client) Find(dest interface{}, conditions ...interface{}) error {
+	return c.db.Find(dest, conditions...).Error
+}
+
+// Delete deletes a record from the database based on the provided interface{}.
+// This function deletes a record from the database using the given interface{} and returns an error if the operation fails.
+func (c *Client) Delete(out interface{}) error {
+	err := c.db.Delete(out).Error
+	if err != nil {
+		return errors.New("failed to delete record: " + err.Error())
 	}
 	return nil
 }

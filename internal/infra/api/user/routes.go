@@ -2,41 +2,38 @@ package user
 
 import (
 	"github.com/emur-uy/backend/internal/infra/api/middlewares"
+	"github.com/emur-uy/backend/internal/infra/api/middlewares/constants"
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
 	"github.com/emur-uy/backend/internal/pkg/service/user"
 	"github.com/gin-gonic/gin"
 )
 
-// Define roles
-const (
-	RoleAdmin = "admin"
-	RoleUser  = "user"
-)
-
-// RegisterRoutes is a function that sets up the user-related routes on the given gin.Engine instance.
-// It initializes the necessary components, such as the repository, service, and handler, to handle
-// user-related operations in a hexagonal architecture.
+// RegisterRoutes sets up the user-related routes on the given gin.Engine instance.
+// It initializes the necessary components, such as the repository, service, and handler,
+// to handle user-related operations in a hexagonal architecture.
 func RegisterRoutes(e *gin.Engine) {
-	// Step 1: Initialize the repository by creating a new PostgreSQL client.
+	// Initialize the repository by creating a new PostgreSQL client.
 	repo := postgresql.NewClient()
 
-	// Step 2: Create a new UserService instance by injecting the repository.
+	// Create a new UserService instance by injecting the repository.
 	service := user.NewService(repo)
 
-	// Step 3: Create a new userHandler instance by injecting the UserService.
+	// Create a new userHandler instance by injecting the UserService.
 	handler := newHandler(service)
 
-	// Step 4: Register the SignUp route with the handler.
+	// Register the SignUp and Login routes with the handler.
 	e.GET("/api/v1/users/login", handler.Login)
 	e.POST("/api/v1/users", handler.SignUp)
 
-	//these below APIs need authentication and authorization
-	e.Use(middlewares.Authenticate())
-	e.Use(middlewares.Authorize(RoleUser))
-	e.PATCH("/api/v1/users", handler.UpdateUser)
-	e.GET("/api/v1/users", handler.GetUser)
+	// Group the user routes together.
+	userRoutes := e.Group("/api/v1/users")
 
-	e.Use(middlewares.Authorize(RoleAdmin))
-	e.PUT("/api/v1/users/active", handler.SetActiveStatus)
-	e.PUT("/api/v1/users/banned", handler.SetBannedStatus)
+	// Register admin routes requiring authentication and authorization for admin role.
+	adminRoutes := userRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
+	adminRoutes.PUT("/active", handler.SetActiveStatus)
+	adminRoutes.PUT("/banned", handler.SetBannedStatus)
+
+	// Register user routes requiring authentication and authorization for user role.
+	userRoutes.PATCH("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser), handler.UpdateUser)
+	userRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser), handler.GetUser)
 }
