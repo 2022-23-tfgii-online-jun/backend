@@ -4,6 +4,7 @@ import (
 	healthcheck "github.com/RaMin0/gin-health-check" // Importing health check package for gin
 	"github.com/emur-uy/backend/internal/infra/api/article"
 	"github.com/emur-uy/backend/internal/infra/api/category"
+	"github.com/emur-uy/backend/internal/infra/api/question"
 	"github.com/emur-uy/backend/internal/infra/api/user"
 	"github.com/gin-gonic/gin" // Importing gin package for http web framework
 )
@@ -21,4 +22,5 @@ func RegisterRoutes(e *gin.Engine) {
 	user.RegisterRoutes(e)
 	article.RegisterRoutes(e)
 	category.RegisterRoutes(e)
+	question.RegisterRoutes(e)
 }
