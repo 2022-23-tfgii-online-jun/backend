@@ -116,6 +116,31 @@ func (a *articleHandler) DeleteArticle(c *gin.Context) {
 	})
 }
 
+// AddArticleToCategory handler for adding an article to a category
+func (a *articleHandler) AddArticleToCategory(ctx *gin.Context) {
+	// Declare a variable for the incoming request payload
+	req := &entity.AddArticleToCategoryRequest{}
+
+	// Bind incoming JSON payload to the req struct
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		handleError(ctx, http.StatusBadRequest, "Invalid input", err)
+		return
+	}
+
+	// Call the service to add the article to the category
+	err := a.articleService.AddArticleToCategory(req.Category, req.Article)
+	if err != nil {
+		handleError(ctx, http.StatusInternalServerError, "An error occurred while adding the article to the category", err)
+		return
+	}
+
+	// Return a successful response
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Article added to Category successfully",
+	})
+}
+
 // handleError is a generic error handler that logs the error and responds
 func handleError(c *gin.Context, statusCode int, message string, err error) {
 	// Log the error message and the error itself

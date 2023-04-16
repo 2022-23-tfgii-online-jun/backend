@@ -130,6 +130,39 @@ func (s *service) DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, err
 	return http.StatusOK, nil
 }
 
+// AddArticleToCategory is the service for adding an article to a category and saving the relationship in the database
+func (s *service) AddArticleToCategory(categoryUUID uuid.UUID, articleUUID uuid.UUID) error {
+	// Check if the article and category exist
+	article := &entity.Article{}
+	category := &entity.Category{}
+
+	_, err := s.repo.FindByUUID(articleUUID, article)
+	if err != nil {
+		return fmt.Errorf("error finding article: %s", err)
+	}
+
+	_, err = s.repo.FindByUUID(categoryUUID, category)
+	if err != nil {
+		return fmt.Errorf("error finding category: %s", err)
+	}
+
+	// Save the relationship between the article and the category to the database
+
+	articleCategory := entity.ArticleCategory{
+		ArticleID:  article.ID,
+		CategoryID: category.ID,
+	}
+
+	// 3. Make a relation between emission with newspaper
+
+	err = s.repo.Create(&articleCategory)
+	if err != nil {
+		return fmt.Errorf("error adding article to category: %s", err)
+	}
+
+	return nil
+}
+
 // processUploadRequestFile processes the file upload request
 func processUploadRequestFile(s *service, c *gin.Context) (int, string, error) {
 	// Parse the multipart form

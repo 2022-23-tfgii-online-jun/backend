@@ -29,6 +29,7 @@ func RegisterRoutes(e *gin.Engine) {
 	adminRoutes.POST("", handler.CreateArticle)
 	adminRoutes.DELETE("/:uuid", handler.DeleteArticle)
 	adminRoutes.PUT("/:uuid", handler.UpdateArticle)
+	adminRoutes.POST("/categories", handler.AddArticleToCategory)
 
 	// Register route for getting all articles accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}

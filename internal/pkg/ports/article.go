@@ -10,6 +10,8 @@ import (
 type ArticleRepository interface {
 	FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error)
 
+	Create(value interface{}) error
+
 	// CreateWithOmit creates a new user record while omitting specific fields.
 	// Returns an error if the operation fails.
 	CreateWithOmit(omit string, value interface{}) error
@@ -26,6 +28,11 @@ type ArticleRepository interface {
 
 	Delete(out interface{}) error
 	//Find(articles *[]entity.Article, query interface{}, args ...interface{}) error
+
+	// AddArticleToCategory creates a relationship between an article and a category.
+	//	AddArticleToCategory(articleID uuid.UUID, categoryID uuid.UUID) error
+
+	//AddArticleToCategory(article interface{}, category interface{}) error
 }
 
 // ArticleService is the interface that defines the methods for managing articles in the application.
@@ -35,4 +42,6 @@ type ArticleService interface {
 	DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, error)
 	//GetArticleByID(articleID uint) (*entity.Article, error)
 	GetAllArticles() ([]*entity.Article, error)
+
+	AddArticleToCategory(articleUUID uuid.UUID, categoryUUID uuid.UUID) error
 }
