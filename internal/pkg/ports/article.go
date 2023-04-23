@@ -38,7 +38,7 @@ type ArticleRepository interface {
 // ArticleService is the interface that defines the methods for managing articles in the application.
 type ArticleService interface {
 	CreateArticle(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateArticle) (int, error)
-	UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequesUpdateArticle) (int, error)
+	UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequestUpdateArticle) (int, error)
 	DeleteArticle(c *gin.Context, articleUUID uuid.UUID) (int, error)
 	//GetArticleByID(articleID uint) (*entity.Article, error)
 	GetAllArticles() ([]*entity.Article, error)

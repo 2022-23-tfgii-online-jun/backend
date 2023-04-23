@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS answers (
     uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     user_id INT NOT NULL,
     question_id INT NOT NULL,
-    response TEXT DEFAULT NULL,
+    text TEXT NOT NULL,
     is_public BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

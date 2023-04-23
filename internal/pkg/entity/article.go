@@ -30,8 +30,8 @@ type RequestCreateArticle struct {
 	Content string `form:"content" binding:"required"`
 }
 
-// RequesUpdateArticle represents a struct for creating articles
-type RequesUpdateArticle struct {
+// RequestUpdateArticle represents a struct for creating articles
+type RequestUpdateArticle struct {
 	Title   string `form:"title" binding:"required"`
 	Content string `form:"content" binding:"required"`
 }

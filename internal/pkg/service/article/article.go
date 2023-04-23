@@ -75,7 +75,7 @@ func (s *service) GetAllArticles() ([]*entity.Article, error) {
 }
 
 // UpdateArticle is the service for updating an article in the database
-func (s *service) UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequesUpdateArticle) (int, error) {
+func (s *service) UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequestUpdateArticle) (int, error) {
 	// Find the existing article by UUID
 	article := &entity.Article{}
 	foundArticle, err := s.repo.FindByUUID(articleUUID, article)
