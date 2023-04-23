@@ -22,7 +22,7 @@ func NewService(answerRepo ports.AnswerRepository) ports.AnswerService {
 }
 
 // CreateAnswer is the service for creating an answer and saving it in the database
-func (s *service) CreateAnswer(c *gin.Context, userUUID uuid.UUID, questionUUID string, createReq *entity.RequestCreateAnswer) (int, error) {
+func (s *service) CreateAnswer(c *gin.Context, userUUID uuid.UUID, questionUUID uuid.UUID, createReq *entity.RequestCreateAnswer) (int, error) {
 	user := &entity.User{}
 
 	// Find user by UUID
@@ -39,7 +39,7 @@ func (s *service) CreateAnswer(c *gin.Context, userUUID uuid.UUID, questionUUID 
 	question := &entity.Question{}
 
 	// Find question by UUID
-	foundQuestion, err := s.repo.FindByUUID(uuid.MustParse(questionUUID), question)
+	foundQuestion, err := s.repo.FindByUUID(questionUUID, question)
 	if err != nil {
 		// Return error if the question is not found
 		return http.StatusNotFound, err
@@ -54,6 +54,7 @@ func (s *service) CreateAnswer(c *gin.Context, userUUID uuid.UUID, questionUUID 
 		UserID:     user.ID,
 		QuestionID: question.ID,
 		Text:       createReq.Text,
+		IsPublic:   true,
 	}
 
 	// Save the answer to the database

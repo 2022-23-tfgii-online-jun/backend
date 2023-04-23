@@ -24,10 +24,9 @@ func RegisterRoutes(e *gin.Engine) {
 	// Group the question routes together.
 	questionRoutes := e.Group("/api/v1/questions")
 
-// Register route for getting all questions accessible to both admin and user roles.
+	// Register route for getting all questions accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	questionRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllQuestions)
 	questionRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.CreateQuestion)
-
 
 }

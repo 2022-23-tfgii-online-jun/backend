@@ -1,6 +1,7 @@
 package answer
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
@@ -30,8 +31,9 @@ func (a *answerHandler) CreateAnswer(c *gin.Context) {
 		return
 	}
 
-	questionUUID := c.Param("question_uuid")
-	if _, err := uuid.Parse(questionUUID); err != nil {
+	questionUUIDStr := c.Param("question_uuid")
+	questionUUID, err := uuid.Parse(questionUUIDStr)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": "Invalid question UUID",
@@ -47,6 +49,8 @@ func (a *answerHandler) CreateAnswer(c *gin.Context) {
 		})
 		return
 	}
+
+	fmt.Println(questionUUID)
 
 	statusCode, err := a.answerService.CreateAnswer(c, userUUID, questionUUID, &createReq)
 	if err != nil {

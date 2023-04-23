@@ -31,9 +31,8 @@ type AnswerRepository interface {
 
 // AnswerService is the interface that defines the methods for managing answers in the application.
 type AnswerService interface {
-	CreateAnswer(c *gin.Context, userUUID uuid.UUID, questionUUID uuid.UUID, createReq *entity.RequestCreateAnswer) (*entity.Answer, error)
+	CreateAnswer(c *gin.Context, userUUID uuid.UUID, questionUUID uuid.UUID, createReq *entity.RequestCreateAnswer) (int, error)
 	// UpdateAnswer(answerUUID uuid.UUID, updateReq *entity.RequestUpdateAnswer) (*entity.Answer, error)
 	// DeleteAnswer(c *gin.Context, answerUUID uuid.UUID) error
-	GetAllAnswers(questionUUID uuid.UUID) ([]*entity.Answer, error)
+	//GetAllAnswers(questionUUID uuid.UUID) ([]*entity.Answer, error)
 }
-	

@@ -18,6 +18,7 @@ type Answer struct {
 	UUID       uuid.UUID `gorm:"Column:uuid" json:"uuid"`
 	UserID     int       `gorm:"Column:user_id" json:"-"`
 	QuestionID int       `gorm:"Column:question_id" json:"-"`
+	IsPublic   bool      `gorm:"Column:is_public" json:"is_public"`
 	Text       string    `gorm:"Column:text" binding:"required" json:"text"`
 	CreatedAt  time.Time `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
 }
