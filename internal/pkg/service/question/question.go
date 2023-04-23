@@ -38,6 +38,7 @@ func (s *service) CreateQuestion(c *gin.Context, userUUID uuid.UUID, createReq *
 
 	// Create a new question
 	question := &entity.Question{
+		UserID: user.ID,
 		Text: createReq.Text,
 	}
 

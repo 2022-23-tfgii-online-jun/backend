@@ -76,7 +76,7 @@ func (a *articleHandler) UpdateArticle(c *gin.Context) {
 	}
 
 	// Bind the incoming JSON payload to an UpdateArticle struct.
-	reqUpdate := &entity.RequesUpdateArticle{}
+	reqUpdate := &entity.RequestUpdateArticle{}
 	if err := c.ShouldBind(reqUpdate); err != nil {
 		handleError(c, http.StatusBadRequest, "Invalid input", err)
 		return
