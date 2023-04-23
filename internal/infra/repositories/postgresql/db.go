@@ -108,3 +108,14 @@ func (c *Client) Delete(out interface{}) error {
 	}
 	return nil
 }
+
+func (c *Client) FindItemByIDs(firstID, secondID int, tableName string, column1Name string, column2Name string, dest interface{}) error {
+	err := c.db.Table(tableName).Where(column1Name+" = ? AND "+column2Name+" = ?", firstID, secondID).First(dest).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errors.New("error record not found: " + err.Error())
+		}
+		return err
+	}
+	return nil
+}
