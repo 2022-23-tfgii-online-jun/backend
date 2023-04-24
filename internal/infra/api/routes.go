@@ -6,6 +6,7 @@ import (
 	"github.com/emur-uy/backend/internal/infra/api/article"
 	"github.com/emur-uy/backend/internal/infra/api/category"
 	"github.com/emur-uy/backend/internal/infra/api/question"
+	"github.com/emur-uy/backend/internal/infra/api/recipe"
 	"github.com/emur-uy/backend/internal/infra/api/user"
 	"github.com/gin-gonic/gin" // Importing gin package for http web framework
 )
@@ -25,5 +26,6 @@ func RegisterRoutes(e *gin.Engine) {
 	category.RegisterRoutes(e)
 	question.RegisterRoutes(e)
 	answer.RegisterRoutes(e)
+	recipe.RegisterRoutes(e)
 
 }
