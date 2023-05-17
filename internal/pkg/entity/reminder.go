@@ -13,8 +13,8 @@ func (*Reminder) TableName() string {
 
 // Reminder represents a struct for reminders
 type Reminder struct {
+	ID           int       `gorm:"Column:id;PRIMARY_KEY" json:"-"`
 	UserID       int       `gorm:"Column:user_id" json:"-"`
-	FileID       int       `gorm:"Column:file_id" json:"-"`
 	UUID         uuid.UUID `gorm:"Column:uuid" json:"uuid"`
 	Name         string    `gorm:"Column:name" binding:"required" json:"name"`
 	Type         string    `gorm:"Column:type" binding:"required" json:"type"`
@@ -36,4 +36,14 @@ type Notification struct {
 type Task struct {
 	Name    string `gorm:"Column:name" json:"name"`
 	Checked bool   `gorm:"Column:checked" sql:"DEFAULT:0" json:"checked"`
+}
+
+// Reminder represents a struct for reminders
+type RequestCreateReminder struct {
+	Name         string    `gorm:"Column:name" binding:"required" json:"name"`
+	Type         string    `gorm:"Column:type" binding:"required" json:"type"`
+	Date         time.Time `gorm:"Column:date" binding:"required" json:"date"`
+	Notification int       `gorm:"Column:notification" json:"notification"`
+	Task         []Task    `gorm:"Column:task" json:"task"`
+	Note         string    `gorm:"Column:note" json:"note"`
 }

@@ -28,8 +28,6 @@ func (q *questionHandler) CreateQuestion(c *gin.Context) {
 	//  Get user uuid from context
 	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
 
-	fmt.Println(userUUID)
-
 	// Bind incoming form-data payload to the reqCreate struct.
 	if err := c.ShouldBind(reqCreate); err != nil {
 		handleError(c, http.StatusBadRequest, "Invalid input", err)
