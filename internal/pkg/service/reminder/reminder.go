@@ -14,13 +14,18 @@ import (
 )
 
 type service struct {
-	repo ports.ReminderRepository
+	repo                 ports.ReminderRepository
+	mediaService         ports.MediaService
+	reminderMediaService ports.ReminderMediaService
 }
 
 // NewService returns a new instance of the reminder service with the given reminder repository.
-func NewService(reminderRepo ports.ReminderRepository) ports.ReminderService {
+func NewService(reminderRepo ports.ReminderRepository, mediaService ports.MediaService,
+	reminderMediaService ports.ReminderMediaService) ports.ReminderService {
 	return &service{
-		repo: reminderRepo,
+		repo:                 reminderRepo,
+		mediaService:         mediaService,
+		reminderMediaService: reminderMediaService,
 	}
 }
 
@@ -47,12 +52,14 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 
 	// Create a new reminder
 	reminder := &entity.Reminder{
-		UserID:   user.ID,
-		Name:     createReq.Name,
-		Type:     createReq.Type,
-		Date:     createReq.Date,
-		Note:     createReq.Note,
-		IsActive: true,
+		UserID:       user.ID,
+		Name:         createReq.Name,
+		Type:         createReq.Type,
+		Date:         createReq.Date,
+		Note:         createReq.Note,
+		Notification: createReq.Notification,
+		Task:         createReq.Task,
+		IsActive:     true,
 	}
 
 	// Save the reminder to the database
@@ -66,7 +73,7 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 		media := &entity.Media{
 			MediaURL: fileUrl,
 		}
-		err = s.repo.CreateMedia(media)
+		err = s.mediaService.CreateMedia(media)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("error creating media: %s", err)
 		}
@@ -74,7 +81,7 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 			ReminderID: reminder.ID,
 			MediaID:    media.ID,
 		}
-		err = s.repo.CreateReminderMedia(reminderMedia)
+		err = s.reminderMediaService.CreateReminderMedia(reminderMedia)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("error creating reminder_media association: %s", err)
 		}

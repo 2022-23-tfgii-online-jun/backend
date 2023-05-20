@@ -1,9 +1,11 @@
 package reminder
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
@@ -28,11 +30,36 @@ func (r *reminderHandler) CreateReminder(c *gin.Context) {
 	// Get user uuid from context
 	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
 
-	// Bind incoming JSON payload to the reqCreate struct.
-	if err := c.ShouldBindJSON(reqCreate); err != nil {
-		handleError(c, http.StatusBadRequest, "Invalid input", err)
+	// Parse individual form-data fields
+	reqCreate.Name = c.PostForm("name")
+	reqCreate.Type = c.PostForm("type")
+	dateStr := c.PostForm("date")
+	layout := "02/01/2006"
+	parsedDate, err := time.Parse(layout, dateStr)
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid date format", err)
 		return
 	}
+	reqCreate.Date = parsedDate
+	reqCreate.Note = c.PostForm("note")
+
+	// Parse 'notification' form-data field
+	notificationStr := c.PostForm("notification")
+	var notifications []entity.Notification
+	if err := json.Unmarshal([]byte(notificationStr), &notifications); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input for notification", err)
+		return
+	}
+	reqCreate.Notification = notifications
+
+	// Parse 'task' form-data field
+	taskStr := c.PostForm("task")
+	var tasks []entity.Task
+	if err := json.Unmarshal([]byte(taskStr), &tasks); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input for task", err)
+		return
+	}
+	reqCreate.Task = tasks
 
 	// Create the reminder and store it in the database.
 	createdReminder, err := r.reminderService.CreateReminder(c, userUUID, reqCreate)
