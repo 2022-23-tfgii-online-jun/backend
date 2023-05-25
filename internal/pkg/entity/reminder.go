@@ -40,6 +40,8 @@ func (n *NotificationSlice) Scan(value interface{}) error {
 		return fmt.Errorf("failed to scan NotificationSlice: unexpected value type")
 	}
 
+	fmt.Println(string(jsonBytes))
+
 	// Unmarshal the JSON bytes to a NotificationSlice.
 	if err := json.Unmarshal(jsonBytes, &n); err != nil {
 		return err
@@ -99,14 +101,14 @@ type Reminder struct {
 
 // Notification represents the struct for notifications
 type Notification struct {
-	DaysOrHours string `gorm:"Column:days_or_hours" json:"days_or_hours"`
-	HoursBefore int    `gorm:"Column:hours_before" json:"hours_before"`
+	DaysOrHours string `json:"days_or_hours"`
+	HoursBefore int    `json:"hours_before"`
 }
 
 // Task represents the struct for tasks
 type Task struct {
-	Name    string `gorm:"Column:name" json:"name"`
-	Checked bool   `gorm:"Column:checked" sql:"DEFAULT:0" json:"checked"`
+	Name    string `json:"name"`
+	Checked bool   `json:"checked"`
 }
 
 // RequestCreateReminder represents a struct for RequestCreateReminder
@@ -117,4 +119,23 @@ type RequestCreateReminder struct {
 	Notification []Notification `gorm:"Column:notification" form:"notification"`
 	Task         []Task         `gorm:"Column:task" form:"task"`
 	Note         string         `gorm:"Column:note" form:"note"`
+}
+
+// GetReminderResponse represents a struct for GetReminderResponse
+type GetReminderResponse struct {
+	UUID         uuid.UUID                  `json:"uuid"`
+	Name         string                     `json:"name"`
+	Type         string                     `json:"type"`
+	Date         time.Time                  `json:"date"`
+	Notification NotificationSlice          `json:"notification"`
+	Task         TaskSlice                  `json:"task"`
+	Note         string                     `json:"note"`
+	IsActive     bool                       `json:"is_active"`
+	Media        []GetReminderMediaResponse `json:"media"`
+}
+
+// GetReminderMediaResponse represents a struct for GetReminderMediaResponse
+type GetReminderMediaResponse struct {
+	MediaURL   string `json:"media_url"`
+	MediaThumb string `json:"media_thumb"`
 }

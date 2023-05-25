@@ -2,15 +2,14 @@ package reminder
 
 import (
 	"fmt"
-	"net/http"
-	"path"
-
 	"github.com/emur-uy/backend/config"
 	aws "github.com/emur-uy/backend/internal/infra/repositories/spaces"
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"net/http"
+	"path"
 )
 
 type service struct {
@@ -89,6 +88,82 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 
 	// Return the HTTP OK status code if the update is successful
 	return http.StatusOK, nil
+}
+
+// GetAllReminders retrieves all reminders from the database
+func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity.GetReminderResponse, error) {
+	user := &entity.User{}
+
+	// Find user by UUID
+	foundUser, err := s.repo.FindByUUID(userUUID, user)
+	if err != nil {
+		// Return error if the user is not found
+		return nil, err
+	}
+	// Perform type assertion to convert foundUser to *entity.User
+	user, ok := foundUser.(*entity.User)
+	if !ok {
+		return nil, fmt.Errorf("type assertion failed")
+	}
+
+	reminders := []*entity.Reminder{}
+	// Get all reminders for this user
+	//err = s.repo.Find(user.ID, reminder)
+	err = s.repo.Find(&entity.Reminder{}, &reminders, "user_id = ?", user.ID)
+
+	response := []*entity.GetReminderResponse{}
+
+	// Get media for each reminder and prepare response
+	for _, reminder := range reminders {
+
+		getReminderResponse := &entity.GetReminderResponse{
+			UUID:         reminder.UUID,
+			Name:         reminder.Name,
+			Type:         reminder.Type,
+			Date:         reminder.Date,
+			Notification: reminder.Notification,
+			Task:         reminder.Task,
+			Note:         reminder.Note,
+			IsActive:     reminder.IsActive,
+		}
+
+		//Get reminder medias
+		reminderMedias := []*entity.ReminderMedia{}
+		err = s.repo.Find(&entity.ReminderMedia{}, &reminderMedias, "reminder_id = ?", reminder.ID)
+		if err != nil {
+			// Return error if the user is not found
+			return nil, err
+		}
+
+		reminderMediaResponses := []entity.GetReminderMediaResponse{}
+
+		//Get media details
+		for _, reminderMedia := range reminderMedias {
+			//Get media details
+			media := entity.Media{}
+			err = s.repo.Find(&entity.Media{}, &media, "id = ?", reminderMedia.MediaID)
+			if err != nil {
+				// Return error if the user is not found
+				return nil, err
+			}
+
+			//add details in response
+			reminderMediaResponse := &entity.GetReminderMediaResponse{
+				MediaURL:   media.MediaURL,
+				MediaThumb: media.MediaThumb,
+			}
+			reminderMediaResponses = append(reminderMediaResponses, *reminderMediaResponse)
+		}
+		getReminderResponse.Media = reminderMediaResponses
+		response = append(response, getReminderResponse)
+	}
+
+	if err != nil {
+		// Return error if the user is not found
+		return nil, err
+	}
+
+	return response, nil
 }
 
 // processUploadRequestFiles processes the file upload request

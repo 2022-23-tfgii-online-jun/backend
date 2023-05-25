@@ -84,3 +84,23 @@ func handleError(c *gin.Context, status int, msg string, err error) {
 		"error":   err.Error(),
 	})
 }
+
+// GetAllReminders handler for getting all reminders
+func (r *reminderHandler) GetAllReminders(c *gin.Context) {
+	// Get user uuid from context
+	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+
+	// Fetch all the reminders from the service.
+	reminders, err := r.reminderService.GetAllReminders(c, userUUID)
+	if err != nil {
+		handleError(c, http.StatusInternalServerError, "An error occurred while fetching the reminders", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Reminders fetched successfully",
+		"data":    reminders,
+	})
+}

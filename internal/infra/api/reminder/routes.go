@@ -21,10 +21,8 @@ func RegisterRoutes(e *gin.Engine) {
 
 	// Create new services
 	mediaService := media.NewService(mediaRepo)
-	reminderMediaService := reminder.NewReminderMediaService(reminderMediaRepo)              // Corrección aquí
-	reminderService := reminder.NewService(reminderRepo, mediaService, reminderMediaService) // Corrección aquí
-
-	//	reminderService := reminder.NewService(reminderRepo, mediaService, reminderMediaService)
+	reminderMediaService := reminder.NewReminderMediaService(reminderMediaRepo)
+	reminderService := reminder.NewService(reminderRepo, mediaService, reminderMediaService)
 
 	// Create a new reminderHandler instance by injecting the ReminderService.
 	handler := newHandler(reminderService)
@@ -35,4 +33,8 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register route for creating reminders accessible only to user role.
 	allowedRolesCreate := []string{constants.RoleUser}
 	reminderRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRolesCreate...), handler.CreateReminder)
+
+	// Register route for getting all reminders accessible only to user role.
+	allowedRolesGetAll := []string{constants.RoleUser}
+	reminderRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRolesGetAll...), handler.GetAllReminders)
 }

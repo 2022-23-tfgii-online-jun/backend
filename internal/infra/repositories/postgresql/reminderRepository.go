@@ -26,3 +26,14 @@ func (r *ReminderRepository) FindByUUID(uuid uuid.UUID, out interface{}) (interf
 func (r *ReminderRepository) CreateWithOmit(omitColumns string, value interface{}) error {
 	return r.client.CreateWithOmit(omitColumns, value)
 }
+
+// // Find return records that match given conditions.
+// func (r *ReminderRepository) Find(dest interface{}, conditions ...interface{}) error {
+// 	return r.client.Find(dest, conditions...)
+// }
+
+// Find return records that match given conditions.
+// Find return records that match given conditions.
+func (r *ReminderRepository) Find(model interface{}, dest interface{}, conditions ...interface{}) error {
+	return r.client.db.Model(model).Find(dest, conditions...).Error
+}
