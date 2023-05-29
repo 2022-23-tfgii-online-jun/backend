@@ -13,13 +13,13 @@ type ReminderRepository interface {
 	CreateWithOmit(omit string, value interface{}) error
 
 	Find(model interface{}, dest interface{}, conditions ...interface{}) error
-	// 	Update(value interface{}) error
+	Update(value interface{}) error
 
 	// 	First(out interface{}, conditions ...interface{}) error
 
 	// 	Find(out interface{}, conditions ...interface{}) error
 
-	//		Delete(out interface{}) error
+	Delete(out interface{}) error
 	//	}
 }
 
@@ -27,7 +27,7 @@ type ReminderRepository interface {
 type ReminderService interface {
 	CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateReminder) (int, error)
 	GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity.GetReminderResponse, error)
-	// UpdateReminder(reminderUUID uuid.UUID, updateReq *entity.RequestUpdateReminder) (int, error)
+	UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateReq *entity.RequestUpdateReminder) (int, error)
 	// DeleteReminder(c *gin.Context, reminderUUID uuid.UUID) (int, error)
 	// GetAllReminders() ([]*entity.Reminder, error)
 }

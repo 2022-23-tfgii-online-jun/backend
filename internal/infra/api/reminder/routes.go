@@ -2,7 +2,6 @@ package reminder
 
 import (
 	"github.com/emur-uy/backend/internal/infra/api/middlewares"
-	"github.com/emur-uy/backend/internal/infra/api/middlewares/constants"
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
 	"github.com/emur-uy/backend/internal/pkg/service/media"
 	"github.com/emur-uy/backend/internal/pkg/service/reminder"
@@ -31,10 +30,14 @@ func RegisterRoutes(e *gin.Engine) {
 	reminderRoutes := e.Group("/api/v1/reminders")
 
 	// Register route for creating reminders accessible only to user role.
-	allowedRolesCreate := []string{constants.RoleUser}
-	reminderRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRolesCreate...), handler.CreateReminder)
+	//allowedRolesCreate := []string{constants.RoleUser}
+	reminderRoutes.POST("", middlewares.Authenticate(), handler.CreateReminder)
 
 	// Register route for getting all reminders accessible only to user role.
-	allowedRolesGetAll := []string{constants.RoleUser}
-	reminderRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRolesGetAll...), handler.GetAllReminders)
+	//allowedRolesGetAll := []string{constants.RoleUser}
+	reminderRoutes.GET("", middlewares.Authenticate(), handler.GetAllReminders)
+
+	// Register route for updating reminder accessible only to user role.
+	//allowedRolesUpdate := []string{constants.RoleUser}
+	reminderRoutes.PUT("", middlewares.Authenticate(), handler.UpdateReminder)
 }

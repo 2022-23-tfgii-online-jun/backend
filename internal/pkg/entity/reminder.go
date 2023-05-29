@@ -139,3 +139,13 @@ type GetReminderMediaResponse struct {
 	MediaURL   string `json:"media_url"`
 	MediaThumb string `json:"media_thumb"`
 }
+
+// RequestUpdateReminder represents a struct for RequestUpdateReminder
+type RequestUpdateReminder struct {
+	Name         string         `form:"name"`
+	Type         string         `form:"type"`
+	Date         time.Time      `form:"date" time_format:"02/01/2006"`
+	Notification []Notification `form:"notification"`
+	Task         []Task         `form:"task"`
+	Note         string         `form:"note"`
+}

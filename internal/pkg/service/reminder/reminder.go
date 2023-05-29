@@ -166,6 +166,94 @@ func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity
 	return response, nil
 }
 
+// UpdateReminder is the service for updating a reminder in the database
+func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateReq *entity.RequestUpdateReminder) (int, error) {
+	// Find the existing reminder by UUID
+	reminder := &entity.Reminder{}
+	foundReminder, err := s.repo.FindByUUID(reminderUUID, reminder)
+	if err != nil {
+		// Return error if the article is not found
+		return http.StatusNotFound, err
+	}
+	// Perform type assertion to convert foundReminder to *entity.Reminder
+	reminder, ok := foundReminder.(*entity.Reminder)
+	if !ok {
+		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+	}
+
+	// Update the reminder fields with the new data from the update request
+	reminder.Name = updateReq.Name
+	reminder.Type = updateReq.Type
+	reminder.Date = updateReq.Date
+	reminder.Notification = updateReq.Notification
+	reminder.Task = updateReq.Task
+	reminder.Note = updateReq.Note
+
+	// Update the reminder in the database
+	err = s.repo.Update(reminder)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("error updating reminder: %s", err)
+	}
+
+	fileProcessCode, fileUrls, err := processUploadRequestFiles(s, c) // This now processes multiple files
+	if err != nil || fileProcessCode != http.StatusOK {
+		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file, %s", err)
+	}
+
+	//get existing reminder media data
+	reminderMedias := []*entity.ReminderMedia{}
+	err = s.repo.Find(&entity.ReminderMedia{}, &reminderMedias, "reminder_id = ?", reminder.ID)
+	if err != nil {
+		// Return error if the media is not found
+		return http.StatusInternalServerError, fmt.Errorf("error updating reminder media, %s", err)
+	}
+
+	// For each uploaded file, create a new media entry and a new reminder_media association
+	for _, fileUrl := range fileUrls {
+		media := &entity.Media{
+			MediaURL: fileUrl,
+		}
+		err = s.mediaService.CreateMedia(media)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("error creating media: %s", err)
+		}
+		reminderMedia := &entity.ReminderMedia{
+			ReminderID: reminder.ID,
+			MediaID:    media.ID,
+		}
+		err = s.reminderMediaService.CreateReminderMedia(reminderMedia)
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Errorf("error creating reminder_media association: %s", err)
+		}
+	}
+
+	//delete old media entries
+	for _, reminderMedia := range reminderMedias {
+
+		mediaID := reminderMedia.MediaID
+
+		//delete the reminderMedia entry
+		err = s.repo.Delete(reminderMedia)
+		if err != nil {
+			// Return an error response if there was an issue deleting the reminder_media.
+			return http.StatusInternalServerError, fmt.Errorf("failed to update media")
+		}
+
+		// Delete the media from the repository.
+		media := entity.Media{
+			ID: mediaID,
+		}
+		err = s.repo.Delete(media)
+		if err != nil {
+			// Return an error response if there was an issue deleting the media.
+			return http.StatusInternalServerError, fmt.Errorf("failed to update media")
+		}
+	}
+
+	// Return the HTTP OK status code if the update is successful
+	return http.StatusOK, nil
+}
+
 // processUploadRequestFiles processes the file upload request
 func processUploadRequestFiles(s *service, c *gin.Context) (int, []string, error) {
 	form, err := c.MultipartForm()

@@ -1,6 +1,7 @@
 package postgresql
 
 import (
+	"errors"
 	"github.com/emur-uy/backend/internal/pkg/ports"
 	"github.com/google/uuid"
 )
@@ -36,4 +37,23 @@ func (r *ReminderRepository) CreateWithOmit(omitColumns string, value interface{
 // Find return records that match given conditions.
 func (r *ReminderRepository) Find(model interface{}, dest interface{}, conditions ...interface{}) error {
 	return r.client.db.Model(model).Find(dest, conditions...).Error
+}
+
+func (r *ReminderRepository) Update(value interface{}) error {
+	if value == nil {
+		return errors.New("input value cannot be nil")
+	}
+	err := r.client.db.Save(value).Error
+	if err != nil {
+		return errors.New("failed to update record: " + err.Error())
+	}
+	return nil
+}
+
+func (r *ReminderRepository) Delete(out interface{}) error {
+	err := r.client.db.Delete(out).Error
+	if err != nil {
+		return errors.New("failed to delete record: " + err.Error())
+	}
+	return nil
 }

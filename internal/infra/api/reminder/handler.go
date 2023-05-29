@@ -104,3 +104,60 @@ func (r *reminderHandler) GetAllReminders(c *gin.Context) {
 		"data":    reminders,
 	})
 }
+
+// UpdateReminder handler for updating a reminder
+func (r *reminderHandler) UpdateReminder(c *gin.Context) {
+	// Parse the reminder UUID from the URL parameter.
+	reminderUUID, err := uuid.Parse(c.Query("uuid"))
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid UUID format", err)
+		return
+	}
+
+	// Bind the incoming JSON payload to an UpdateReminder struct.
+	reqUpdate := &entity.RequestUpdateReminder{}
+	// Parse individual form-data fields
+	reqUpdate.Name = c.PostForm("name")
+	reqUpdate.Type = c.PostForm("type")
+	dateStr := c.PostForm("date")
+	layout := "02/01/2006"
+	parsedDate, err := time.Parse(layout, dateStr)
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid date format", err)
+		return
+	}
+	reqUpdate.Date = parsedDate
+	reqUpdate.Note = c.PostForm("note")
+
+	// Parse 'notification' form-data field
+	notificationStr := c.PostForm("notification")
+	var notifications []entity.Notification
+	if err := json.Unmarshal([]byte(notificationStr), &notifications); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input for notification", err)
+		return
+	}
+	reqUpdate.Notification = notifications
+
+	// Parse 'task' form-data field
+	taskStr := c.PostForm("task")
+	var tasks []entity.Task
+	if err := json.Unmarshal([]byte(taskStr), &tasks); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input for task", err)
+		return
+	}
+	reqUpdate.Task = tasks
+
+	// Update the reminder in the database.
+	updatedReminder, err := r.reminderService.UpdateReminder(c, reminderUUID, reqUpdate)
+	if err != nil {
+		handleError(c, http.StatusInternalServerError, "An error occurred while updating the reminder", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Reminder updated successfully",
+		"data":    updatedReminder,
+	})
+}
