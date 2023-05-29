@@ -12,23 +12,31 @@ var ErrInvalidInput = errors.New("invalid input")
 // MediaRepository defines the interface for interacting with the media data store.
 type MediaRepository interface {
 	CreateWithOmit(omit string, value interface{}) error
+	Delete(value interface{}) error
+	Find(model interface{}, dest interface{}, conditions ...interface{}) error
 	// Any other methods you might need for media management.
 }
 
 // MediaService defines the interface for managing media in the application.
 type MediaService interface {
 	CreateMedia(media *entity.Media) error
+	DeleteMedia(media *entity.Media) error
+	FindByMediaID(id int, i *entity.Media) error
 	// Any other methods you might need for media management.
 }
 
 // ReminderMediaRepository defines the interface for interacting with the reminder_media data store.
 type ReminderMediaRepository interface {
 	Create(value interface{}) error
+	Delete(value interface{}) error
+	Find(model interface{}, dest interface{}, conditions ...interface{}) error
 	// Any other methods you might need for reminder_media management.
 }
 
 // ReminderMediaService defines the interface for managing reminder_media in the application.
 type ReminderMediaService interface {
 	CreateReminderMedia(reminderMedia *entity.ReminderMedia) error
+	DeleteReminderMedia(reminderMedia *entity.ReminderMedia) error
+	FindByReminderID(id int, i *[]*entity.ReminderMedia) error
 	// Any other methods you might need for reminder_media management.
 }

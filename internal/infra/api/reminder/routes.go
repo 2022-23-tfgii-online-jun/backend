@@ -40,4 +40,6 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register route for updating reminder accessible only to user role.
 	//allowedRolesUpdate := []string{constants.RoleUser}
 	reminderRoutes.PUT("", middlewares.Authenticate(), handler.UpdateReminder)
+
+	reminderRoutes.DELETE("", middlewares.Authenticate(), handler.DeleteReminder)
 }

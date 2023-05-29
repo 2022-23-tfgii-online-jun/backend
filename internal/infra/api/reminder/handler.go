@@ -161,3 +161,26 @@ func (r *reminderHandler) UpdateReminder(c *gin.Context) {
 		"data":    updatedReminder,
 	})
 }
+
+// DeleteReminder handler for deleting a reminder
+func (r *reminderHandler) DeleteReminder(c *gin.Context) {
+	// Parse the reminder UUID from the URL parameter.
+	reminderUUID, err := uuid.Parse(c.Query("uuid"))
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid UUID format", err)
+		return
+	}
+
+	// Delete the reminder in the database.
+	err = r.reminderService.DeleteReminder(c, reminderUUID)
+	if err != nil {
+		handleError(c, http.StatusInternalServerError, "An error occurred while deleting the reminder", err)
+		return
+	}
+
+	// Return a successful response.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Reminder deleted successfully",
+	})
+}

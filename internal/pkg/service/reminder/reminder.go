@@ -2,14 +2,15 @@ package reminder
 
 import (
 	"fmt"
+	"net/http"
+	"path"
+
 	"github.com/emur-uy/backend/config"
 	aws "github.com/emur-uy/backend/internal/infra/repositories/spaces"
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"net/http"
-	"path"
 )
 
 type service struct {
@@ -252,6 +253,65 @@ func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateR
 
 	// Return the HTTP OK status code if the update is successful
 	return http.StatusOK, nil
+}
+
+func (s *service) DeleteReminder(c *gin.Context, reminderUUID uuid.UUID) error {
+	reminder := &entity.Reminder{}
+
+	// 1. Find reminder by UUID
+	foundReminder, err := s.repo.FindByUUID(reminderUUID, reminder)
+	if err != nil {
+		// Return error if the reminder is not found
+		return err
+	}
+	// Perform type assertion to convert foundReminder to *entity.Reminder
+	reminder, ok := foundReminder.(*entity.Reminder)
+	if !ok {
+		return fmt.Errorf("type assertion failed")
+	}
+
+	// 2. Find reminder_media associations by reminder ID
+	reminderMedias := []*entity.ReminderMedia{}
+	err = s.reminderMediaService.FindByReminderID(reminder.ID, &reminderMedias)
+	if err != nil {
+		return err
+	}
+
+	// 3. Iterate over each reminder_media association
+	for _, reminderMedia := range reminderMedias {
+		media := &entity.Media{}
+		// Find the media by ID
+		err := s.mediaService.FindByMediaID(reminderMedia.MediaID, media)
+		if err != nil {
+			return err
+		}
+
+		// Delete file from S3
+		err = aws.DeleteObjectFromS3(media.MediaURL)
+		if err != nil {
+			return fmt.Errorf("failed to delete uploaded files from s3, error: %s", err.Error())
+		}
+
+		// Delete reminder_media association from db
+		err = s.reminderMediaService.DeleteReminderMedia(reminderMedia)
+		if err != nil {
+			return err
+		}
+
+		// Delete media from db
+		err = s.mediaService.DeleteMedia(media)
+		if err != nil {
+			return err
+		}
+	}
+
+	// 4. Delete reminder from db
+	err = s.repo.Delete(reminder)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // processUploadRequestFiles processes the file upload request
