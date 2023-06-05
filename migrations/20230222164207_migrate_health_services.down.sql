@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS health_services_ratings;
+DROP TABLE IF EXISTS health_services;

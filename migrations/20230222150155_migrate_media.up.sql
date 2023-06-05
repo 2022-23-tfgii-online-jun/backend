@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS media (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+    media_url TEXT NOT NULL,
+    media_thumb TEXT NOT NULL,
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

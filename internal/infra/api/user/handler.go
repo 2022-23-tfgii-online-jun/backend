@@ -60,7 +60,7 @@ func (u *userHandler) SignUp(c *gin.Context) {
 
 	// Step 1: Bind incoming JSON payload to the signUpData struct.
 	if err := c.ShouldBindJSON(signUpData); err != nil {
-		handleError(c, http.StatusBadRequest, "Invalid input", err)
+		handleError(c, http.StatusBadRequest, "invalid input", err)
 		return
 	}
 
@@ -79,9 +79,9 @@ func (u *userHandler) SignUp(c *gin.Context) {
 	// Step 3: Register the user in the database.
 	resCode, err := u.userService.CreateUser(user)
 	if err != nil {
-		errMsg := "An error occurred while creating a new user"
+		errMsg := "an error occurred while creating a new user"
 		if strings.Contains(err.Error(), "ERROR: duplicate key value violates unique constraint") {
-			errMsg = "User already exists"
+			errMsg = "user already exists"
 			resCode = http.StatusConflict
 		}
 		handleSignUpError(c, resCode, errMsg, err)
@@ -91,7 +91,7 @@ func (u *userHandler) SignUp(c *gin.Context) {
 	// Return a successful response.
 	c.JSON(http.StatusCreated, gin.H{
 		"code":    http.StatusCreated,
-		"message": "User registered successfully",
+		"message": "user registered successfully",
 		"data":    nil,
 	})
 }
@@ -102,7 +102,7 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 
 	// Step 1: Bind incoming JSON payload to the updateData struct.
 	if err := c.ShouldBindJSON(updateData); err != nil {
-		handleError(c, http.StatusBadRequest, "Invalid input", err)
+		handleError(c, http.StatusBadRequest, "invalid input", err)
 		return
 	}
 
@@ -115,14 +115,14 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 	// Step 3: Update the user in the database.
 	resCode, err := u.userService.UpdateUser(updateData)
 	if err != nil {
-		handleUserError(c, resCode, "An error occurred while updating the user", err)
+		handleUserError(c, resCode, "an error occurred while updating the user", err)
 		return
 	}
 
 	// Return a successful response.
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
-		"message": "User updated successfully",
+		"message": "user updated successfully",
 		"data":    nil,
 	})
 }
@@ -138,9 +138,9 @@ func (u *userHandler) GetUser(c *gin.Context) {
 	if err != nil {
 		// If an error occurs while retrieving the user, we return an error response to the client.
 		if errors.Is(err, ports.ErrUserNotFound) {
-			handleUserError(c, http.StatusNotFound, "User not found", err)
+			handleUserError(c, http.StatusNotFound, "user not found", err)
 		} else {
-			handleUserError(c, http.StatusInternalServerError, "An error occurred while getting the user", err)
+			handleUserError(c, http.StatusInternalServerError, "an error occurred while getting the user", err)
 		}
 		return
 	}
@@ -149,7 +149,7 @@ func (u *userHandler) GetUser(c *gin.Context) {
 	// We set the `data` field in the response directly to the user information.
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
-		"message": "User information retrieved successfully",
+		"message": "user information retrieved successfully",
 		"data":    user,
 	})
 }
@@ -167,21 +167,21 @@ func (u *userHandler) SetActiveStatus(c *gin.Context) {
 	// Parse the request body JSON.
 	var requestBody RequestBody
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		handleUserError(c, http.StatusBadRequest, "Invalid request body", err)
+		handleUserError(c, http.StatusBadRequest, "invalid request body", err)
 		return
 	}
 
 	// Update the user's is_active status in the database.
 	statusCode, err := u.userService.UpdateActiveStatus(userUUID, requestBody.IsActive)
 	if err != nil {
-		handleUserError(c, statusCode, "An error occurred while updating the user's active status", err)
+		handleUserError(c, statusCode, "an error occurred while updating the user's active status", err)
 		return
 	}
 
 	// Return a successful response.
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
-		"message": "User active status updated successfully",
+		"message": "user active status updated successfully",
 		"data":    nil,
 	})
 }
@@ -199,21 +199,21 @@ func (u *userHandler) SetBannedStatus(c *gin.Context) {
 	// Parse the request body JSON.
 	var requestBody RequestBody
 	if err := c.ShouldBindJSON(&requestBody); err != nil {
-		handleUserError(c, http.StatusBadRequest, "Invalid request body", err)
+		handleUserError(c, http.StatusBadRequest, "invalid request body", err)
 		return
 	}
 
 	// Update the user's is_banned status in the database.
 	statusCode, err := u.userService.UpdateBannedStatus(userUUID, requestBody.IsBanned)
 	if err != nil {
-		handleUserError(c, statusCode, "An error occurred while updating the user's banned status", err)
+		handleUserError(c, statusCode, "an error occurred while updating the user's banned status", err)
 		return
 	}
 
 	// Return a successful response.
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
-		"message": "User banned status updated successfully",
+		"message": "user banned status updated successfully",
 		"data":    nil,
 	})
 }
