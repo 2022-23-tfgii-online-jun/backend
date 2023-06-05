@@ -47,3 +47,20 @@ func (s *service) GetAllHealthServices() ([]*entity.HealthService, error) {
 
 	return healthServices, nil
 }
+
+// AddRatingToHealthService is the service for adding a rating to a health service.
+func (s *service) AddRatingToHealthService(rating *entity.HealthServiceRating) (int, error) {
+	// Validate the input parameters
+	if rating.HealthServiceID == 0 || rating.ReminderID == 0 {
+		return http.StatusBadRequest, fmt.Errorf("health service and reminder IDs are required")
+	}
+
+	// Save the health service rating to the database
+	err := s.repo.Create(rating)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("error adding rating to health service: %s", err)
+	}
+
+	// Return the HTTP OK status code if the operation is successful
+	return http.StatusOK, nil
+}

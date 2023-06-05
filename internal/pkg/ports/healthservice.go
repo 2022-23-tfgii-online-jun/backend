@@ -31,4 +31,5 @@ type HealthServiceRepository interface {
 type HealthServiceService interface {
 	CreateHealthService(c *gin.Context, createReq *entity.RequestCreateHealthService) (string, int, error)
 	GetAllHealthServices() ([]*entity.HealthService, error)
+	AddRatingToHealthService(rating *entity.HealthServiceRating) (int, error)
 }

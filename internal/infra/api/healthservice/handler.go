@@ -1,6 +1,7 @@
 package healthservice
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -73,5 +74,35 @@ func handleError(c *gin.Context, status int, message string, err error) {
 	c.JSON(status, gin.H{
 		"code":    status,
 		"message": message,
+	})
+}
+
+// AddRatingToHealthService handles the HTTP request for adding a rating to a health service.
+func (h *healthServiceHandler) AddRatingToHealthService(c *gin.Context) {
+	req := &entity.HealthServiceRating{}
+
+	// Bind incoming JSON payload to the req struct.
+	if err := c.ShouldBindJSON(req); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input", err)
+		return
+	}
+
+	// Validate input parameters
+	if req.HealthServiceID == 0 || req.Rating == 0 {
+		handleError(c, http.StatusBadRequest, "Invalid input", fmt.Errorf("health service ID and rating are required"))
+		return
+	}
+
+	// Call the service method to add the rating to the health service
+	status, err := h.healthService.AddRatingToHealthService(req)
+	if err != nil {
+		handleError(c, status, "An error occurred while adding the rating", err)
+		return
+	}
+
+	// Return a successful response
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Rating added successfully",
 	})
 }
