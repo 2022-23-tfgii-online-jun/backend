@@ -28,5 +28,6 @@ func RegisterRoutes(e *gin.Engine) {
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	medicalRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllMedicalRecords)
 	medicalRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.UploadCSV)
+	medicalRoutes.POST("/rating", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.AddRatingToMedical)
 
 }

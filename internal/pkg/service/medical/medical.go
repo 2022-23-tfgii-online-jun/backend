@@ -75,3 +75,20 @@ func (s *service) GetAllMedicalRecords() ([]*entity.Medical, error) {
 
 	return medicals, nil
 }
+
+// AddRatingToMedical is the service for adding a rating to a medical record.
+func (m *service) AddRatingToMedical(rating *entity.MedicalRating) (int, error) {
+	// Validate the input parameters
+	if rating.MedicalID == 0 || rating.ReminderID == 0 {
+		return http.StatusBadRequest, fmt.Errorf("medical and reminder IDs are required")
+	}
+
+	// Save the medical rating to the database
+	err := m.repo.Create(rating)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("error adding rating to medical record: %s", err)
+	}
+
+	// Return the HTTP OK status code if the operation is successful
+	return http.StatusOK, nil
+}

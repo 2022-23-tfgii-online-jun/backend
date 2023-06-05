@@ -20,4 +20,5 @@ type MedicalRepository interface {
 type MedicalService interface {
 	CreateRecordFromFile(c *gin.Context) (int, error)
 	GetAllMedicalRecords() ([]*entity.Medical, error)
+	AddRatingToMedical(rating *entity.MedicalRating) (int, error)
 }

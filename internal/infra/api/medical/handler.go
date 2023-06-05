@@ -1,9 +1,11 @@
 package medical
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
 	"github.com/gin-gonic/gin"
 )
@@ -61,5 +63,35 @@ func handleError(c *gin.Context, status int, message string, err error) {
 	c.JSON(status, gin.H{
 		"code":    status,
 		"message": message,
+	})
+}
+
+// AddRatingToMedical handles the HTTP request for adding a rating to a medical record.
+func (m *medicalHandler) AddRatingToMedical(c *gin.Context) {
+	req := &entity.MedicalRating{}
+
+	// Bind incoming json payload to the req struct.
+	if err := c.ShouldBindJSON(req); err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid input", err)
+		return
+	}
+
+	// Validate input parameters
+	if req.MedicalID == 0 || req.ReminderID == 0 {
+		handleError(c, http.StatusBadRequest, "Invalid input", fmt.Errorf("medical and reminder IDs are required"))
+		return
+	}
+
+	// Call the service method to add the rating to the medical record
+	status, err := m.medicalService.AddRatingToMedical(req)
+	if err != nil {
+		handleError(c, status, "An error occurred while adding the rating", err)
+		return
+	}
+
+	// Return a successful response
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Rating added successfully",
 	})
 }
