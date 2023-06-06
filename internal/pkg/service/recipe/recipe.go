@@ -11,7 +11,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/disintegration/imaging"
 	"github.com/emur-uy/backend/config"
@@ -54,30 +53,27 @@ func (s *service) CreateRecipe(c *gin.Context, userUUID uuid.UUID, createReq *en
 		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
 	}
 
+	// Call the processUploadRequestFile function to handle the image upload and create the media entry
+	fileProcessStatusCode, mediaID, err := processUploadRequestFile(s, c)
+	if err != nil || fileProcessStatusCode != http.StatusOK {
+		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file, %s", err)
+	}
+
 	// Create a new recipe
 	recipe := &entity.Recipe{
 		Name:        createReq.Name,
-		Description: createReq.Description,
 		Ingredients: createReq.Ingredients,
 		Elaboration: createReq.Elaboration,
-		PrepTime:    createReq.PrepTime,
-		CookTime:    createReq.CookTime,
-		Serving:     createReq.Serving,
-		Difficulty:  createReq.Difficulty,
-		Nutrition:   createReq.Nutrition,
+		Time:        createReq.Time,
 		UserID:      user.ID,
+		MediaID:     mediaID,
+		Category:    createReq.Category,
 	}
 
 	// Save the recipe to the database
 	err = s.repo.CreateWithOmit("uuid", recipe)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("error creating recipe: %s", err)
-	}
-
-	// Call the processUploadRequestFile function to handle the image upload and create the media entry
-	fileProcessCode, err := processUploadRequestFile(s, c, recipe.ID)
-	if err != nil || fileProcessCode != http.StatusOK {
-		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file, %s", err)
 	}
 
 	// Return the HTTP OK status code if the update is successful
@@ -112,7 +108,6 @@ func (s *service) UpdateRecipe(recipeUUID uuid.UUID, updateReq *entity.RequestUp
 
 	// Update the recipe fields with the new data from the update request
 	recipe.Name = updateReq.Name
-	recipe.Description = updateReq.Description
 
 	// Update the recipe in the database
 	err = s.repo.Update(recipe)
@@ -197,16 +192,16 @@ func (s *service) VoteRecipe(c *gin.Context, userUUID uuid.UUID, recipeUUID uuid
 	return http.StatusOK, s.repo.Create(recipeVote)
 }
 
-func processUploadRequestFile(s *service, c *gin.Context, recipeID int) (int, error) {
+func processUploadRequestFile(s *service, c *gin.Context) (int, int, error) {
 	// Source
 	form, err := c.MultipartForm()
 	if err != nil {
-		return http.StatusBadRequest, fmt.Errorf("get form err: %s", err.Error())
+		return http.StatusBadRequest, 0, fmt.Errorf("get form err: %s", err.Error())
 	}
 
 	files := form.File["file"]
 	if files == nil || len(files) < 1 {
-		return http.StatusBadRequest, fmt.Errorf("file not found, %s", err)
+		return http.StatusBadRequest, 0, fmt.Errorf("file not found, %s", err)
 	}
 
 	// Destination
@@ -218,13 +213,13 @@ func processUploadRequestFile(s *service, c *gin.Context, recipeID int) (int, er
 	file := files[0] // only one file expected
 	src, err := file.Open()
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to open file, %s", err)
+		return http.StatusInternalServerError, 0, fmt.Errorf("failed to open file, %s", err)
 	}
 
 	//Checking file-type, supported types are PNG and JPEG
 	fileType := file.Header.Get("Content-Type")
 	if fileType != PNG && fileType != JPEG {
-		return http.StatusBadRequest, fmt.Errorf("unsupported file type, %s", fileType)
+		return http.StatusBadRequest, 0, fmt.Errorf("unsupported file type, %s", fileType)
 	}
 
 	fileExt := path.Ext(file.Filename)
@@ -233,43 +228,42 @@ func processUploadRequestFile(s *service, c *gin.Context, recipeID int) (int, er
 	filename := fmt.Sprintf("%s/%s%s", tempDirPath, fileNameUuid.String(), fileExt)
 	dst, err := os.Create(filename)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to create file, %s", err)
+		return http.StatusInternalServerError, 0, fmt.Errorf("failed to create file, %s", err)
 	}
 	// Copy
 	if _, err = io.Copy(dst, src); err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to copy file, %s", err)
+		return http.StatusInternalServerError, 0, fmt.Errorf("failed to copy file, %s", err)
 	}
 
 	// Upload file to S3
 	uploadPath := fmt.Sprintf("%s/%s/%s", config.Get().AwsFolderName, fileNameUuid.String(), fmt.Sprintf("%s%s", fileNameUuid.String(), fileExt))
 	url, err := aws.UploadFileToS3(filename, uploadPath)
 	if err != nil || url == "" {
-		return http.StatusInternalServerError, fmt.Errorf("s3 upload error: %s", err.Error())
+		return http.StatusInternalServerError, 0, fmt.Errorf("s3 upload error: %s", err.Error())
 	}
 
 	// Get and upload thumbnail
 	thumbnailUrl, err := getAndUploadThumbnail(filename, fileType, tempDirPath, fileNameUuid.String())
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to process thumbnail for %s, %s", filename, err)
+		return http.StatusInternalServerError, 0, fmt.Errorf("failed to process thumbnail for %s, %s", filename, err)
 	}
 
 	// Create media entry in the database
 	mediaEntry := &entity.Media{
-		RecipeID:   recipeID,
-		MediaType:  strings.Split(fileType, "/")[0],
 		MediaURL:   url,
 		MediaThumb: thumbnailUrl,
 	}
 
-	err = s.repo.Create(mediaEntry)
+	err = s.repo.CreateWithOmit("uuid", mediaEntry)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error creating media entry in db %s", err)
+		return http.StatusInternalServerError, 0, fmt.Errorf("error creating media entry in db: %s", err.Error())
 	}
 
 	defer src.Close()
 	defer dst.Close()
 
-	return http.StatusOK, nil
+	// Return the media ID if the process is successful
+	return http.StatusOK, mediaEntry.ID, nil
 }
 
 func getAndUploadThumbnail(filename, fileType, tempDirPath, fileNameUuid string) (string, error) {

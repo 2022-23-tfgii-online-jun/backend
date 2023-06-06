@@ -1,17 +1,17 @@
 CREATE TABLE IF NOT EXISTS recipes (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     uuid UUID NOT NULL DEFAULT gen_random_uuid(),
+    category_id INT NOT NULL,
     user_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
-    description VARCHAR(200) NOT NULL,
-    image TEXT DEFAULT NULL,
-    ingredients json NOT NULL,
-    elaboration json NOT NULL,
-    prep_time INT DEFAULT NULL,
-    cook_time INT DEFAULT NULL,
-    serving INT DEFAULT NULL,
-    difficulty INT DEFAULT NULL,
-    nutrition json DEFAULT NULL,
+    ingredients TEXT DEFAULT NULL,
+    elaboration TEXT DEFAULT NULL,
+    time INT DEFAULT NULL,
     is_published BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    media_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT FK_media FOREIGN KEY(media_id)
+    REFERENCES media(id)
 );

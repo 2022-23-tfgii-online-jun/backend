@@ -35,6 +35,22 @@ func (r *Client) FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error
 	return out, nil
 }
 
+// FindItemByIDs retrieves a record from the database based on the provided IDs and assigns the result to the provided destination interface.
+// The tableName parameter specifies the name of the table to query.
+// The column1Name and column2Name parameters specify the names of the columns used for the IDs.
+// The dest parameter is a pointer to the destination variable where the result will be assigned.
+// Returns an error if the record is not found or if there is any issue during the query execution.
+func (c *Client) FindItemByIDs(firstID, secondID int, tableName, column1Name, column2Name string, dest interface{}) error {
+	err := c.db.Table(tableName).Where(fmt.Sprintf("%s = ? AND %s = ?", column1Name, column2Name), firstID, secondID).First(dest).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("record not found")
+		}
+		return err
+	}
+	return nil
+}
+
 // Create stores a new record in the database.
 // This function creates a new record in the database using the given value and returns an error if the operation fails.
 func (c *Client) Create(value interface{}) error {
@@ -105,17 +121,6 @@ func (c *Client) Delete(out interface{}) error {
 	err := c.db.Delete(out).Error
 	if err != nil {
 		return errors.New("failed to delete record: " + err.Error())
-	}
-	return nil
-}
-
-func (c *Client) FindItemByIDs(firstID, secondID int, tableName string, column1Name string, column2Name string, dest interface{}) error {
-	err := c.db.Table(tableName).Where(column1Name+" = ? AND "+column2Name+" = ?", firstID, secondID).First(dest).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return errors.New("error record not found: " + err.Error())
-		}
-		return err
 	}
 	return nil
 }
