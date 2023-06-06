@@ -4,10 +4,14 @@ CREATE TABLE IF NOT EXISTS recipes (
     category_id INT NOT NULL,
     user_id INT NOT NULL,
     name VARCHAR(100) NOT NULL,
-    image TEXT DEFAULT NULL,
     ingredients TEXT DEFAULT NULL,
     elaboration TEXT DEFAULT NULL,
-    time TIMESTAMP DEFAULT NULL,
+    time INT DEFAULT NULL,
     is_published BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    media_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT FK_media FOREIGN KEY(media_id)
+    REFERENCES media(id)
 );
