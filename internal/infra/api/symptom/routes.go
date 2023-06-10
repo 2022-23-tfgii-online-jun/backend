@@ -31,4 +31,10 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register route for getting all symptoms accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	symptomRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllSymptoms)
+
+	// Register user routes requiring authentication and authorization for user role.
+	userRoutes := symptomRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
+	userRoutes.POST("/add-user", handler.AddUserToSymptom)
+	userRoutes.POST("/remove-user", handler.RemoveUserFromSymptom)
+	userRoutes.GET("/user", handler.GetSymptomsByUser)
 }

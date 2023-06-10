@@ -50,6 +50,7 @@ func (s *service) GetAllHealthServices() ([]*entity.HealthService, error) {
 
 // AddRatingToHealthService is the service for adding a rating to a health service.
 func (s *service) AddRatingToHealthService(rating *entity.HealthServiceRating) (int, error) {
+
 	// Validate the input parameters
 	if rating.HealthServiceID == 0 || rating.ReminderID == 0 {
 		return http.StatusBadRequest, fmt.Errorf("health service and reminder IDs are required")

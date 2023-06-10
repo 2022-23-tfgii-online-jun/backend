@@ -9,7 +9,7 @@ import (
 // SymptomRepository is the interface that defines the methods for accessing the symptom data store.
 type SymptomRepository interface {
 	FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error)
-
+	Create(value interface{}) error
 	// Create creates a new symptom record.
 	// Returns an error if the operation fails.
 	CreateWithOmit(omit string, value interface{}) error
@@ -31,4 +31,7 @@ type SymptomRepository interface {
 type SymptomService interface {
 	CreateSymptom(c *gin.Context, createReq *entity.RequestCreateSymptom) (*entity.Symptom, int, error)
 	GetAllSymptoms() ([]*entity.Symptom, error)
+	AddUserToSymptom(userUUID uuid.UUID, symptomUser *entity.RequestCreateSymptomUser) (int, error)
+	RemoveUserFromSymptom(userUUID uuid.UUID, symptomUser *entity.RequestCreateSymptomUser) (int, error)
+	GetSymptomsByUser(userUUID uuid.UUID) ([]*entity.Symptom, error)
 }
