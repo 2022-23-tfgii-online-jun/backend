@@ -15,10 +15,9 @@ func (*Symptom) TableName() string {
 type Symptom struct {
 	ID        int64     `gorm:"Column:id;PRIMARY_KEY" json:"-"`
 	UUID      uuid.UUID `gorm:"Column:uuid" json:"uuid"`
-	UserID    int       `gorm:"Column:user_id" json:"-"`
 	Name      string    `gorm:"Column:name" binding:"required" json:"name"`
 	IsActive  bool      `gorm:"Column:is_active" json:"is_active"`
-	Scale     string    `gorm:"Column:scale" json:"scale"`
+	Scale     int       `gorm:"Column:scale" json:"scale"`
 	CreatedAt time.Time `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
 }
 
@@ -26,5 +25,5 @@ type Symptom struct {
 type RequestCreateSymptom struct {
 	Name     string `binding:"required" json:"name"`
 	IsActive bool   `json:"is_active"`
-	Scale    string `json:"scale"`
+	Scale    int    `json:"scale"`
 }
