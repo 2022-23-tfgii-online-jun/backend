@@ -13,9 +13,9 @@ func (*SymptomUser) TableName() string {
 
 // SymptomUser represents a struct for the symptom_user table
 type SymptomUser struct {
-	ID        int64     `gorm:"Column:id;PRIMARY_KEY" json:"-"`
+	ID        int       `gorm:"Column:id;PRIMARY_KEY" json:"-"`
 	UserID    int       `gorm:"Column:user_id" json:"user_id"`
-	SymptomID int64     `gorm:"Column:symptom_id" json:"symptom"`
+	SymptomID int       `gorm:"Column:symptom_id" json:"symptom"`
 	CreatedAt time.Time `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
 }
 

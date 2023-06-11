@@ -13,7 +13,7 @@ func (*Symptom) TableName() string {
 
 // Symptom represents a struct for symptoms
 type Symptom struct {
-	ID        int64     `gorm:"Column:id;PRIMARY_KEY" json:"-"`
+	ID        int       `gorm:"Column:id;PRIMARY_KEY" json:"-"`
 	UUID      uuid.UUID `gorm:"Column:uuid" json:"uuid"`
 	Name      string    `gorm:"Column:name" binding:"required" json:"name"`
 	IsActive  bool      `gorm:"Column:is_active" json:"is_active"`

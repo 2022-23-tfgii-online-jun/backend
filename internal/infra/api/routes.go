@@ -7,6 +7,7 @@ import (
 	"github.com/emur-uy/backend/internal/infra/api/category"
 	"github.com/emur-uy/backend/internal/infra/api/healthservice"
 	"github.com/emur-uy/backend/internal/infra/api/medical"
+	"github.com/emur-uy/backend/internal/infra/api/monitoring"
 	"github.com/emur-uy/backend/internal/infra/api/question"
 	"github.com/emur-uy/backend/internal/infra/api/recipe"
 	"github.com/emur-uy/backend/internal/infra/api/reminder"
@@ -35,5 +36,6 @@ func RegisterRoutes(e *gin.Engine) {
 	medical.RegisterRoutes(e)
 	healthservice.RegisterRoutes(e)
 	symptom.RegisterRoutes(e)
+	monitoring.RegisterRoutes(e)
 
 }
