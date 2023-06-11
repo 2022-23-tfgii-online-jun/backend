@@ -1,8 +1,7 @@
 package medicalrecord
 
 import (
-	"fmt"
-	"log"
+	"errors"
 	"net/http"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
@@ -11,6 +10,18 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrFindingUser             = errors.New("error finding user")
+	ErrAssertingUser           = errors.New("error asserting user entity type")
+	ErrCreatingMedicalRecord   = errors.New("error creating medical record")
+	ErrRetrievingMedicalRecord = errors.New("error retrieving medical record")
+	ErrFindingMedicalRecord    = errors.New("error finding medical record")
+	ErrAssertingMedicalRecord  = errors.New("error asserting medical record entity type")
+	ErrUnauthorizedUpdate      = errors.New("user is not authorized to update the medical record")
+	ErrUpdatingMedicalRecord   = errors.New("error updating medical record")
+)
+
+// medicalRecordService struct holds the necessary dependencies for the medical record service
 type medicalRecordService struct {
 	repo ports.MedicalRecordRepository
 }
@@ -27,13 +38,13 @@ func (s *medicalRecordService) CreateMedicalRecord(c *gin.Context, userUUID uuid
 	// Find user by UUID
 	user, err := s.repo.FindByUUID(userUUID, &entity.User{})
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error finding user: %s", err)
+		return nil, http.StatusInternalServerError, ErrFindingUser
 	}
 
 	// Ensure the found entity is of type *entity.User
 	userEntity, ok := user.(*entity.User)
 	if !ok {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error asserting user entity type")
+		return nil, http.StatusInternalServerError, ErrAssertingUser
 	}
 
 	// Create a new medical record entity
@@ -53,7 +64,7 @@ func (s *medicalRecordService) CreateMedicalRecord(c *gin.Context, userUUID uuid
 	// Save the medical record to the database
 	err = s.repo.CreateWithOmit("uuid", medicalRecord)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error creating medical record: %s", err)
+		return nil, http.StatusInternalServerError, ErrCreatingMedicalRecord
 	}
 
 	// Return the created medical record and the HTTP OK status code
@@ -65,20 +76,20 @@ func (s *medicalRecordService) GetMedicalRecord(c *gin.Context, uuid uuid.UUID) 
 	// Retrieve the user ID based on the provided UUID
 	user, err := s.repo.FindByUUID(uuid, &entity.User{})
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error finding user: %s", err)
+		return nil, http.StatusInternalServerError, ErrFindingUser
 	}
 
 	// Ensure the found entity is of type *entity.User
 	userEntity, ok := user.(*entity.User)
 	if !ok {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error asserting user entity type")
+		return nil, http.StatusInternalServerError, ErrAssertingUser
 	}
 
 	// Retrieve the medical record for the user from the database
 	medicalRecord := &entity.MedicalRecord{}
 	err = s.repo.First(medicalRecord, "user_id = ?", userEntity.ID)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error retrieving medical record: %s", err)
+		return nil, http.StatusInternalServerError, ErrRetrievingMedicalRecord
 	}
 
 	// Return the retrieved medical record and the HTTP OK status code
@@ -90,30 +101,30 @@ func (s *medicalRecordService) UpdateMedicalRecord(c *gin.Context, userUUID uuid
 	// Find the user by UUID
 	user, err := s.repo.FindByUUID(userUUID, &entity.User{})
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error finding user: %s", err)
+		return nil, http.StatusInternalServerError, ErrFindingUser
 	}
 
 	// Ensure the found entity is of type *entity.User
 	userEntity, ok := user.(*entity.User)
 	if !ok {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error asserting user entity type")
+		return nil, http.StatusInternalServerError, ErrAssertingUser
 	}
 
 	// Find the medical record by UUID
 	medicalRecord, err := s.repo.FindByUUID(medicalRecordUUID, &entity.MedicalRecord{})
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error finding medical record: %s", err)
+		return nil, http.StatusInternalServerError, ErrFindingMedicalRecord
 	}
 
 	// Ensure the found entity is of type *entity.MedicalRecord
 	medicalRecordEntity, ok := medicalRecord.(*entity.MedicalRecord)
 	if !ok {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error asserting medical record entity type")
+		return nil, http.StatusInternalServerError, ErrAssertingMedicalRecord
 	}
 
 	// Check if the user is the owner of the medical record
 	if medicalRecordEntity.UserID != userEntity.ID {
-		return nil, http.StatusForbidden, fmt.Errorf("user is not authorized to update the medical record")
+		return nil, http.StatusForbidden, ErrUnauthorizedUpdate
 	}
 
 	// Update the medical record entity with the new values
@@ -130,7 +141,7 @@ func (s *medicalRecordService) UpdateMedicalRecord(c *gin.Context, userUUID uuid
 	// Save the updated medical record to the database
 	err = s.repo.Update(medicalRecordEntity)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("error updating medical record: %s", err)
+		return nil, http.StatusInternalServerError, ErrUpdatingMedicalRecord
 	}
 
 	// Return the updated medical record and the HTTP OK status code
@@ -138,10 +149,9 @@ func (s *medicalRecordService) UpdateMedicalRecord(c *gin.Context, userUUID uuid
 }
 
 // handleError handles errors by sending an appropriate response to the client.
-func handleError(c *gin.Context, status int, message string, err error) {
-	log.Printf("[MedicalRecordService]: %s, %v", message, err)
+func handleError(c *gin.Context, status int, message error) {
 	c.JSON(status, gin.H{
 		"code":    status,
-		"message": message,
+		"message": message.Error(),
 	})
 }
