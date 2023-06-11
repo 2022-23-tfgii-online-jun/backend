@@ -27,7 +27,12 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register route for getting all medical records accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	medicalRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllMedicalRecords)
-	medicalRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.UploadCSV)
-	medicalRoutes.POST("/rating", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.AddRatingToMedical)
 
+	// Register route for uploading a CSV file accessible only to admin role.
+	adminRoutes := medicalRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
+	adminRoutes.POST("", handler.UploadCSV)
+
+	// Register route for adding a rating to a medical record accessible only to user role.
+	userRoutes := medicalRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
+	userRoutes.POST("/rating", handler.AddRatingToMedical)
 }
