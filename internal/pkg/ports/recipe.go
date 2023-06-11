@@ -9,6 +9,7 @@ import (
 // RecipeRepository is the interface that defines the methods for accessing the recipe data store.
 type RecipeRepository interface {
 	FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error)
+
 	FindItemByIDs(firstID, secondID int, tableName string, column1Name string, column2Name string, dest interface{}) error
 
 	Create(value interface{}) error

@@ -37,5 +37,4 @@ func RegisterRoutes(e *gin.Engine) {
 	healthservice.RegisterRoutes(e)
 	symptom.RegisterRoutes(e)
 	monitoring.RegisterRoutes(e)
-
 }
