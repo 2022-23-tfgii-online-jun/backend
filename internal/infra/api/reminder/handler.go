@@ -13,21 +13,27 @@ import (
 	"github.com/google/uuid"
 )
 
+// reminderHandler type contains an instance of ReminderService
 type reminderHandler struct {
 	reminderService ports.ReminderService
 }
 
+// newHandler is a constructor function for initializing reminderHandler with the given ReminderService.
+// The return is a pointer to an reminderHandler instance.
 func newHandler(reminderService ports.ReminderService) *reminderHandler {
 	return &reminderHandler{
 		reminderService: reminderService,
 	}
 }
 
-// CreateReminder handler for creating a reminder
+// CreateReminder handles the HTTP request for creating a reminder.
+// It parses the incoming form-data fields, binds them to the reqCreate struct, and calls the reminder service to create the reminder.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the reminder is created successfully, it returns a 200 OK status with the created reminder.
 func (r *reminderHandler) CreateReminder(c *gin.Context) {
 	reqCreate := &entity.RequestCreateReminder{}
 
-	// Get user uuid from context
+	// Get user UUID from context
 	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
 
 	// Parse individual form-data fields
@@ -76,6 +82,7 @@ func (r *reminderHandler) CreateReminder(c *gin.Context) {
 	})
 }
 
+// handleError is a generic error handler that logs the error and responds.
 func handleError(c *gin.Context, status int, msg string, err error) {
 	log.Println(err)
 	c.JSON(status, gin.H{
@@ -85,9 +92,12 @@ func handleError(c *gin.Context, status int, msg string, err error) {
 	})
 }
 
-// GetAllReminders handler for getting all reminders
+// GetAllReminders handles the HTTP request for getting all reminders.
+// It retrieves all reminders from the service.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the reminders are fetched successfully, it returns a 200 OK status with the retrieved reminders.
 func (r *reminderHandler) GetAllReminders(c *gin.Context) {
-	// Get user uuid from context
+	// Get user UUID from context
 	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
 
 	// Fetch all the reminders from the service.
@@ -105,7 +115,11 @@ func (r *reminderHandler) GetAllReminders(c *gin.Context) {
 	})
 }
 
-// UpdateReminder handler for updating a reminder
+// UpdateReminder handles the HTTP request for updating a reminder.
+// It parses the reminder UUID from the URL parameter, binds the incoming form-data fields to the reqUpdate struct,
+// and calls the reminder service to update the reminder in the database.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the reminder is updated successfully, it returns a 200 OK status with the updated reminder.
 func (r *reminderHandler) UpdateReminder(c *gin.Context) {
 	// Parse the reminder UUID from the URL parameter.
 	reminderUUID, err := uuid.Parse(c.Query("uuid"))
@@ -114,7 +128,6 @@ func (r *reminderHandler) UpdateReminder(c *gin.Context) {
 		return
 	}
 
-	// Bind the incoming JSON payload to an UpdateReminder struct.
 	reqUpdate := &entity.RequestUpdateReminder{}
 	// Parse individual form-data fields
 	reqUpdate.Name = c.PostForm("name")
@@ -162,7 +175,10 @@ func (r *reminderHandler) UpdateReminder(c *gin.Context) {
 	})
 }
 
-// DeleteReminder handler for deleting a reminder
+// DeleteReminder handles the HTTP request for deleting a reminder.
+// It parses the reminder UUID from the URL parameter and calls the reminder service to delete the reminder from the database.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the reminder is deleted successfully, it returns a 200 OK status.
 func (r *reminderHandler) DeleteReminder(c *gin.Context) {
 	// Parse the reminder UUID from the URL parameter.
 	reminderUUID, err := uuid.Parse(c.Query("uuid"))

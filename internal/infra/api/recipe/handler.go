@@ -11,21 +11,27 @@ import (
 	"github.com/google/uuid"
 )
 
+// recipeHandler type contains an instance of RecipeService
 type recipeHandler struct {
 	recipeService ports.RecipeService
 }
 
+// newHandler is a constructor function for initializing recipeHandler with the given RecipeService.
+// The return is a pointer to an recipeHandler instance.
 func newHandler(recipeService ports.RecipeService) *recipeHandler {
 	return &recipeHandler{
 		recipeService: recipeService,
 	}
 }
 
-// CreateRecipe handler for creating a recipe
+// CreateRecipe handles the HTTP request for creating a recipe.
+// It binds the incoming form-data payload to the reqCreate struct and calls the recipe service to create the recipe.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the recipe is created successfully, it returns a 200 OK status with the created recipe.
 func (r *recipeHandler) CreateRecipe(c *gin.Context) {
 	reqCreate := &entity.RequestCreateRecipe{}
 
-	//  Get user uuid from context
+	// Get user UUID from context
 	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
 
 	// Bind incoming form-data payload to the reqCreate struct.
@@ -50,6 +56,9 @@ func (r *recipeHandler) CreateRecipe(c *gin.Context) {
 }
 
 // GetAllRecipes handles the HTTP request for getting all recipes.
+// It retrieves all recipes from the database.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the recipes are retrieved successfully, it returns a 200 OK status with the retrieved recipes.
 func (r *recipeHandler) GetAllRecipes(c *gin.Context) {
 	// Get all recipes from the database.
 	recipes, err := r.recipeService.GetAllRecipes()
@@ -66,7 +75,11 @@ func (r *recipeHandler) GetAllRecipes(c *gin.Context) {
 	})
 }
 
-// UpdateRecipe handler for updating a recipe
+// UpdateRecipe handles the HTTP request for updating a recipe.
+// It parses the recipe UUID from the URL parameter, binds the incoming JSON payload to an UpdateRecipe struct,
+// and calls the recipe service to update the recipe in the database.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the recipe is updated successfully, it returns a 200 OK status with the updated recipe.
 func (r *recipeHandler) UpdateRecipe(c *gin.Context) {
 	// Parse the recipe UUID from the URL parameter.
 	recipeUUID, err := uuid.Parse(c.Param("uuid"))
@@ -97,9 +110,12 @@ func (r *recipeHandler) UpdateRecipe(c *gin.Context) {
 	})
 }
 
-// DeleteRecipe handler for deleting a recipe
+// DeleteRecipe handles the HTTP request for deleting a recipe.
+// It gets the recipe UUID from the path parameter, calls the recipe service to delete the recipe from the database.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the recipe is deleted successfully, it returns a 200 OK status.
 func (r *recipeHandler) DeleteRecipe(c *gin.Context) {
-	// Get recipe uuid from path parameter
+	// Get recipe UUID from path parameter.
 	recipeUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.Param("uuid")))
 
 	// Delete the recipe from the database.
@@ -116,12 +132,12 @@ func (r *recipeHandler) DeleteRecipe(c *gin.Context) {
 	})
 }
 
-// handleError is a generic error handler that logs the error and responds
+// handleError is a generic error handler that logs the error and responds.
 func handleError(c *gin.Context, statusCode int, message string, err error) {
-	// Log the error message and the error itself
+	// Log the error message and the error itself.
 	log.Printf("[RecipeHandler]: %s, %v", message, err)
 
-	// Send the JSON response with the status code and error message
+	// Send the JSON response with the status code and error message.
 	c.JSON(statusCode, gin.H{
 		"code":    statusCode,
 		"message": message,
@@ -130,6 +146,11 @@ func handleError(c *gin.Context, statusCode int, message string, err error) {
 }
 
 // VoteRecipe handles the HTTP request for voting a recipe.
+// It parses the recipe UUID from the URL parameter, gets the user UUID from the context,
+// binds the incoming JSON payload to a RequestVoteRecipe struct,
+// and calls the recipe service to vote the recipe.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the recipe is voted successfully, it returns a 200 OK status.
 func (r *recipeHandler) VoteRecipe(c *gin.Context) {
 	// Parse the recipe UUID from the URL parameter.
 	recipeUUID, err := uuid.Parse(c.Param("uuid"))
@@ -138,7 +159,7 @@ func (r *recipeHandler) VoteRecipe(c *gin.Context) {
 		return
 	}
 
-	// Get user uuid from context
+	// Get user UUID from context.
 	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
 
 	// Bind the incoming JSON payload to a RequestVoteRecipe struct.

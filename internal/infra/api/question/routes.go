@@ -28,5 +28,4 @@ func RegisterRoutes(e *gin.Engine) {
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	questionRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllQuestions)
 	questionRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.CreateQuestion)
-
 }
