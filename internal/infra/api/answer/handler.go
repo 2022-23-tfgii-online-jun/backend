@@ -10,10 +10,13 @@ import (
 	"github.com/google/uuid"
 )
 
+// answerHandler type contains an instance of AnswerService.
 type answerHandler struct {
 	answerService ports.AnswerService
 }
 
+// newHandler is a constructor function for initializing answerHandler with the given AnswerService.
+// The return is a pointer to an answerHandler instance.
 func newHandler(answerService ports.AnswerService) *answerHandler {
 	return &answerHandler{
 		answerService: answerService,
