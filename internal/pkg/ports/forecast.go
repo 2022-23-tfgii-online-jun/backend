@@ -2,10 +2,11 @@ package ports
 
 import "github.com/emur-uy/backend/internal/pkg/entity"
 
-type WeatherService interface {
+type ForecastService interface {
 	GetDistinctCountryAndCityUsers() ([]entity.User, error)
 }
 
-type WeatherRepository interface {
+type ForecastRepository interface {
+	Create(value interface{}) error
 	GetDistinctCountryAndCityUsers(users *[]entity.User) error
 }

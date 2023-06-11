@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS forecasts (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    country VARCHAR(255) NOT NULL,
+    state VARCHAR(255) NOT NULL,
+    max_temperature SMALLINT NOT NULL,
+    min_temperature SMALLINT NOT NULL,
+    avg_temperature SMALLINT NOT NULL,
+    description VARCHAR(255) NULL DEFAULT NULL,
+    humidity INT NULL DEFAULT NULL,
+    code INT NULL DEFAULT NULL,
+    wind INT NULL DEFAULT NULL,
+    uv INT NULL DEFAULT NULL,
+    date VARCHAR(255) NULL DEFAULT NULL,
+    created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP
+    );

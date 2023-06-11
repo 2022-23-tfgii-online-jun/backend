@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
-	"github.com/emur-uy/backend/internal/pkg/service/weather"
+	"github.com/emur-uy/backend/internal/pkg/service/forecast"
 	"github.com/go-co-op/gocron"
 )
 
@@ -12,11 +12,11 @@ func Start() {
 	postgresql.Connect()
 
 	repo := postgresql.NewClient()
-	weatherService := weather.NewService(repo)
-	weatherWorker := weather.NewWorker(weatherService)
+	forecastService := forecast.NewService(repo)
+	forecastWorker := forecast.NewWorker(forecastService)
 
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(1).Hour().Do(weatherWorker.CheckWeather)
+	s.Every(1).Hour().Do(forecastWorker.CheckForecast)
 
 	s.StartBlocking()
 }

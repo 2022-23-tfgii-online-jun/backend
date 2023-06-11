@@ -1,4 +1,4 @@
-package weather
+package forecast
 
 import (
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"github.com/getsentry/sentry-go"
 )
 
-func GetWeatherApi(lang string, state string, country string) entity.RequestForecast {
+func GetForecast(lang string, state string, country string) entity.RequestForecast {
 	apiKey := config.Get().ForecastKey
 	apiUrl := config.Get().ForecastAPI
 
@@ -23,14 +23,14 @@ func GetWeatherApi(lang string, state string, country string) entity.RequestFore
 
 	if err != nil {
 		errMsg := "cannot fetch URL"
-		sentry.CaptureMessage(fmt.Sprintf("[GetWeatherAPI]: %s, %s", errMsg, err))
+		sentry.CaptureMessage(fmt.Sprintf("[GetForecast]: %s, %s", errMsg, err))
 	}
 
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		errMsg := "unexpected http GET status"
-		sentry.CaptureMessage(fmt.Sprintf("[GetWeatherAPI]: %s, %s", errMsg, res.Status))
+		sentry.CaptureMessage(fmt.Sprintf("[GetForecast]: %s, %s", errMsg, res.Status))
 	}
 
 	var data entity.RequestForecast
@@ -42,7 +42,7 @@ func GetWeatherApi(lang string, state string, country string) entity.RequestFore
 	err = json.Unmarshal([]byte(resBodyString), &data)
 	if err != nil {
 		errMsg := "cannot decode JSON:"
-		sentry.CaptureMessage(fmt.Sprintf("[GetWeatherAPI]: %s, %v", errMsg, err))
+		sentry.CaptureMessage(fmt.Sprintf("[GetForecast]: %s, %v", errMsg, err))
 	}
 
 	return data
