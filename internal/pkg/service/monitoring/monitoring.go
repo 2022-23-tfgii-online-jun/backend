@@ -82,3 +82,28 @@ func (s *service) CreateMonitoring(c *gin.Context, userUUID uuid.UUID, createReq
 	// Return the monitoring record and the HTTP OK status code if the create operation is successful
 	return monitoring, http.StatusOK, nil
 }
+
+// GetAllMonitorings retrieves all monitoring records for a user from the database.
+func (s *service) GetAllMonitorings(c *gin.Context, userUUID uuid.UUID) ([]*entity.Monitoring, int, error) {
+	// Find user by UUID
+	user := &entity.User{}
+	foundUser, err := s.repo.FindByUUID(userUUID, user)
+	if err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("error finding user: %s", err)
+	}
+
+	// Perform type assertion to convert foundUser to *entity.User
+	userEntity, ok := foundUser.(*entity.User)
+	if !ok {
+		return nil, http.StatusInternalServerError, fmt.Errorf("error asserting user entity type")
+	}
+
+	// Get all reminders for this user
+	var monitorings []*entity.Monitoring
+	if err := s.repo.Find(&monitorings, "user_id = ?", userEntity.ID); err != nil {
+		return nil, http.StatusInternalServerError, fmt.Errorf("error retrieving monitorings: %s", err)
+	}
+
+	// Return the monitoring records and the HTTP OK status code if the retrieval is successful
+	return monitorings, http.StatusOK, nil
+}
