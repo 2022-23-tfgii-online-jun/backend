@@ -11,10 +11,13 @@ import (
 	"github.com/google/uuid"
 )
 
+// medicalRecordHandler type contains an instance of MedicalRecordService.
 type medicalRecordHandler struct {
 	medicalRecordService ports.MedicalRecordService
 }
 
+// newHandler is a constructor function for initializing medicalRecordHandler with the given MedicalRecordService.
+// The return is a pointer to an medicalRecordHandler instance.
 func newHandler(medicalRecordService ports.MedicalRecordService) *medicalRecordHandler {
 	return &medicalRecordHandler{
 		medicalRecordService: medicalRecordService,
@@ -22,6 +25,9 @@ func newHandler(medicalRecordService ports.MedicalRecordService) *medicalRecordH
 }
 
 // CreateMedicalRecord handles the HTTP request for creating a medical record.
+// It binds the incoming JSON payload to the reqCreate struct.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// If the medical record is created successfully, it will return a 200 OK status with the created medical record.
 func (h *medicalRecordHandler) CreateMedicalRecord(c *gin.Context) {
 	reqCreate := &entity.MedicalRecord{}
 
@@ -56,6 +62,9 @@ func (h *medicalRecordHandler) CreateMedicalRecord(c *gin.Context) {
 }
 
 // GetMedicalRecord handles the HTTP request for getting a medical record.
+// It gets the user UUID from the JWT token.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// If the medical record is retrieved successfully, it will return a 200 OK status with the retrieved medical record.
 func (h *medicalRecordHandler) GetMedicalRecord(c *gin.Context) {
 	// Get user UUID from JWT token
 	userUUID, err := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
@@ -80,6 +89,9 @@ func (h *medicalRecordHandler) GetMedicalRecord(c *gin.Context) {
 }
 
 // UpdateMedicalRecord handles the HTTP request for updating a medical record.
+// It parses the medical record UUID from the URL parameter and binds the incoming JSON payload to the reqUpdate struct.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// If the medical record is updated successfully, it will return a 200 OK status with the updated medical record.
 func (h *medicalRecordHandler) UpdateMedicalRecord(c *gin.Context) {
 	// Get medical record ID from path parameter
 	medicalRecordUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.Param("uuid")))

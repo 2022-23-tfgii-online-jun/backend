@@ -1,6 +1,6 @@
 package constants
 
 const (
-	RoleAdmin = "admin"
-	RoleUser  = "user"
+	RoleAdmin = "admin" // RoleAdmin represents the admin role.
+	RoleUser  = "user"  // RoleUser represents the user role.
 )

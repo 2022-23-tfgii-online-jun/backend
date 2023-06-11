@@ -10,10 +10,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// medicalHandler type contains an instance of MedicalService.
 type medicalHandler struct {
 	medicalService ports.MedicalService
 }
 
+// newHandler is a constructor function for initializing medicalHandler with the given MedicalService.
+// The return is a pointer to an medicalHandler instance.
 func newHandler(medicalService ports.MedicalService) *medicalHandler {
 	return &medicalHandler{
 		medicalService: medicalService,
