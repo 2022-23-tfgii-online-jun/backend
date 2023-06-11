@@ -3,12 +3,10 @@ package ports
 import (
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 // HealthServiceRepository is the interface that defines the methods for accessing the health service data store.
 type HealthServiceRepository interface {
-	FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error)
 
 	// CreateWithOmit creates a new health service record while omitting specific fields.
 	// Returns an error if the operation fails.
