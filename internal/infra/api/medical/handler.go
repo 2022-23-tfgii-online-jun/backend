@@ -21,77 +21,77 @@ func newHandler(medicalService ports.MedicalService) *medicalHandler {
 }
 
 // UploadCSV handles the HTTP request for uploading and processing a CSV file.
+// It calls the medicalService method to process the CSV file and save the records in the database.
+// If any error occurs during this process, it will return the corresponding status code and error message.
+// If the CSV file is processed and the records are saved successfully, it will return a 200 OK status.
 func (m *medicalHandler) UploadCSV(c *gin.Context) {
-	// Call the service method to process the CSV file and save the records in the database
 	status, err := m.medicalService.CreateRecordFromFile(c)
 	if err != nil {
 		handleError(c, status, "An error occurred while processing the CSV file", err)
 		return
 	}
 
-	// Return a successful response
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "CSV file processed and records saved successfully",
 	})
 }
 
-// GetMedicalRecord handles the HTTP request for getting a specific medical record.
+// GetAllMedicalRecords handles the HTTP request for getting all medical records.
+// It retrieves all medical records from the database.
+// If any error occurs during this process, it will return a 500 Internal Server Error status.
+// If the medical records are retrieved successfully, it will return a 200 OK status with the retrieved medical records.
 func (m *medicalHandler) GetAllMedicalRecords(c *gin.Context) {
-
-	// Get the medical record from the database.
-	medicalRecord, err := m.medicalService.GetAllMedicalRecords()
+	medicalRecords, err := m.medicalService.GetAllMedicalRecords()
 	if err != nil {
-		handleError(c, http.StatusInternalServerError, "An error occurred while getting the medical record", err)
+		handleError(c, http.StatusInternalServerError, "An error occurred while getting the medical records", err)
 		return
 	}
 
-	// Return a successful response with the retrieved medical record.
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
-		"message": "Medical record retrieved successfully",
-		"data":    medicalRecord,
-	})
-}
-
-// handleError handles errors by sending an appropriate response to the client.
-func handleError(c *gin.Context, status int, message string, err error) {
-	// Log the error message and the error itself
-	log.Printf("[ArticleHandler]: %s, %v", message, err)
-
-	// Send the JSON response with the status code and error message
-	c.JSON(status, gin.H{
-		"code":    status,
-		"message": message,
+		"message": "Medical records retrieved successfully",
+		"data":    medicalRecords,
 	})
 }
 
 // AddRatingToMedical handles the HTTP request for adding a rating to a medical record.
+// It binds the incoming JSON payload to the req struct.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// If the input parameters are invalid, it will return a 400 Bad Request status with an error message.
+// If the rating is added to the medical record successfully, it will return a 200 OK status.
 func (m *medicalHandler) AddRatingToMedical(c *gin.Context) {
 	req := &entity.MedicalRating{}
 
-	// Bind incoming json payload to the req struct.
 	if err := c.ShouldBindJSON(req); err != nil {
 		handleError(c, http.StatusBadRequest, "Invalid input", err)
 		return
 	}
 
-	// Validate input parameters
 	if req.MedicalID == 0 || req.ReminderID == 0 {
 		handleError(c, http.StatusBadRequest, "Invalid input", fmt.Errorf("medical and reminder IDs are required"))
 		return
 	}
 
-	// Call the service method to add the rating to the medical record
 	status, err := m.medicalService.AddRatingToMedical(req)
 	if err != nil {
 		handleError(c, status, "An error occurred while adding the rating", err)
 		return
 	}
 
-	// Return a successful response
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "Rating added successfully",
+	})
+}
+
+// handleError handles errors by sending an appropriate response to the client.
+// It logs the error message and the error itself, then sends a JSON response with the status code and error message.
+func handleError(c *gin.Context, status int, message string, err error) {
+	log.Printf("[MedicalHandler]: %s, %v", message, err)
+
+	c.JSON(status, gin.H{
+		"code":    status,
+		"message": message,
 	})
 }

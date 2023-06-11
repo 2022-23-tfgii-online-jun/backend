@@ -24,13 +24,15 @@ func RegisterRoutes(e *gin.Engine) {
 	// Group the healthservice routes together.
 	healthServiceRoutes := e.Group("/api/v1/healthservices")
 
-	// Register admin routes requiring authentication and authorization for admin role.
-	//adminRoutes := healthServiceRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
-	//adminRoutes.POST("", handler.CreateHealthService)
-
 	// Register route for getting all health services accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	healthServiceRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllHealthServices)
-	healthServiceRoutes.POST("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.CreateHealthService)
-	healthServiceRoutes.POST("/rating", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.AddRatingToHealthService)
+
+	// Register route for creating a health service accessible only to the admin role.
+	adminRoutes := healthServiceRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
+	adminRoutes.POST("", handler.CreateHealthService)
+
+	// Register route for adding a rating to a health service accessible only to the user role.
+	userRoutes := healthServiceRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
+	userRoutes.POST("/rating", handler.AddRatingToHealthService)
 }

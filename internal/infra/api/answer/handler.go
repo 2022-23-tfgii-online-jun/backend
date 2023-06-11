@@ -1,7 +1,6 @@
 package answer
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
@@ -24,6 +23,11 @@ func newHandler(answerService ports.AnswerService) *answerHandler {
 }
 
 // CreateAnswer handles the HTTP request for creating an answer.
+// It parses the userUUID and questionUUID from the request parameters.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// It binds the JSON request body to createReq.
+// If the request body is invalid, it will return a 400 Bad Request status.
+// If the Answer is created successfully, it will return a 200 OK status.
 func (a *answerHandler) CreateAnswer(c *gin.Context) {
 	userUUID, err := uuid.Parse(c.GetString("userUUID"))
 	if err != nil {
@@ -53,8 +57,7 @@ func (a *answerHandler) CreateAnswer(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(questionUUID)
-
+	// Call the service method create a new answer.
 	statusCode, err := a.answerService.CreateAnswer(c, userUUID, questionUUID, &createReq)
 	if err != nil {
 		c.JSON(statusCode, gin.H{
