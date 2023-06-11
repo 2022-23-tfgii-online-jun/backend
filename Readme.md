@@ -36,7 +36,7 @@ Style tests are audited by Sonarqube. You can review the results on the followin
 
 ## Deployment 📦
 
-The project can be deployed using Docker [Docker](https://www.docker.com/).
+The project can be deployed using [Docker](https://www.docker.com/).
 
 ## Built With 🛠️
 

@@ -7,10 +7,11 @@ import (
 	"github.com/emur-uy/backend/internal/infra/api/category"
 	"github.com/emur-uy/backend/internal/infra/api/healthservice"
 	"github.com/emur-uy/backend/internal/infra/api/medical"
+	"github.com/emur-uy/backend/internal/infra/api/monitoring"
 	"github.com/emur-uy/backend/internal/infra/api/question"
 	"github.com/emur-uy/backend/internal/infra/api/recipe"
 	"github.com/emur-uy/backend/internal/infra/api/reminder"
-	"github.com/emur-uy/backend/internal/infra/api/treatment"
+	"github.com/emur-uy/backend/internal/infra/api/symptom"
 	"github.com/emur-uy/backend/internal/infra/api/user"
 	"github.com/gin-gonic/gin" // Importing gin package for http web framework
 )
@@ -34,6 +35,6 @@ func RegisterRoutes(e *gin.Engine) {
 	reminder.RegisterRoutes(e)
 	medical.RegisterRoutes(e)
 	healthservice.RegisterRoutes(e)
-	treatment.RegisterRoutes(e)
-
+	symptom.RegisterRoutes(e)
+	monitoring.RegisterRoutes(e)
 }
