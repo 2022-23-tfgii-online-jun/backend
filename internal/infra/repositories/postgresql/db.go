@@ -4,6 +4,7 @@ import (
 	"errors" // Importing errors package for error handling
 	"fmt"
 
+	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/google/uuid"
 	"gorm.io/gorm" // Importing gorm package for database ORM
 )
@@ -121,6 +122,14 @@ func (c *Client) Delete(out interface{}) error {
 	err := c.db.Delete(out).Error
 	if err != nil {
 		return errors.New("failed to delete record: " + err.Error())
+	}
+	return nil
+}
+
+func (c *Client) GetDistinctCountryAndCityUsers(users *[]entity.User) error {
+	result := c.db.Model(&entity.User{}).Select("DISTINCT country, city").Find(users)
+	if result.Error != nil {
+		return result.Error
 	}
 	return nil
 }

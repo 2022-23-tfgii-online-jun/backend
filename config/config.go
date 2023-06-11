@@ -33,6 +33,8 @@ type Config struct {
 	AwsAccessKey     string `mapstructure:"AWS_ACCESS_KEY"`
 	AwsSecretKey     string `mapstructure:"AWS_SECRET_KEY"`
 	AwsEndpoint      string `mapstructure:"AWS_ENDPOINT"`
+	ForecastKey      string `mapstructure:"FORECAST_KEY"`
+	ForecastAPI      string `mapstructure:"FORECAST_API"`
 }
 
 // Get returns the configuration instance.
