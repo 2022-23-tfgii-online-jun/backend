@@ -19,6 +19,7 @@ var (
 	ErrDeletingTreatment   = errors.New("error deleting treatment")
 )
 
+// service struct holds the necessary dependencies for the treatment service
 type service struct {
 	repo ports.TreatmentRepository
 }

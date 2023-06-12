@@ -20,6 +20,7 @@ var (
 	ErrFindingSymptomUser      = errors.New("error finding symptom user")
 )
 
+// service struct holds the necessary dependencies for the symptom service
 type service struct {
 	repo ports.SymptomRepository
 }

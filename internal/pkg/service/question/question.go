@@ -14,6 +14,7 @@ var (
 	ErrCreatingQuestion    = errors.New("error creating question")
 )
 
+// service struct holds the necessary dependencies for the question service
 type service struct {
 	repo ports.QuestionRepository
 }

@@ -30,6 +30,7 @@ var (
 	ErrFindingMedia          = errors.New("error finding media")
 )
 
+// service struct holds the necessary dependencies for the reminder service
 type service struct {
 	repo                 ports.ReminderRepository
 	mediaService         ports.MediaService
