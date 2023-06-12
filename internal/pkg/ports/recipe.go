@@ -48,7 +48,7 @@ type RecipeRepository interface {
 type RecipeService interface {
 	// CreateRecipe creates a new Recipe using the provided request data and user UUID.
 	// Returns an HTTP status code and an error if the operation fails.
-	CreateRecipe(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateRecipe) (int, error)
+	CreateRecipe(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateRecipe) (*entity.Recipe, error)
 
 	// UpdateRecipe updates an existing Recipe using the provided Recipe UUID and update request data.
 	// Returns an HTTP status code and an error if the operation fails.
