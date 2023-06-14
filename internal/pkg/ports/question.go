@@ -55,4 +55,6 @@ type QuestionService interface {
 	// GetAllQuestions retrieves all Question records.
 	// Returns a slice of Questions and an error if the operation fails.
 	GetAllQuestions() ([]*entity.Question, error)
+
+	GetAllQuestionsAndAnswers() ([]*entity.Question, error)
 }

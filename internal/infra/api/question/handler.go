@@ -75,6 +75,26 @@ func (q *questionHandler) GetAllQuestions(c *gin.Context) {
 	})
 }
 
+// GetAllQuestionsAndAnswers handles the HTTP request for getting all questions and their answers.
+// It retrieves all questions and their answers from the database.
+// If any error occurs during this process, it returns the corresponding status code and error message.
+// If the questions and answers are retrieved successfully, it returns a 200 OK status with the retrieved questions and answers.
+func (q *questionHandler) GetAllQuestionsAndAnswers(c *gin.Context) {
+	// Get all questions and their answers from the database.
+	questions, err := q.questionService.GetAllQuestionsAndAnswers()
+	if err != nil {
+		handleError(c, http.StatusInternalServerError, "An error occurred while getting the questions and answers", err)
+		return
+	}
+
+	// Return a successful response with the retrieved questions and answers.
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Questions and answers retrieved successfully",
+		"data":    questions,
+	})
+}
+
 // handleError is a generic error handler that logs the error and responds.
 func handleError(c *gin.Context, statusCode int, message string, err error) {
 	// Log the error message and the error itself.

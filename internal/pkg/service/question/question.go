@@ -68,3 +68,22 @@ func (s *service) GetAllQuestions() ([]*entity.Question, error) {
 
 	return questions, nil
 }
+
+func (s *service) GetAllQuestionsAndAnswers() ([]*entity.Question, error) {
+	// Get all questions from the database
+	var questions []*entity.Question
+	if err := s.repo.Find(&questions); err != nil {
+		return nil, err
+	}
+
+	// Get answers for each question
+	for _, question := range questions {
+		var answers []*entity.Answer
+		if err := s.repo.Find(&answers, question.ID); err != nil {
+			return nil, err
+		}
+		question.Answers = answers
+	}
+
+	return questions, nil
+}

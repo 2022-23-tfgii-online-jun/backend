@@ -19,6 +19,7 @@ type Question struct {
 	UserID    int       `gorm:"Column:user_id" json:"-"`
 	Text      string    `gorm:"Column:text" binding:"required" json:"text"`
 	CreatedAt time.Time `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
+	Answers   []*Answer `json:"answers"`
 }
 
 // RequestCreateQuestion represents a struct for creating questions
