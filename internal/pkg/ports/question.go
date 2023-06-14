@@ -56,5 +56,5 @@ type QuestionService interface {
 	// Returns a slice of Questions and an error if the operation fails.
 	GetAllQuestions() ([]*entity.Question, error)
 
-	GetAllQuestionsAndAnswers() ([]*entity.Question, error)
+	GetAllQuestionsAndAnswers() ([]*entity.QuestionAndAnswers, error)
 }

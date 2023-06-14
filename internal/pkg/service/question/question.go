@@ -69,9 +69,9 @@ func (s *service) GetAllQuestions() ([]*entity.Question, error) {
 	return questions, nil
 }
 
-func (s *service) GetAllQuestionsAndAnswers() ([]*entity.Question, error) {
+func (s *service) GetAllQuestionsAndAnswers() ([]*entity.QuestionAndAnswers, error) {
 	// Get all questions from the database
-	var questions []*entity.Question
+	var questions []*entity.QuestionAndAnswers
 	if err := s.repo.Find(&questions); err != nil {
 		return nil, err
 	}
