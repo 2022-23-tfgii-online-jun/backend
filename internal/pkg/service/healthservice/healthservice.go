@@ -1,7 +1,7 @@
 package healthservice
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
@@ -9,6 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	ErrCreatingHealthService     = errors.New("error creating health service")
+	ErrAddingHealthServiceRating = errors.New("error adding rating to health service")
+	ErrMissingIDs                = errors.New("health service and reminder IDs are required")
+)
+
+// service struct holds the necessary dependencies for the health service
 type service struct {
 	repo ports.HealthServiceRepository
 }
@@ -30,7 +37,7 @@ func (s *service) CreateHealthService(c *gin.Context, createReq *entity.RequestC
 	// Save the health service to the database
 	err := s.repo.Create(healthService)
 	if err != nil {
-		return "", http.StatusInternalServerError, fmt.Errorf("error creating health service: %s", err)
+		return "", http.StatusInternalServerError, ErrCreatingHealthService
 	}
 
 	// Return the name of the created health service and the HTTP OK status code if the create operation is successful
@@ -50,16 +57,15 @@ func (s *service) GetAllHealthServices() ([]*entity.HealthService, error) {
 
 // AddRatingToHealthService is the service for adding a rating to a health service.
 func (s *service) AddRatingToHealthService(rating *entity.HealthServiceRating) (int, error) {
-
 	// Validate the input parameters
 	if rating.HealthServiceID == 0 || rating.ReminderID == 0 {
-		return http.StatusBadRequest, fmt.Errorf("health service and reminder IDs are required")
+		return http.StatusBadRequest, ErrMissingIDs
 	}
 
 	// Save the health service rating to the database
 	err := s.repo.Create(rating)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error adding rating to health service: %s", err)
+		return http.StatusInternalServerError, ErrAddingHealthServiceRating
 	}
 
 	// Return the HTTP OK status code if the operation is successful

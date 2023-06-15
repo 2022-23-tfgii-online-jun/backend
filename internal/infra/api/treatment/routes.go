@@ -24,7 +24,7 @@ func RegisterRoutes(e *gin.Engine) {
 	// Group the treatment routes together.
 	treatmentRoutes := e.Group("/api/v1/treatments")
 
-	// Register user routes requiring authentication and authorization for user role.
+	// Register routes requiring authentication and authorization for user role.
 	userRoutes := treatmentRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
 	userRoutes.POST("", handler.CreateTreatment)
 	userRoutes.DELETE("/:uuid", handler.DeleteTreatment)

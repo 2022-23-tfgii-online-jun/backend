@@ -1,6 +1,7 @@
 package treatment
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -10,6 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrTypeAssertionFailed = errors.New("type assertion failed")
+	ErrCreatingTreatment   = errors.New("error creating treatment")
+	ErrFindingUser         = errors.New("error finding user")
+	ErrUpdatingTreatment   = errors.New("error updating treatment")
+	ErrDeletingTreatment   = errors.New("error deleting treatment")
+)
+
+// service struct holds the necessary dependencies for the treatment service
 type service struct {
 	repo ports.TreatmentRepository
 }
@@ -21,20 +31,22 @@ func NewService(treatmentRepo ports.TreatmentRepository) ports.TreatmentService 
 	}
 }
 
-// CreateTreatment is the service for creating a treatment and saving it in the database
+// CreateTreatment is the service for creating a treatment and saving it in the database.
 func (s *service) CreateTreatment(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateTreatment) (*entity.Treatment, int, error) {
+	// Find user by UUID
 	user := &entity.User{}
-
 	foundUser, err := s.repo.FindByUUID(userUUID, user)
 	if err != nil {
 		return nil, http.StatusNotFound, err
 	}
 
+	// Perform type assertion to convert foundUser to *entity.User
 	user, ok := foundUser.(*entity.User)
 	if !ok {
-		return nil, http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return nil, http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
+	// Create a new treatment
 	treatment := &entity.Treatment{
 		Name:      createReq.Name,
 		Type:      createReq.Type,
@@ -45,6 +57,7 @@ func (s *service) CreateTreatment(c *gin.Context, userUUID uuid.UUID, createReq 
 		UserID:    user.ID,
 	}
 
+	// Save the treatment to the database
 	err = s.repo.CreateWithOmit("uuid", treatment)
 	if err != nil {
 		return nil, http.StatusInternalServerError, fmt.Errorf("error creating treatment: %s", err)
@@ -53,20 +66,19 @@ func (s *service) CreateTreatment(c *gin.Context, userUUID uuid.UUID, createReq 
 	return treatment, http.StatusOK, nil
 }
 
-// GetAllTreatments returns all treatments of a specific user stored in the database
+// GetAllTreatments returns all treatments of a specific user stored in the database.
 func (s *service) GetAllTreatments(userUUID uuid.UUID) ([]*entity.Treatment, error) {
 	// Find user by UUID
 	user := &entity.User{}
 	foundUser, err := s.repo.FindByUUID(userUUID, user)
 	if err != nil {
-		// Return error if the user is not found
 		return nil, err
 	}
 
 	// Perform type assertion to convert foundUser to *entity.User
 	user, ok := foundUser.(*entity.User)
 	if !ok {
-		return nil, fmt.Errorf("type assertion failed")
+		return nil, ErrTypeAssertionFailed
 	}
 
 	// Get all treatments from the database for the user
@@ -78,7 +90,7 @@ func (s *service) GetAllTreatments(userUUID uuid.UUID) ([]*entity.Treatment, err
 	return treatments, nil
 }
 
-// UpdateTreatment is the service for updating a treatment in the database
+// UpdateTreatment is the service for updating a treatment in the database.
 func (s *service) UpdateTreatment(treatmentUUID uuid.UUID, updateReq *entity.RequestUpdateTreatment) (int, error) {
 	// Find the existing treatment by UUID
 	treatment := &entity.Treatment{}
@@ -90,7 +102,7 @@ func (s *service) UpdateTreatment(treatmentUUID uuid.UUID, updateReq *entity.Req
 	// Perform type assertion to convert foundTreatment to *entity.Treatment
 	treatment, ok := foundTreatment.(*entity.Treatment)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
 	// Update the treatment fields with the new data from the update request
@@ -106,7 +118,7 @@ func (s *service) UpdateTreatment(treatmentUUID uuid.UUID, updateReq *entity.Req
 	return http.StatusOK, nil
 }
 
-// DeleteTreatment is the service for deleting a treatment from the database
+// DeleteTreatment is the service for deleting a treatment from the database.
 func (s *service) DeleteTreatment(treatmentUUID uuid.UUID) (int, error) {
 	// Find the existing treatment by UUID
 	treatment := &entity.Treatment{}
@@ -118,7 +130,7 @@ func (s *service) DeleteTreatment(treatmentUUID uuid.UUID) (int, error) {
 	// Perform type assertion to convert foundTreatment to *entity.Treatment
 	treatment, ok := foundTreatment.(*entity.Treatment)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
 	// Delete the treatment from the database

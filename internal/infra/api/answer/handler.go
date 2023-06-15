@@ -23,8 +23,10 @@ func newHandler(answerService ports.AnswerService) *answerHandler {
 }
 
 // CreateAnswer handles the HTTP request for creating an answer.
-// It validates the userUUID and questionUUID from the request parameters and binds the JSON request body to createReq.
+// It parses the userUUID and questionUUID from the request parameters.
 // If any error occurs during this process, it will return a 400 Bad Request status.
+// It binds the JSON request body to createReq.
+// If the request body is invalid, it will return a 400 Bad Request status.
 // If the Answer is created successfully, it will return a 200 OK status.
 func (a *answerHandler) CreateAnswer(c *gin.Context) {
 	// Parse the userUUID from the request context

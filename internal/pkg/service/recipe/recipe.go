@@ -3,16 +3,9 @@ package recipe
 import (
 	"errors"
 	"fmt"
-	"image"
-	"image/jpeg"
-	"image/png"
-	"io"
 	"net/http"
-	"os"
 	"path"
-	"path/filepath"
 
-	"github.com/disintegration/imaging"
 	"github.com/emur-uy/backend/config"
 	aws "github.com/emur-uy/backend/internal/infra/repositories/spaces"
 	"github.com/emur-uy/backend/internal/pkg/entity"
@@ -21,42 +14,62 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrTypeAssertionFailed = errors.New("type assertion failed")
+	ErrCreatingRecipe      = errors.New("error creating recipe")
+	ErrUpdatingRecipe      = errors.New("error updating recipe")
+	ErrDeletingRecipe      = errors.New("error deleting recipe")
+	ErrCreatingMedia       = errors.New("error creating media")
+	ErrFindingRecipeMedia  = errors.New("error finding recipe media")
+	ErrCreatingRecipeMedia = errors.New("error creating recipe media association")
+	ErrDeletingRecipeMedia = errors.New("error deleting recipe media association")
+	ErrDeletingMedia       = errors.New("error deleting media")
+	ErrUnsupportedFileType = errors.New("unsupported file type")
+	ErrFileNotFound        = errors.New("file not found")
+)
+
 const (
 	PNG  = "image/png"
 	JPEG = "image/jpeg"
 )
 
+// service struct holds the necessary dependencies for the recipe service
 type service struct {
-	repo ports.RecipeRepository
+	repo               ports.RecipeRepository
+	mediaService       ports.MediaService
+	recipeMediaService ports.RecipeMediaService
 }
 
-// NewService returns a new instance of the recipe service with the given recipe repository.
-func NewService(recipeRepo ports.RecipeRepository) ports.RecipeService {
+// NewService returns a new instance of the recipe service with the given recipe repository, media service, and recipe media service.
+func NewService(recipeRepo ports.RecipeRepository, mediaService ports.MediaService, recipeMediaService ports.RecipeMediaService) ports.RecipeService {
 	return &service{
-		repo: recipeRepo,
+		repo:               recipeRepo,
+		mediaService:       mediaService,
+		recipeMediaService: recipeMediaService,
 	}
 }
 
-// CreateRecipe is the service for creating a recipe and saving it in the database
-func (s *service) CreateRecipe(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateRecipe) (int, error) {
+// CreateRecipe is the service for creating a recipe and saving it in the database.
+func (s *service) CreateRecipe(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateRecipe) (*entity.Recipe, error) {
 	user := &entity.User{}
 
 	// Find user by UUID
 	foundUser, err := s.repo.FindByUUID(userUUID, user)
 	if err != nil {
 		// Return error if the user is not found
-		return http.StatusNotFound, err
+		return nil, err
 	}
+
 	// Perform type assertion to convert foundUser to *entity.User
 	user, ok := foundUser.(*entity.User)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return nil, ErrTypeAssertionFailed
 	}
 
 	// Call the processUploadRequestFile function to handle the image upload and create the media entry
-	fileProcessStatusCode, mediaID, err := processUploadRequestFile(s, c)
-	if err != nil || fileProcessStatusCode != http.StatusOK {
-		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file, %s", err)
+	fileProcessCode, fileUrls, err := processUploadRequestFiles(s, c)
+	if err != nil || fileProcessCode != http.StatusOK {
+		return nil, fmt.Errorf("error processing content upload file: %s", err)
 	}
 
 	// Create a new recipe
@@ -65,34 +78,41 @@ func (s *service) CreateRecipe(c *gin.Context, userUUID uuid.UUID, createReq *en
 		Ingredients: createReq.Ingredients,
 		Elaboration: createReq.Elaboration,
 		Time:        createReq.Time,
-		UserID:      user.ID,
-		MediaID:     mediaID,
 		Category:    createReq.Category,
 	}
 
 	// Save the recipe to the database
 	err = s.repo.CreateWithOmit("uuid", recipe)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error creating recipe: %s", err)
+		return nil, ErrCreatingRecipe
 	}
 
-	// Return the HTTP OK status code if the update is successful
-	return http.StatusOK, nil
-}
+	// For each uploaded file, create a new media entry and then a new RecipeMedia entry
+	for _, fileUrl := range fileUrls {
+		media := &entity.Media{
+			MediaURL: fileUrl,
+		}
 
-// GetAllRecipes returns all recipes stored in the database
-func (s *service) GetAllRecipes() ([]*entity.Recipe, error) {
-	// Get all recipes from the database
-	var recipes []*entity.Recipe
-	if err := s.repo.Find(&recipes); err != nil { // Removed .Error after s.repo.Find()
-		return nil, err
+		err = s.mediaService.CreateMedia(media)
+		if err != nil {
+			return nil, ErrCreatingMedia
+		}
+
+		recipeMedia := &entity.RecipeMedia{
+			RecipeID: recipe.ID,
+			MediaID:  media.ID,
+		}
+		err = s.recipeMediaService.CreateRecipeMedia(recipeMedia)
+		if err != nil {
+			return nil, fmt.Errorf("error creating RecipeMedia: %s", err)
+		}
 	}
 
-	return recipes, nil
+	return recipe, nil
 }
 
-// UpdateRecipe is the service for updating a recipe in the database
-func (s *service) UpdateRecipe(recipeUUID uuid.UUID, updateReq *entity.RequestUpdateRecipe) (int, error) {
+// UpdateRecipe is the service for updating a recipe in the database.
+func (s *service) UpdateRecipe(c *gin.Context, recipeUUID uuid.UUID, updateReq *entity.RequestUpdateRecipe) (int, error) {
 	// Find the existing recipe by UUID
 	recipe := &entity.Recipe{}
 	foundRecipe, err := s.repo.FindByUUID(recipeUUID, recipe)
@@ -100,10 +120,11 @@ func (s *service) UpdateRecipe(recipeUUID uuid.UUID, updateReq *entity.RequestUp
 		// Return error if the recipe is not found
 		return http.StatusNotFound, err
 	}
+
 	// Perform type assertion to convert foundRecipe to *entity.Recipe
 	recipe, ok := foundRecipe.(*entity.Recipe)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
 	// Update the recipe fields with the new data from the update request
@@ -113,6 +134,57 @@ func (s *service) UpdateRecipe(recipeUUID uuid.UUID, updateReq *entity.RequestUp
 	err = s.repo.Update(recipe)
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("error updating recipe: %s", err)
+	}
+
+	fileProcessCode, fileUrls, err := processUploadRequestFiles(s, c)
+	if err != nil || fileProcessCode != http.StatusOK {
+		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file: %s", err)
+	}
+
+	// Get existing recipe media data
+	recipeMedias := []*entity.RecipeMedia{}
+	err = s.recipeMediaService.FindByRecipeID(recipe.ID, &recipeMedias)
+	if err != nil {
+		return http.StatusInternalServerError, ErrFindingRecipeMedia
+	}
+
+	// For each uploaded file, create a new media entry and a new recipe_media association
+	for _, fileUrl := range fileUrls {
+		media := &entity.Media{
+			MediaURL: fileUrl,
+		}
+		err = s.mediaService.CreateMedia(media)
+		if err != nil {
+			return http.StatusInternalServerError, ErrCreatingMedia
+		}
+		recipeMedia := &entity.RecipeMedia{
+			RecipeID: recipe.ID,
+			MediaID:  media.ID,
+		}
+		err = s.recipeMediaService.CreateRecipeMedia(recipeMedia)
+		if err != nil {
+			return http.StatusInternalServerError, ErrCreatingRecipeMedia
+		}
+	}
+
+	// Delete old media entries
+	for _, recipeMedia := range recipeMedias {
+		mediaID := recipeMedia.MediaID
+
+		// Delete the recipeMedia entry
+		err = s.recipeMediaService.DeleteRecipeMedia(recipeMedia)
+		if err != nil {
+			return http.StatusInternalServerError, ErrDeletingRecipeMedia
+		}
+
+		// Delete the media from the repository
+		media := entity.Media{
+			ID: mediaID,
+		}
+		err = s.mediaService.DeleteMedia(&media)
+		if err != nil {
+			return http.StatusInternalServerError, ErrDeletingMedia
+		}
 	}
 
 	// Return the HTTP OK status code if the update is successful
@@ -126,31 +198,98 @@ func (s *service) DeleteRecipe(c *gin.Context, recipeUUID uuid.UUID) (int, error
 	foundRecipe, err := s.repo.FindByUUID(recipeUUID, recipe)
 	if err != nil {
 		// Return an error response if the recipe is not found.
-		return http.StatusNotFound, fmt.Errorf("recipe not found")
+		return http.StatusNotFound, err
 	}
 
 	// Perform type assertion to convert foundRecipe to *entity.Recipe.
 	recipe, ok := foundRecipe.(*entity.Recipe)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
-	// Delete the recipe from the repository.
+	// Get recipe media associations by recipe ID
+	recipeMedias := []*entity.RecipeMedia{}
+	err = s.recipeMediaService.FindByRecipeID(recipe.ID, &recipeMedias)
+	if err != nil {
+		return http.StatusInternalServerError, ErrFindingRecipeMedia
+	}
+
+	// Iterate over each recipe_media association
+	for _, recipeMedia := range recipeMedias {
+		media := &entity.Media{}
+		// Find the media by ID
+		err := s.mediaService.FindByMediaID(recipeMedia.MediaID, media)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+
+		// Delete the recipe_media association from the repository
+		err = s.recipeMediaService.DeleteRecipeMedia(recipeMedia)
+		if err != nil {
+			return http.StatusInternalServerError, ErrDeletingRecipeMedia
+		}
+
+		// Delete the media from the repository
+		err = s.mediaService.DeleteMedia(media)
+		if err != nil {
+			return http.StatusInternalServerError, ErrDeletingMedia
+		}
+	}
+
+	// Delete the recipe from the repository
 	err = s.repo.Delete(recipe)
 	if err != nil {
-		// Return an error response if there was an issue deleting the recipe.
-		return http.StatusInternalServerError, fmt.Errorf("failed to delete recipe")
+		return http.StatusInternalServerError, ErrDeletingRecipe
 	}
 
 	// Return a success response.
 	return http.StatusOK, nil
 }
 
+// GetAllRecipes returns all recipes stored in the database with associated image URLs.
+func (s *service) GetAllRecipes() ([]*entity.RecipeWithMediaURLs, error) {
+	// Get all recipes from the database
+	var recipes []*entity.Recipe
+	if err := s.repo.Find(&recipes); err != nil {
+		return nil, err
+	}
+
+	recipesWithMediaURLs := make([]*entity.RecipeWithMediaURLs, len(recipes))
+
+	for i, recipe := range recipes {
+		// Get associated media for the recipe
+		recipeMedias := []*entity.RecipeMedia{}
+		err := s.recipeMediaService.FindByRecipeID(recipe.ID, &recipeMedias)
+		if err != nil {
+			return nil, err
+		}
+
+		mediaURLs := make([]string, len(recipeMedias))
+
+		// Get media URLs
+		for j, recipeMedia := range recipeMedias {
+			media := &entity.Media{}
+			err = s.mediaService.FindByMediaID(recipeMedia.MediaID, media)
+			if err != nil {
+				return nil, err
+			}
+
+			mediaURLs[j] = media.MediaURL
+		}
+
+		recipesWithMediaURLs[i] = &entity.RecipeWithMediaURLs{
+			Recipe:    recipe,
+			MediaURLs: mediaURLs,
+		}
+	}
+
+	return recipesWithMediaURLs, nil
+}
+
 // VoteRecipe is the service for voting a recipe in the database.
 func (s *service) VoteRecipe(c *gin.Context, userUUID uuid.UUID, recipeUUID uuid.UUID, vote int) (int, error) {
-	// Validate vote value
 	if vote < 1 || vote > 5 {
-		return http.StatusNotFound, errors.New("invalid vote value, must be between 1 and 5")
+		return http.StatusBadRequest, errors.New("invalid vote value, must be between 1 and 5")
 	}
 
 	// Get user by UUID
@@ -183,7 +322,7 @@ func (s *service) VoteRecipe(c *gin.Context, userUUID uuid.UUID, recipeUUID uuid
 		return http.StatusOK, s.repo.Update(existingVote)
 	}
 
-	// Crear un nuevo registro de voto
+	// Create a new vote record
 	recipeVote := &RatingRecipe{
 		UserID:   user.ID,
 		RecipeID: recipe.ID,
@@ -192,122 +331,42 @@ func (s *service) VoteRecipe(c *gin.Context, userUUID uuid.UUID, recipeUUID uuid
 	return http.StatusOK, s.repo.Create(recipeVote)
 }
 
-func processUploadRequestFile(s *service, c *gin.Context) (int, int, error) {
-	// Source
+// processUploadRequestFiles processes the file upload request
+func processUploadRequestFiles(s *service, c *gin.Context) (int, []string, error) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		return http.StatusBadRequest, 0, fmt.Errorf("get form err: %s", err.Error())
+		return http.StatusBadRequest, nil, fmt.Errorf("get form err: %s", err.Error())
 	}
-
 	files := form.File["file"]
-	if files == nil || len(files) < 1 {
-		return http.StatusBadRequest, 0, fmt.Errorf("file not found, %s", err)
+	if files == nil {
+		return http.StatusBadRequest, nil, ErrFileNotFound
 	}
 
-	// Destination
-	tempDirPath := fmt.Sprintf("/tmp/uploads/%s", uuid.New().String())
-	if _, err = os.Stat(tempDirPath); os.IsNotExist(err) {
-		os.MkdirAll(tempDirPath, 0700)
+	var fileUrls []string
+
+	for _, file := range files {
+		src, err := file.Open()
+		if err != nil {
+			return http.StatusInternalServerError, nil, fmt.Errorf("failed to open file: %s", err)
+		}
+		defer src.Close()
+
+		fileType := file.Header.Get("Content-Type")
+		if fileType != "image/png" && fileType != "image/jpeg" {
+			return http.StatusBadRequest, nil, ErrUnsupportedFileType
+		}
+
+		fileExt := path.Ext(file.Filename)
+		fileNameUuid := uuid.New()
+
+		uploadPath := fmt.Sprintf("%s/%s", config.Get().AwsFolderName, fmt.Sprintf("%s%s", fileNameUuid.String(), fileExt))
+		url, err := aws.UploadFileToS3Stream(src, uploadPath, true)
+		if err != nil || url == "" {
+			return http.StatusInternalServerError, nil, fmt.Errorf("s3 upload error: %s", err.Error())
+		}
+
+		fileUrls = append(fileUrls, url)
 	}
 
-	file := files[0] // only one file expected
-	src, err := file.Open()
-	if err != nil {
-		return http.StatusInternalServerError, 0, fmt.Errorf("failed to open file, %s", err)
-	}
-
-	//Checking file-type, supported types are PNG and JPEG
-	fileType := file.Header.Get("Content-Type")
-	if fileType != PNG && fileType != JPEG {
-		return http.StatusBadRequest, 0, fmt.Errorf("unsupported file type, %s", fileType)
-	}
-
-	fileExt := path.Ext(file.Filename)
-
-	fileNameUuid := uuid.New()
-	filename := fmt.Sprintf("%s/%s%s", tempDirPath, fileNameUuid.String(), fileExt)
-	dst, err := os.Create(filename)
-	if err != nil {
-		return http.StatusInternalServerError, 0, fmt.Errorf("failed to create file, %s", err)
-	}
-	// Copy
-	if _, err = io.Copy(dst, src); err != nil {
-		return http.StatusInternalServerError, 0, fmt.Errorf("failed to copy file, %s", err)
-	}
-
-	// Upload file to S3
-	uploadPath := fmt.Sprintf("%s/%s/%s", config.Get().AwsFolderName, fileNameUuid.String(), fmt.Sprintf("%s%s", fileNameUuid.String(), fileExt))
-	url, err := aws.UploadFileToS3(filename, uploadPath)
-	if err != nil || url == "" {
-		return http.StatusInternalServerError, 0, fmt.Errorf("s3 upload error: %s", err.Error())
-	}
-
-	// Get and upload thumbnail
-	thumbnailUrl, err := getAndUploadThumbnail(filename, fileType, tempDirPath, fileNameUuid.String())
-	if err != nil {
-		return http.StatusInternalServerError, 0, fmt.Errorf("failed to process thumbnail for %s, %s", filename, err)
-	}
-
-	// Create media entry in the database
-	mediaEntry := &entity.Media{
-		MediaURL:   url,
-		MediaThumb: thumbnailUrl,
-	}
-
-	err = s.repo.CreateWithOmit("uuid", mediaEntry)
-	if err != nil {
-		return http.StatusInternalServerError, 0, fmt.Errorf("error creating media entry in db: %s", err.Error())
-	}
-
-	defer src.Close()
-	defer dst.Close()
-
-	// Return the media ID if the process is successful
-	return http.StatusOK, mediaEntry.ID, nil
-}
-
-func getAndUploadThumbnail(filename, fileType, tempDirPath, fileNameUuid string) (string, error) {
-	imgFile, err := os.Open(filename)
-	if err != nil {
-		return "", fmt.Errorf("failed to open image file: %s", err)
-	}
-	defer imgFile.Close()
-
-	img, _, err := image.Decode(imgFile)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode image file: %s", err)
-	}
-
-	// Create thumbnail
-	thumbnail := imaging.Thumbnail(img, 200, 200, imaging.CatmullRom)
-
-	// Save thumbnail to a temporary file
-	thumbnailFilename := fmt.Sprintf("%s/%s_thumb%s", tempDirPath, fileNameUuid, filepath.Ext(filename))
-	thumbnailFile, err := os.Create(thumbnailFilename)
-	if err != nil {
-		return "", fmt.Errorf("failed to create thumbnail file: %s", err)
-	}
-	defer thumbnailFile.Close()
-
-	// Encode thumbnail and write it to the file
-	switch fileType {
-	case PNG:
-		err = png.Encode(thumbnailFile, thumbnail)
-	case JPEG:
-		err = jpeg.Encode(thumbnailFile, thumbnail, &jpeg.Options{Quality: 80})
-	default:
-		return "", fmt.Errorf("unsupported file type for thumbnail: %s", fileType)
-	}
-	if err != nil {
-		return "", fmt.Errorf("failed to encode thumbnail: %s", err)
-	}
-
-	// Upload thumbnail to S3
-	thumbnailUploadPath := fmt.Sprintf("%s/%s/%s_thumb%s", config.Get().AwsFolderName, fileNameUuid, fileNameUuid, filepath.Ext(filename))
-	thumbnailUrl, err := aws.UploadFileToS3(thumbnailFilename, thumbnailUploadPath)
-	if err != nil || thumbnailUrl == "" {
-		return "", fmt.Errorf("s3 upload error for thumbnail: %s", err.Error())
-	}
-
-	return thumbnailUrl, nil
+	return http.StatusOK, fileUrls, nil
 }

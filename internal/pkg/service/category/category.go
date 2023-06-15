@@ -1,6 +1,7 @@
 package category
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -10,37 +11,41 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrTypeAssertion    = errors.New("type assertion failed")
+	ErrCreatingCategory = errors.New("error creating category")
+	ErrUpdatingCategory = errors.New("error updating category")
+	ErrDeletingCategory = errors.New("failed to delete category")
+)
+
+// service struct holds required dependencies for the category service
 type service struct {
 	repo ports.CategoryRepository
 }
 
-// NewService returns a new instance of the category service with the given category repository.
+// NewService creates a new instance of the category service with the provided category repository.
 func NewService(categoryRepo ports.CategoryRepository) ports.CategoryService {
 	return &service{
 		repo: categoryRepo,
 	}
 }
 
-// CreateCategory is the service for creating a category and saving it in the database
+// CreateCategory is a service function for creating a category and saving it in the database
 func (s *service) CreateCategory(c *gin.Context, createReq *entity.Category) (int, error) {
-	// Create a new category
 	category := &entity.Category{
 		Name: createReq.Name,
 	}
 
-	// Save the category to the database
 	err := s.repo.CreateWithOmit("uuid", category)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error creating category: %s", err)
+		return http.StatusInternalServerError, ErrCreatingCategory
 	}
 
-	// Return the HTTP OK status code if the creation is successful
 	return http.StatusOK, nil
 }
 
-// GetAllCategories returns all categories stored in the database
+// GetAllCategories retrieves all categories stored in the database
 func (s *service) GetAllCategories() ([]*entity.Category, error) {
-	// Get all categories from the database
 	var categories []*entity.Category
 	if err := s.repo.Find(&categories); err != nil {
 		return nil, err
@@ -49,57 +54,46 @@ func (s *service) GetAllCategories() ([]*entity.Category, error) {
 	return categories, nil
 }
 
-// UpdateCategory is the service for updating a category in the database
+// UpdateCategory is a service function for updating a category in the database
 func (s *service) UpdateCategory(categoryUUID uuid.UUID, updateReq *entity.Category) (int, error) {
-	// Find the existing category by UUID
 	category := &entity.Category{}
 	foundCategory, err := s.repo.FindByUUID(categoryUUID, category)
 	if err != nil {
-		// Return error if the category is not found
 		return http.StatusNotFound, err
 	}
-	// Perform type assertion to convert foundCategory to *entity.Category
+
 	category, ok := foundCategory.(*entity.Category)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertion
 	}
 
-	// Update the category fields with the new data from the update request
 	category.Name = updateReq.Name
 
-	// Update the category in the database
 	err = s.repo.Update(category)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error updating category: %s", err)
+		return http.StatusInternalServerError, ErrUpdatingCategory
 	}
 
-	// Return the HTTP OK status code if the update is successful
 	return http.StatusOK, nil
 }
 
-// DeleteCategory deletes a category from the database by its UUID.
+// DeleteCategory is a service function to delete a category from the database by its UUID.
 func (s *service) DeleteCategory(c *gin.Context, categoryUUID uuid.UUID) (int, error) {
-	// Retrieve the category from the repository by its UUID.
 	category := &entity.Category{}
 	foundCategory, err := s.repo.FindByUUID(categoryUUID, category)
 	if err != nil {
-		// Return an error response if the category is not found.
 		return http.StatusNotFound, fmt.Errorf("category not found")
 	}
 
-	// Perform type assertion to convert foundCategory to *entity.Category.
 	category, ok := foundCategory.(*entity.Category)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertion
 	}
 
-	// Delete the category from the repository.
 	err = s.repo.Delete(category)
 	if err != nil {
-		// Return an error response if there was an issue deleting the category.
-		return http.StatusInternalServerError, fmt.Errorf("failed to delete category")
+		return http.StatusInternalServerError, ErrDeletingCategory
 	}
 
-	// Return a success response.
 	return http.StatusOK, nil
 }

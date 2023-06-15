@@ -2,6 +2,7 @@ package reminder
 
 import (
 	"github.com/emur-uy/backend/internal/infra/api/middlewares"
+	"github.com/emur-uy/backend/internal/infra/api/middlewares/constants"
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
 	"github.com/emur-uy/backend/internal/pkg/service/media"
 	"github.com/emur-uy/backend/internal/pkg/service/reminder"
@@ -9,6 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RegisterRoutes sets up the reminder-related routes on the given gin.Engine instance.
+// It initializes the necessary components, such as the repository, service, and handler,
+// to handle reminder-related operations in a hexagonal architecture.
 func RegisterRoutes(e *gin.Engine) {
 	// Initialize the repository by creating a new PostgreSQL client.
 	client := postgresql.NewClient()
@@ -28,18 +32,11 @@ func RegisterRoutes(e *gin.Engine) {
 
 	// Group the reminder routes together.
 	reminderRoutes := e.Group("/api/v1/reminders")
+	reminderRoutes.Use(middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
 
-	// Register route for creating reminders accessible only to user role.
-	//allowedRolesCreate := []string{constants.RoleUser}
-	reminderRoutes.POST("", middlewares.Authenticate(), handler.CreateReminder)
-
-	// Register route for getting all reminders accessible only to user role.
-	//allowedRolesGetAll := []string{constants.RoleUser}
-	reminderRoutes.GET("", middlewares.Authenticate(), handler.GetAllReminders)
-
-	// Register route for updating reminder accessible only to user role.
-	//allowedRolesUpdate := []string{constants.RoleUser}
-	reminderRoutes.PUT("", middlewares.Authenticate(), handler.UpdateReminder)
-
-	reminderRoutes.DELETE("", middlewares.Authenticate(), handler.DeleteReminder)
+	// Register user routes requiring authentication and authorization for user role.
+	reminderRoutes.POST("", handler.CreateReminder)
+	reminderRoutes.GET("", handler.GetAllReminders)
+	reminderRoutes.PUT("", handler.UpdateReminder)
+	reminderRoutes.DELETE("", handler.DeleteReminder)
 }

@@ -2,16 +2,18 @@ package reminder
 
 import (
 	"fmt"
+
 	"github.com/emur-uy/backend/internal/pkg/entity"
 	"github.com/emur-uy/backend/internal/pkg/ports"
 )
 
+// service struct holds the necessary dependencies for the reminder media service
 type reminderMediaService struct {
 	repo ports.ReminderMediaRepository
 }
 
 func (s *reminderMediaService) FindByReminderID(reminderID int, i *[]*entity.ReminderMedia) error {
-	return s.repo.Find(&entity.ReminderMedia{}, &i, "reminder_id = ?", reminderID)
+	return s.repo.Find(&entity.ReminderMedia{}, i, "reminder_id = ?", reminderID)
 }
 
 func (s *reminderMediaService) DeleteReminderMedia(reminderMedia *entity.ReminderMedia) error {

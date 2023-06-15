@@ -11,12 +11,14 @@ import (
 
 // RegisterAuthMiddlewares is a function that sets up the authentication and authorization middlewares
 // on the given gin.RouterGroup instance for the specified role.
+// It takes the role string and the gin.RouterGroup instance as parameters.
 func RegisterAuthMiddlewares(role string, r *gin.RouterGroup) {
 	r.Use(Authenticate())
 	r.Use(Authorize(role))
 }
 
 // Authenticate is a middleware to validate JWT tokens and extract claims for authenticated requests.
+// It returns a gin.HandlerFunc.
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 1. Retrieve the JWT from the Authorization header.
@@ -44,6 +46,7 @@ func Authenticate() gin.HandlerFunc {
 }
 
 // getJwt retrieves the JWT from the Authorization header.
+// It takes the gin.Context as a parameter and returns the JWT string and an error (if any).
 func getJwt(c *gin.Context) (string, error) {
 	authorizationHeader := c.Request.Header.Get("Authorization")
 	if authorizationHeader == "" {
@@ -53,12 +56,13 @@ func getJwt(c *gin.Context) (string, error) {
 	return strings.TrimSpace(jwtToken), nil
 }
 
-// Authorize is Authorization middleware to validate roles for API calls
+// Authorize is Authorization middleware to validate roles for API calls.
+// It takes a variadic parameter allowedRoles of type string and returns a gin.HandlerFunc.
 func Authorize(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Check if the user making the request has any of the specified roles
-		// If the user has any of the roles, call the next middleware/handler
-		// If the user does not have any of the roles, return an error response
+		// Check if the user making the request has any of the specified roles.
+		// If the user has any of the roles, call the next middleware/handler.
+		// If the user does not have any of the roles, return an error response.
 		userRole := c.GetString("role")
 
 		authorized := false

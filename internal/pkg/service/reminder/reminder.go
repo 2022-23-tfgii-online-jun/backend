@@ -1,6 +1,7 @@
 package reminder
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -13,6 +14,23 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	ErrTypeAssertionFailed   = errors.New("type assertion failed")
+	ErrCreatingReminder      = errors.New("error creating reminder")
+	ErrUpdatingReminder      = errors.New("error updating reminder")
+	ErrDeletingReminder      = errors.New("error deleting reminder")
+	ErrFindingReminderMedia  = errors.New("error finding reminder media")
+	ErrCreatingReminderMedia = errors.New("error creating reminder media association")
+	ErrDeletingReminderMedia = errors.New("error deleting reminder media association")
+	ErrCreatingMedia         = errors.New("error creating media")
+	ErrDeletingMedia         = errors.New("error deleting media")
+	ErrFileNotFound          = errors.New("file not found")
+	ErrUnsupportedFileType   = errors.New("unsupported file type")
+	ErrInvalidVoteValue      = errors.New("invalid vote value, must be between 1 and 5")
+	ErrFindingMedia          = errors.New("error finding media")
+)
+
+// service struct holds the necessary dependencies for the reminder service
 type service struct {
 	repo                 ports.ReminderRepository
 	mediaService         ports.MediaService
@@ -20,8 +38,7 @@ type service struct {
 }
 
 // NewService returns a new instance of the reminder service with the given reminder repository.
-func NewService(reminderRepo ports.ReminderRepository, mediaService ports.MediaService,
-	reminderMediaService ports.ReminderMediaService) ports.ReminderService {
+func NewService(reminderRepo ports.ReminderRepository, mediaService ports.MediaService, reminderMediaService ports.ReminderMediaService) ports.ReminderService {
 	return &service{
 		repo:                 reminderRepo,
 		mediaService:         mediaService,
@@ -29,7 +46,7 @@ func NewService(reminderRepo ports.ReminderRepository, mediaService ports.MediaS
 	}
 }
 
-// CreateReminder is the service for creating a reminder and saving it in the database
+// CreateReminder is the service for creating a reminder and saving it in the database.
 func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateReminder) (int, error) {
 	user := &entity.User{}
 
@@ -42,12 +59,12 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 	// Perform type assertion to convert foundUser to *entity.User
 	user, ok := foundUser.(*entity.User)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
 	fileProcessCode, fileUrls, err := processUploadRequestFiles(s, c) // This now processes multiple files
 	if err != nil || fileProcessCode != http.StatusOK {
-		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file, %s", err)
+		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file: %s", err)
 	}
 
 	// Create a new reminder
@@ -65,7 +82,7 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 	// Save the reminder to the database
 	err = s.repo.CreateWithOmit("uuid", reminder)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error creating reminder: %s", err)
+		return http.StatusInternalServerError, ErrCreatingReminder
 	}
 
 	// For each uploaded file, create a new media entry and a new reminder_media association
@@ -75,7 +92,7 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 		}
 		err = s.mediaService.CreateMedia(media)
 		if err != nil {
-			return http.StatusInternalServerError, fmt.Errorf("error creating media: %s", err)
+			return http.StatusInternalServerError, ErrCreatingMedia
 		}
 		reminderMedia := &entity.ReminderMedia{
 			ReminderID: reminder.ID,
@@ -83,7 +100,7 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 		}
 		err = s.reminderMediaService.CreateReminderMedia(reminderMedia)
 		if err != nil {
-			return http.StatusInternalServerError, fmt.Errorf("error creating reminder_media association: %s", err)
+			return http.StatusInternalServerError, ErrCreatingReminderMedia
 		}
 	}
 
@@ -91,7 +108,7 @@ func (s *service) CreateReminder(c *gin.Context, userUUID uuid.UUID, createReq *
 	return http.StatusOK, nil
 }
 
-// GetAllReminders retrieves all reminders from the database
+// GetAllReminders retrieves all reminders from the database.
 func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity.GetReminderResponse, error) {
 	user := &entity.User{}
 
@@ -104,19 +121,21 @@ func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity
 	// Perform type assertion to convert foundUser to *entity.User
 	user, ok := foundUser.(*entity.User)
 	if !ok {
-		return nil, fmt.Errorf("type assertion failed")
+		return nil, ErrTypeAssertionFailed
 	}
 
 	reminders := []*entity.Reminder{}
 	// Get all reminders for this user
-	//err = s.repo.Find(user.ID, reminder)
 	err = s.repo.Find(&entity.Reminder{}, &reminders, "user_id = ?", user.ID)
+	if err != nil {
+		// Return error if the user is not found
+		return nil, err
+	}
 
 	response := []*entity.GetReminderResponse{}
 
 	// Get media for each reminder and prepare response
 	for _, reminder := range reminders {
-
 		getReminderResponse := &entity.GetReminderResponse{
 			UUID:         reminder.UUID,
 			Name:         reminder.Name,
@@ -128,7 +147,7 @@ func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity
 			IsActive:     reminder.IsActive,
 		}
 
-		//Get reminder medias
+		// Get reminder medias
 		reminderMedias := []*entity.ReminderMedia{}
 		err = s.repo.Find(&entity.ReminderMedia{}, &reminderMedias, "reminder_id = ?", reminder.ID)
 		if err != nil {
@@ -138,9 +157,9 @@ func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity
 
 		reminderMediaResponses := []entity.GetReminderMediaResponse{}
 
-		//Get media details
+		// Get media details
 		for _, reminderMedia := range reminderMedias {
-			//Get media details
+			// Get media details
 			media := entity.Media{}
 			err = s.repo.Find(&entity.Media{}, &media, "id = ?", reminderMedia.MediaID)
 			if err != nil {
@@ -148,7 +167,7 @@ func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity
 				return nil, err
 			}
 
-			//add details in response
+			// Add details in response
 			reminderMediaResponse := &entity.GetReminderMediaResponse{
 				MediaURL:   media.MediaURL,
 				MediaThumb: media.MediaThumb,
@@ -167,19 +186,19 @@ func (s *service) GetAllReminders(c *gin.Context, userUUID uuid.UUID) ([]*entity
 	return response, nil
 }
 
-// UpdateReminder is the service for updating a reminder in the database
+// UpdateReminder is the service for updating a reminder in the database.
 func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateReq *entity.RequestUpdateReminder) (int, error) {
 	// Find the existing reminder by UUID
 	reminder := &entity.Reminder{}
 	foundReminder, err := s.repo.FindByUUID(reminderUUID, reminder)
 	if err != nil {
-		// Return error if the article is not found
+		// Return error if the reminder is not found
 		return http.StatusNotFound, err
 	}
 	// Perform type assertion to convert foundReminder to *entity.Reminder
 	reminder, ok := foundReminder.(*entity.Reminder)
 	if !ok {
-		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
 	// Update the reminder fields with the new data from the update request
@@ -193,20 +212,19 @@ func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateR
 	// Update the reminder in the database
 	err = s.repo.Update(reminder)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("error updating reminder: %s", err)
+		return http.StatusInternalServerError, ErrUpdatingReminder
 	}
 
 	fileProcessCode, fileUrls, err := processUploadRequestFiles(s, c) // This now processes multiple files
 	if err != nil || fileProcessCode != http.StatusOK {
-		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file, %s", err)
+		return http.StatusInternalServerError, fmt.Errorf("error processing content upload file: %s", err)
 	}
 
-	//get existing reminder media data
+	// Get existing reminder media data
 	reminderMedias := []*entity.ReminderMedia{}
-	err = s.repo.Find(&entity.ReminderMedia{}, &reminderMedias, "reminder_id = ?", reminder.ID)
+	err = s.reminderMediaService.FindByReminderID(reminder.ID, &reminderMedias)
 	if err != nil {
-		// Return error if the media is not found
-		return http.StatusInternalServerError, fmt.Errorf("error updating reminder media, %s", err)
+		return http.StatusInternalServerError, ErrFindingReminderMedia
 	}
 
 	// For each uploaded file, create a new media entry and a new reminder_media association
@@ -216,7 +234,7 @@ func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateR
 		}
 		err = s.mediaService.CreateMedia(media)
 		if err != nil {
-			return http.StatusInternalServerError, fmt.Errorf("error creating media: %s", err)
+			return http.StatusInternalServerError, ErrCreatingMedia
 		}
 		reminderMedia := &entity.ReminderMedia{
 			ReminderID: reminder.ID,
@@ -224,30 +242,27 @@ func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateR
 		}
 		err = s.reminderMediaService.CreateReminderMedia(reminderMedia)
 		if err != nil {
-			return http.StatusInternalServerError, fmt.Errorf("error creating reminder_media association: %s", err)
+			return http.StatusInternalServerError, ErrCreatingReminderMedia
 		}
 	}
 
-	//delete old media entries
+	// Delete old media entries
 	for _, reminderMedia := range reminderMedias {
-
 		mediaID := reminderMedia.MediaID
 
-		//delete the reminderMedia entry
-		err = s.repo.Delete(reminderMedia)
+		// Delete the reminderMedia entry
+		err = s.reminderMediaService.DeleteReminderMedia(reminderMedia)
 		if err != nil {
-			// Return an error response if there was an issue deleting the reminder_media.
-			return http.StatusInternalServerError, fmt.Errorf("failed to update media")
+			return http.StatusInternalServerError, ErrDeletingReminderMedia
 		}
 
-		// Delete the media from the repository.
+		// Delete the media from the repository
 		media := entity.Media{
 			ID: mediaID,
 		}
-		err = s.repo.Delete(media)
+		err = s.mediaService.DeleteMedia(&media)
 		if err != nil {
-			// Return an error response if there was an issue deleting the media.
-			return http.StatusInternalServerError, fmt.Errorf("failed to update media")
+			return http.StatusInternalServerError, ErrDeletingMedia
 		}
 	}
 
@@ -267,7 +282,7 @@ func (s *service) DeleteReminder(c *gin.Context, reminderUUID uuid.UUID) error {
 	// Perform type assertion to convert foundReminder to *entity.Reminder
 	reminder, ok := foundReminder.(*entity.Reminder)
 	if !ok {
-		return fmt.Errorf("type assertion failed")
+		return ErrTypeAssertionFailed
 	}
 
 	// 2. Find reminder_media associations by reminder ID
@@ -289,7 +304,7 @@ func (s *service) DeleteReminder(c *gin.Context, reminderUUID uuid.UUID) error {
 		// Delete file from S3
 		err = aws.DeleteObjectFromS3(media.MediaURL)
 		if err != nil {
-			return fmt.Errorf("failed to delete uploaded files from s3, error: %s", err.Error())
+			return fmt.Errorf("failed to delete uploaded files from s3: %s", err.Error())
 		}
 
 		// Delete reminder_media association from db
@@ -322,7 +337,7 @@ func processUploadRequestFiles(s *service, c *gin.Context) (int, []string, error
 	}
 	files := form.File["file"]
 	if files == nil {
-		return http.StatusBadRequest, nil, fmt.Errorf("file not found")
+		return http.StatusBadRequest, nil, ErrFileNotFound
 	}
 
 	var fileUrls []string
@@ -330,13 +345,13 @@ func processUploadRequestFiles(s *service, c *gin.Context) (int, []string, error
 	for _, file := range files {
 		src, err := file.Open()
 		if err != nil {
-			return http.StatusInternalServerError, nil, fmt.Errorf("failed to open file, %s", err)
+			return http.StatusInternalServerError, nil, fmt.Errorf("failed to open file: %s", err)
 		}
 		defer src.Close()
 
 		fileType := file.Header.Get("Content-Type")
 		if fileType != "image/png" && fileType != "image/jpeg" {
-			return http.StatusBadRequest, nil, fmt.Errorf("unsupported file type, %s", fileType)
+			return http.StatusBadRequest, nil, ErrUnsupportedFileType
 		}
 
 		fileExt := path.Ext(file.Filename)

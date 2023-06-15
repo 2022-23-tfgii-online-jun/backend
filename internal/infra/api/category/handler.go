@@ -11,39 +11,41 @@ import (
 	"github.com/google/uuid"
 )
 
+// categoryHandler type contains an instance of CategoryService.
 type categoryHandler struct {
 	categoryService ports.CategoryService
 }
 
-// Constructor function for categoryHandler struct
+// newHandler is a constructor function for initializing categoryHandler with the given CategoryService.
+// The return is a pointer to an categoryHandler instance.
 func newHandler(categoryService ports.CategoryService) *categoryHandler {
 	return &categoryHandler{
 		categoryService: categoryService,
 	}
 }
 
-// CreateCategory handler for creating a category
+// CreateCategory handles the HTTP request for creating a category.
+// It binds the incoming JSON payload to the reqCreate struct.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// If the category is created successfully, it will return a 200 OK status with the created category.
 func (c *categoryHandler) CreateCategory(ctx *gin.Context) {
-	// Declare a variable for the incoming request payload
+	// Declare a variable for the incoming request payload.
 	reqCreate := &entity.Category{}
 
-	// Get user uuid from context
-	// userUUID, _ := uuid.Parse(fmt.Sprintf("%v", ctx.MustGet("userUUID")))
-
-	// Bind incoming form-data payload to the reqCreate struct.
+	// Bind incoming JSON payload to the reqCreate struct.
 	if err := ctx.ShouldBindJSON(reqCreate); err != nil {
 		handleError(ctx, http.StatusBadRequest, "Invalid input", err)
 		return
 	}
 
-	// Create the category and store it in the database.
+	// Create the category and store it in the database using service.
 	createdCategory, err := c.categoryService.CreateCategory(ctx, reqCreate)
 	if err != nil {
 		handleError(ctx, http.StatusInternalServerError, "An error occurred while creating the category", err)
 		return
 	}
 
-	// Return a successful response.
+	// Return a successful response with the created category.
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "Category created successfully",
@@ -52,6 +54,9 @@ func (c *categoryHandler) CreateCategory(ctx *gin.Context) {
 }
 
 // GetAllCategories handles the HTTP request for getting all categories.
+// It retrieves all categories from the database.
+// If any error occurs during this process, it will return a 500 Internal Server Error status.
+// If the categories are retrieved successfully, it will return a 200 OK status with the retrieved categories.
 func (c *categoryHandler) GetAllCategories(ctx *gin.Context) {
 	// Get all categories from the database.
 	categories, err := c.categoryService.GetAllCategories()
@@ -68,7 +73,10 @@ func (c *categoryHandler) GetAllCategories(ctx *gin.Context) {
 	})
 }
 
-// UpdateCategory handler for updating a category
+// UpdateCategory handles the HTTP request for updating a category.
+// It parses the category UUID from the URL parameter and binds the incoming JSON payload to the reqUpdate struct.
+// If any error occurs during this process, it will return a 400 Bad Request status.
+// If the category is updated successfully, it will return a 200 OK status with the updated category.
 func (c *categoryHandler) UpdateCategory(ctx *gin.Context) {
 	// Parse the category UUID from the URL parameter.
 	categoryUUID, err := uuid.Parse(ctx.Param("uuid"))
@@ -79,7 +87,7 @@ func (c *categoryHandler) UpdateCategory(ctx *gin.Context) {
 
 	// Bind the incoming JSON payload to an UpdateCategory struct.
 	reqUpdate := &entity.Category{}
-	if err := ctx.ShouldBind(reqUpdate); err != nil {
+	if err := ctx.ShouldBindJSON(reqUpdate); err != nil {
 		handleError(ctx, http.StatusBadRequest, "Invalid input", err)
 		return
 	}
@@ -91,7 +99,7 @@ func (c *categoryHandler) UpdateCategory(ctx *gin.Context) {
 		return
 	}
 
-	// Return a successful response.
+	// Return a successful response with the updated category.
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "Category updated successfully",
@@ -99,9 +107,12 @@ func (c *categoryHandler) UpdateCategory(ctx *gin.Context) {
 	})
 }
 
-// DeleteCategory handler for deleting a category
+// DeleteCategory handles the HTTP request for deleting a category.
+// It gets the category UUID from the path parameter and calls the categoryService to delete the category.
+// If any error occurs during this process, it will return the corresponding status code and error message.
+// If the category is deleted successfully, it will return a 200 OK status.
 func (c *categoryHandler) DeleteCategory(ctx *gin.Context) {
-	// Get category uuid from path parameter
+	// Get category UUID from path parameter.
 	categoryUUID, _ := uuid.Parse(fmt.Sprintf("%v", ctx.Param("uuid")))
 
 	// Delete the category from the database.
@@ -118,12 +129,12 @@ func (c *categoryHandler) DeleteCategory(ctx *gin.Context) {
 	})
 }
 
-// handleError is a generic error handler that logs the error and responds
+// handleError is a generic error handler that logs the error and responds with the corresponding status code and error message.
 func handleError(ctx *gin.Context, statusCode int, message string, err error) {
-	// Log the error message and the error itself
+	// Log the error message and the error itself.
 	log.Printf("[CategoryHandler]: %s, %v", message, err)
 
-	// Send the JSON response with the status code and error message
+	// Send the JSON response with the status code and error message.
 	ctx.JSON(statusCode, gin.H{
 		"code":    statusCode,
 		"message": message,

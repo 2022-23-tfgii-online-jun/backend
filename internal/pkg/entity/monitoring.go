@@ -15,7 +15,7 @@ func (*Monitoring) TableName() string {
 type Monitoring struct {
 	ID        int64     `gorm:"column:id;primary_key" json:"-"`
 	UserID    int       `gorm:"column:user_id" json:"-"`
-	SymptomID int       `gorm:"column:symptom_id" json:"-"`
+	SymptomID int       `gorm:"column:symptom_id" json:"symptom"`
 	Scale     int       `gorm:"Column:scale" json:"scale"`
 	Date      time.Time `gorm:"column:date;default:current_timestamp" json:"date"`
 }
