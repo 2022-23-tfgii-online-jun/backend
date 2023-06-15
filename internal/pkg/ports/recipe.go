@@ -52,7 +52,7 @@ type RecipeService interface {
 
 	// UpdateRecipe updates an existing Recipe using the provided Recipe UUID and update request data.
 	// Returns an HTTP status code and an error if the operation fails.
-	UpdateRecipe(recipeUUID uuid.UUID, updateReq *entity.RequestUpdateRecipe) (int, error)
+	UpdateRecipe(c *gin.Context, recipeUUID uuid.UUID, updateReq *entity.RequestUpdateRecipe) (int, error)
 
 	// DeleteRecipe deletes a Recipe based on the provided Recipe UUID.
 	// Returns an HTTP status code and an error if the operation fails.
@@ -60,7 +60,7 @@ type RecipeService interface {
 
 	// GetAllRecipes retrieves all Recipe records.
 	// Returns a slice of Recipes and an error if the operation fails.
-	GetAllRecipes() ([]*entity.Recipe, error)
+	GetAllRecipes() ([]*entity.RecipeWithMediaURLs, error)
 
 	// VoteRecipe enables users to vote for a Recipe using the provided user UUID, recipe UUID and vote value.
 	// Returns an HTTP status code and an error if the operation fails.

@@ -72,3 +72,35 @@ type ReminderMediaService interface {
 	// Returns an error if the operation fails.
 	FindByReminderID(id int, i *[]*entity.ReminderMedia) error
 }
+
+// RecipeMediaRepository defines an interface for accessing the recipe_media data store.
+// It is a contract for all database operations related to RecipeMedia data.
+type RecipeMediaRepository interface {
+	// Create creates a new RecipeMedia record in the data store.
+	// Returns an error if the operation fails.
+	Create(value interface{}) error
+
+	// Delete removes a RecipeMedia record from the data store.
+	// Returns an error if the operation fails.
+	Delete(value interface{}) error
+
+	// Find retrieves all RecipeMedia records that match the given conditions.
+	// Returns an error if the operation fails.
+	Find(model interface{}, dest interface{}, conditions ...interface{}) error
+}
+
+// RecipeMediaService is an interface defining a contract for business logic operators related to RecipeMedia.
+// It works with the entity layer to manipulate RecipeMedia data.
+type RecipeMediaService interface {
+	// CreateRecipeMedia creates a new RecipeMedia entity.
+	// Returns an error if the operation fails.
+	CreateRecipeMedia(recipeMedia *entity.RecipeMedia) error
+
+	// DeleteRecipeMedia removes an existing RecipeMedia entity.
+	// Returns an error if the operation fails.
+	DeleteRecipeMedia(recipeMedia *entity.RecipeMedia) error
+
+	// FindByRecipeID retrieves RecipeMedia entities based on the Recipe ID.
+	// Returns an error if the operation fails.
+	FindByRecipeID(id int, i *[]*entity.RecipeMedia) error
+}

@@ -28,7 +28,7 @@ func (w *Worker) CheckForecast() {
 	}
 
 	for _, user := range users {
-		forecastData := forecast.GetForecast("es", user.Country, user.City)
+		forecastData, _ := forecast.GetForecast("es", user.Country, user.City)
 
 		// Iterate over each day of the forecast
 		for _, d := range forecastData.ForecastInfo.ForecastDay {

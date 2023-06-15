@@ -96,7 +96,7 @@ func (r *recipeHandler) UpdateRecipe(c *gin.Context) {
 	}
 
 	// Update the recipe in the database.
-	updatedRecipe, err := r.recipeService.UpdateRecipe(recipeUUID, reqUpdate)
+	updatedRecipe, err := r.recipeService.UpdateRecipe(c, recipeUUID, reqUpdate)
 	if err != nil {
 		handleError(c, http.StatusInternalServerError, "An error occurred while updating the recipe", err)
 		return
