@@ -43,6 +43,10 @@ func (s *service) CreateQuestion(c *gin.Context, userUUID uuid.UUID, createReq *
 		return nil, ErrTypeAssertionFailed
 	}
 
+	if createReq == nil {
+		return nil, errors.New("nil payload")
+	}
+
 	// Create a new question
 	question := &entity.Question{
 		UserID: user.ID,

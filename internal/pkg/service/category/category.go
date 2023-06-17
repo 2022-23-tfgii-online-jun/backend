@@ -32,6 +32,10 @@ func NewService(categoryRepo ports.CategoryRepository) ports.CategoryService {
 
 // CreateCategory is a service function for creating a category and saving it in the database
 func (s *service) CreateCategory(c *gin.Context, createReq *entity.Category) (int, error) {
+	if createReq == nil {
+		return http.StatusBadRequest, ErrCreatingCategory
+	}
+
 	category := &entity.Category{
 		Name: createReq.Name,
 	}

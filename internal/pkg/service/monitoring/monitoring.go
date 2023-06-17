@@ -36,6 +36,10 @@ func NewService(repo ports.MonitoringRepository) ports.MonitoringService {
 
 // CreateMonitoring is the service for creating a monitoring record and saving it in the database.
 func (s *service) CreateMonitoring(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateMonitoring) (*entity.Monitoring, int, error) {
+	if createReq == nil {
+		return nil, http.StatusBadRequest, errors.New("nil payload")
+	}
+
 	// Find user by UUID
 	user, err := s.repo.FindByUUID(userUUID, &entity.User{})
 	if err != nil {

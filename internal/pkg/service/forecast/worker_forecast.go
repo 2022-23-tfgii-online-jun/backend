@@ -53,7 +53,7 @@ func (w *Worker) CheckForecast() {
 			// Call the service function to create the forecast record in the database
 			err := w.service.CreateForecast(forecast)
 			if err != nil {
-				fmt.Printf("Error creating forecast record for user %s (%s, %s): %s\n", user.Country, user.City, err)
+				fmt.Printf("Error creating forecast record for user %s (%s, %s): %s\n", user.UUID, user.Country, user.City, err)
 				continue
 			}
 

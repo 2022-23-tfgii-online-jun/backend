@@ -152,6 +152,8 @@ func (s *service) AddArticleToCategory(categoryUUID uuid.UUID, articleUUID uuid.
 	return nil
 }
 
+var uploadFunc = aws.UploadFileToS3Stream
+
 // processUploadRequestFile processes the file upload request
 func processUploadRequestFile(s *service, c *gin.Context) (int, string, error) {
 	form, err := c.MultipartForm()
@@ -178,7 +180,7 @@ func processUploadRequestFile(s *service, c *gin.Context) (int, string, error) {
 	fileNameUuid := uuid.New()
 
 	uploadPath := fmt.Sprintf("%s/%s", config.Get().AwsFolderName, fmt.Sprintf("%s%s", fileNameUuid.String(), fileExt))
-	url, err := aws.UploadFileToS3Stream(src, uploadPath, true)
+	url, err := uploadFunc(src, uploadPath, true)
 	if err != nil || url == "" {
 		return http.StatusInternalServerError, "", ErrProcessingUpload
 	}

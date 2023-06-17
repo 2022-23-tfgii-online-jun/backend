@@ -29,7 +29,6 @@ func newHandler(answerService ports.AnswerService) *answerHandler {
 // If the request body is invalid, it will return a 400 Bad Request status.
 // If the Answer is created successfully, it will return a 200 OK status.
 func (a *answerHandler) CreateAnswer(c *gin.Context) {
-	// Parse the userUUID from the request context
 	userUUID, err := uuid.Parse(c.GetString("userUUID"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -39,7 +38,6 @@ func (a *answerHandler) CreateAnswer(c *gin.Context) {
 		return
 	}
 
-	// Parse the questionUUID from the request parameters
 	questionUUIDStr := c.Param("question_uuid")
 	questionUUID, err := uuid.Parse(questionUUIDStr)
 	if err != nil {
@@ -50,7 +48,6 @@ func (a *answerHandler) CreateAnswer(c *gin.Context) {
 		return
 	}
 
-	// Bind the JSON request body to createReq
 	var createReq entity.RequestCreateAnswer
 	if err := c.ShouldBindJSON(&createReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -60,7 +57,7 @@ func (a *answerHandler) CreateAnswer(c *gin.Context) {
 		return
 	}
 
-	// Call the answerService to create the answer
+	// Call the service method create a new answer.
 	statusCode, err := a.answerService.CreateAnswer(c, userUUID, questionUUID, &createReq)
 	if err != nil {
 		c.JSON(statusCode, gin.H{

@@ -47,6 +47,10 @@ func (s *medicalRecordService) CreateMedicalRecord(c *gin.Context, userUUID uuid
 		return nil, http.StatusInternalServerError, ErrAssertingUser
 	}
 
+	if createReq == nil {
+		return nil, http.StatusBadRequest, errors.New("nil payload")
+	}
+
 	// Create a new medical record entity
 	medicalRecord := &entity.MedicalRecord{
 		UserID:                  userEntity.ID,

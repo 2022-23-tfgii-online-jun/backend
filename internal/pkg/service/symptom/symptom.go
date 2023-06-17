@@ -34,6 +34,11 @@ func NewService(symptomRepo ports.SymptomRepository) ports.SymptomService {
 
 // CreateSymptom is the service for creating a symptom and saving it in the database.
 func (s *service) CreateSymptom(c *gin.Context, createReq *entity.RequestCreateSymptom) (*entity.Symptom, int, error) {
+
+	if createReq == nil {
+		return nil, http.StatusBadRequest, errors.New("nil payload")
+	}
+
 	// Create a new symptom
 	symptom := &entity.Symptom{
 		Name:     createReq.Name,

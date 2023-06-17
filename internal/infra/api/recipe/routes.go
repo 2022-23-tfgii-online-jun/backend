@@ -41,8 +41,5 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register route for getting all recipes accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}
 	recipeRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.GetAllRecipes)
-
-	// Register route for voting recipes accessible only to user roles.
-	allowedRolesForVoting := []string{constants.RoleUser}
-	recipeRoutes.POST("/:uuid/vote", middlewares.Authenticate(), middlewares.Authorize(allowedRolesForVoting...), handler.VoteRecipe)
+	recipeRoutes.POST("/:uuid/vote", middlewares.Authenticate(), middlewares.Authorize(allowedRoles...), handler.VoteRecipe)
 }

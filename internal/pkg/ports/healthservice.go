@@ -9,7 +9,6 @@ import (
 // HealthServiceRepository is an interface that acts as a contract for the data access layer,
 // requiring implementations to provide methods for querying and modifying Health Service data.
 type HealthServiceRepository interface {
-
 	// FindByUUID retrieves a HealthService based on its UUID.
 	// Returns the HealthService and an error if any occurred.
 	FindByUUID(uuid uuid.UUID, out interface{}) (interface{}, error)
