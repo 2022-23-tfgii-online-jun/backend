@@ -3,11 +3,8 @@ package user_test
 import (
 	"errors"
 	"net/http"
-	"os"
 	"testing"
 	"time"
-
-	"github.com/spf13/viper"
 
 	"github.com/google/uuid"
 
@@ -41,7 +38,7 @@ func (m *MockUserRepository) Update(value interface{}) error {
 
 // First is a mock implementation of the First method.
 func (m *MockUserRepository) First(out interface{}, conditions ...interface{}) error {
-	if conditions[0] == "uuid= ?" && conditions[1] == testUuid.String() {
+	if conditions[0] == "uuid= ?" && conditions[1] == testUuid {
 		out.(*entity.User).UUID = testUuid
 		return nil
 	}
@@ -72,9 +69,9 @@ func (m *MockUserRepository) UpdateColumns(value interface{}, column string, upd
 }
 
 // FindByUUID is a mock implementation of the FindByUUID method.
-func (m *MockUserRepository) FindByUUID(userUUID string, out interface{}) (interface{}, error) {
-	if userUUID == testUuid.String() {
-		user := &entity.User{
+func (m *MockUserRepository) FindByUUID(userUUID uuid.UUID, out interface{}) (interface{}, error) {
+	if userUUID == testUuid {
+		usr := &entity.User{
 			ID:        1,
 			UUID:      testUuid,
 			Email:     "test@example.com",
@@ -83,14 +80,14 @@ func (m *MockUserRepository) FindByUUID(userUUID string, out interface{}) (inter
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		}
-		out.(*entity.User).ID = user.ID
-		out.(*entity.User).UUID = user.UUID
-		out.(*entity.User).Email = user.Email
-		out.(*entity.User).Password = user.Password
-		out.(*entity.User).IsActive = user.IsActive
-		out.(*entity.User).CreatedAt = user.CreatedAt
-		out.(*entity.User).UpdatedAt = user.UpdatedAt
-		return user, nil
+		out.(*entity.User).ID = usr.ID
+		out.(*entity.User).UUID = usr.UUID
+		out.(*entity.User).Email = usr.Email
+		out.(*entity.User).Password = usr.Password
+		out.(*entity.User).IsActive = usr.IsActive
+		out.(*entity.User).CreatedAt = usr.CreatedAt
+		out.(*entity.User).UpdatedAt = usr.UpdatedAt
+		return usr, nil
 	}
 	return nil, errors.New("user not found")
 }
@@ -101,41 +98,6 @@ func TestLogin(t *testing.T) {
 	// Set up the mock repository and service.
 	mockRepo := &MockUserRepository{}
 	s := user.NewService(mockRepo)
-
-	// Prepare environment variables for testing.
-	// Create a temporary file for the environment variables.
-	tmpFile, err := os.CreateTemp("./", "dev.env")
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Write test data to the temporary file.
-	testData := []byte("DB_HOST=localhost\n" +
-		"DB_USER=test\n" +
-		"DB_PASS=test\n" +
-		"DB_NAME=test\n" +
-		"DB_PORT=25060\n" +
-		"DB_TLS=require\n" +
-		"SENTRY_KEY=test\n" +
-		"GIN_MODE=debug\n" +
-		"APP_ENV=dev\n" +
-		"SECRET_KEY=test\n" +
-		"JWT_TOKEN_KEY=07bdb5e4afedc99c756075c6403122b622e070bb314eb4e8e2127c22794a392acda82ab9bb61b246015404bd58d38aab3b4488eb087d944a837b2da0d15ceb5b\n" +
-		"JWT_TOKEN_EXPIRED=24\n")
-	_, err = tmpFile.Write(testData)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Close the temporary file to flush its contents to disk.
-	err = tmpFile.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Defer cleanup of the temporary file.
-	defer os.Remove(tmpFile.Name())
-
-	// Mock the environment variable to use the temporary file.
-	viper.Set("APP_ENV", tmpFile.Name())
 
 	// Define test cases.
 	testCases := []struct {
@@ -236,13 +198,13 @@ func TestGetUser(t *testing.T) {
 	mockRepo := &MockUserRepository{}
 	s := user.NewService(mockRepo)
 	// Test case 1: user found
-	mockUser, err := s.GetUser(testUuid.String())
+	mockUser, err := s.GetUser(testUuid)
 	assert.Nil(t, err)
 	assert.NotNil(t, mockUser)
 	assert.Equal(t, testUuid, mockUser.UUID)
 
 	// Test case 2: user not found
-	mockUser, err = s.GetUser("not-found-uuid")
+	mockUser, err = s.GetUser(uuid.New()) //some random non-existing UUID
 	assert.NotNil(t, err)
 	assert.Nil(t, mockUser)
 }
@@ -251,12 +213,12 @@ func TestUpdateActiveStatus(t *testing.T) {
 	mockRepo := &MockUserRepository{}
 	s := user.NewService(mockRepo)
 	// Test case 1: user found and updated successfully
-	status, err := s.UpdateActiveStatus(testUuid.String(), true)
+	status, err := s.UpdateActiveStatus(testUuid, true)
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, status)
 
 	// Test case 2: user not found
-	status, err = s.UpdateActiveStatus("not-found-uuid", true)
+	status, err = s.UpdateActiveStatus(uuid.New(), true)
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusInternalServerError, status)
 }
@@ -265,12 +227,12 @@ func TestUpdateBannedStatus(t *testing.T) {
 	mockRepo := &MockUserRepository{}
 	s := user.NewService(mockRepo)
 	// Test case 1: user found and updated successfully
-	status, err := s.UpdateBannedStatus(testUuid.String(), true)
+	status, err := s.UpdateBannedStatus(testUuid, true) //some random non-existing UUID
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, status)
 
 	// Test case 2: user not found
-	status, err = s.UpdateBannedStatus("not-found-uuid", true)
+	status, err = s.UpdateBannedStatus(uuid.New(), true) //some random non-existing UUID
 	assert.NotNil(t, err)
 	assert.Equal(t, http.StatusInternalServerError, status)
 }

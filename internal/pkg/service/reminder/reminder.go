@@ -201,6 +201,10 @@ func (s *service) UpdateReminder(c *gin.Context, reminderUUID uuid.UUID, updateR
 		return http.StatusInternalServerError, ErrTypeAssertionFailed
 	}
 
+	if updateReq == nil {
+		return http.StatusBadRequest, errors.New("nil payload")
+	}
+
 	// Update the reminder fields with the new data from the update request
 	reminder.Name = updateReq.Name
 	reminder.Type = updateReq.Type
@@ -329,6 +333,8 @@ func (s *service) DeleteReminder(c *gin.Context, reminderUUID uuid.UUID) error {
 	return nil
 }
 
+var uploadFunc = aws.UploadFileToS3Stream
+
 // processUploadRequestFiles processes the file upload request
 func processUploadRequestFiles(s *service, c *gin.Context) (int, []string, error) {
 	form, err := c.MultipartForm()
@@ -358,7 +364,7 @@ func processUploadRequestFiles(s *service, c *gin.Context) (int, []string, error
 		fileNameUuid := uuid.New()
 
 		uploadPath := fmt.Sprintf("%s/%s", config.Get().AwsFolderName, fmt.Sprintf("%s%s", fileNameUuid.String(), fileExt))
-		url, err := aws.UploadFileToS3Stream(src, uploadPath, true)
+		url, err := uploadFunc(src, uploadPath, true)
 		if err != nil || url == "" {
 			return http.StatusInternalServerError, nil, fmt.Errorf("s3 upload error: %s", err.Error())
 		}

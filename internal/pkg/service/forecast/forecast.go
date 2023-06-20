@@ -1,6 +1,7 @@
 package forecast
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/emur-uy/backend/internal/pkg/entity"
@@ -29,6 +30,11 @@ func (s *service) GetDistinctCountryAndCityUsers() ([]entity.User, error) {
 }
 
 func (s *service) CreateForecast(createReq *entity.Forecast) error {
+
+	if createReq == nil {
+		return errors.New("nil payload")
+	}
+
 	// Crea una nueva entidad de pronóstico
 	forecast := &entity.Forecast{
 		Country:        createReq.Country,

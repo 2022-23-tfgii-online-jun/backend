@@ -33,6 +33,10 @@ func NewService(treatmentRepo ports.TreatmentRepository) ports.TreatmentService 
 
 // CreateTreatment is the service for creating a treatment and saving it in the database.
 func (s *service) CreateTreatment(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateTreatment) (*entity.Treatment, int, error) {
+	if createReq == nil {
+		return nil, http.StatusNotFound, errors.New("request payload is nil")
+	}
+
 	// Find user by UUID
 	user := &entity.User{}
 	foundUser, err := s.repo.FindByUUID(userUUID, user)

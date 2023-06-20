@@ -29,6 +29,10 @@ func NewService(healthServiceRepo ports.HealthServiceRepository) ports.HealthSer
 
 // CreateHealthService is the service for creating a health service and saving it in the database
 func (s *service) CreateHealthService(c *gin.Context, createReq *entity.RequestCreateHealthService) (string, int, error) {
+	if createReq == nil {
+		return "", http.StatusBadRequest, errors.New("nil payload")
+	}
+
 	// Create a new health service
 	healthService := &entity.HealthService{
 		Name: createReq.Name,

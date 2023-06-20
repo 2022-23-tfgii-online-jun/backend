@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	"log"
+	"path/filepath"
+	"runtime"
 	"sync"
 
 	"github.com/spf13/viper"
@@ -53,7 +55,10 @@ func Get() *Config {
 
 func loadConfig() error {
 	// Configure Viper to read environment variables and configuration files
-	viper.AddConfigPath(".")
+	_, filename, _, _ := runtime.Caller(0)             // Get the path of the current file
+	configPath := filepath.Dir(filepath.Dir(filename)) // Derive the root directory from the file path
+
+	viper.AddConfigPath(configPath)
 	viper.SetConfigType("env")
 
 	// Set the appropriate config file based on the environment
