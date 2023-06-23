@@ -3,8 +3,6 @@ package config
 import (
 	"errors"
 	"log"
-	"path/filepath"
-	"runtime"
 	"sync"
 
 	"github.com/spf13/viper"
@@ -39,59 +37,25 @@ type Config struct {
 	ForecastAPI      string `mapstructure:"FORECAST_API"`
 }
 
-// Get returns the configuration instance.
-// It uses 'sync.Once' to ensure the configuration is loaded only once.
-func Get() *Config {
-	// Use 'doOnce' to ensure the configuration is loaded only once
+func Get() Config {
+	viper.AddConfigPath(".")
+	viper.SetConfigType("env")
+	viper.SetConfigName("prod")
+
+	viper.AutomaticEnv()
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Printf("[ReadENV]: cannot read env file")
+	}
+
 	doOnce.Do(func() {
-		if err := loadConfig(); err != nil {
-			log.Fatalf("Error loading config: %v", err)
+		err := viper.Unmarshal(&cfg)
+		if err != nil {
+			log.Fatalln("error unmarshalling config", err)
 		}
 	})
 
-	// Return the configuration instance
-	return &cfg
-}
-
-func loadConfig() error {
-	// Configure Viper to read environment variables and configuration files
-	_, filename, _, _ := runtime.Caller(0)             // Get the path of the current file
-	configPath := filepath.Dir(filepath.Dir(filename)) // Derive the root directory from the file path
-
-	viper.AddConfigPath(configPath)
-	viper.SetConfigType("env")
-
-	// Set the appropriate config file based on the environment
-	env := viper.GetString("APP_ENV")
-	if env == "" {
-		env = "dev"
-	}
-	viper.SetConfigName(env)
-
-	// Set Viper to read environment variables automatically
-	viper.AutomaticEnv()
-
-	// Try to read the configuration file
-	err := viper.ReadInConfig()
-	if err != nil {
-		// If there is an error, log a message
-		log.Printf("[ReadENV]: cannot read env file (%s): %v\n", env, err)
-	}
-
-	// Deserialize the environment variables into the 'Config' structure
-	err = viper.Unmarshal(&cfg)
-	if err != nil {
-		// If there is an error, log the error message
-		log.Printf("Error unmarshalling config: %v\n", err)
-		return err
-	}
-
-	// Validate the required configuration variables
-	if err := validateConfig(cfg); err != nil {
-		return err
-	}
-
-	return nil
+	return cfg
 }
 
 // validateConfig checks if all the required configuration variables are present
