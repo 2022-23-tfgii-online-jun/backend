@@ -30,7 +30,7 @@ WORKDIR /dist
 
 # Copy binary from build to main folder
 RUN cp ../cmd/api/main .
-RUN cp /build/dev.env .
+RUN cp /build/prod.env .
 
 # Build a small image
 FROM alpine
@@ -40,7 +40,7 @@ RUN apk add --no-cache --upgrade ffmpeg
 
 # Copy from builder
 COPY --from=builder /dist/main /
-COPY --from=builder /build/dev.env .
+COPY --from=builder /build/prod.env .
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
