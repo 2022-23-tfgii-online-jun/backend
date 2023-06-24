@@ -19,8 +19,13 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-# Copy the code into the container
-COPY . .
+# Copy only the necessary files for building
+COPY cmd/api/main.go ./cmd/api/
+COPY cmd/worker/main.go ./cmd/worker/
+COPY internal/infra/api ./internal/infra/api
+COPY internal/infra/worker ./internal/infra/worker
+COPY internal/infra/repositories/postgresql ./internal/infra/repositories/postgresql
+COPY config ./config
 
 # Build the application
 RUN go build -o /api ./cmd/api/main.go
