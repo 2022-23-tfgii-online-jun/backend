@@ -27,6 +27,9 @@ COPY internal/infra/worker ./internal/infra/worker
 COPY internal/infra/repositories/postgresql ./internal/infra/repositories/postgresql
 COPY config ./config
 
+# Copy the Swagger documentation
+COPY docs /docs
+
 # Build the application
 RUN go build -o /api ./cmd/api/main.go
 RUN go build -o /worker ./cmd/worker/main.go
@@ -43,6 +46,7 @@ COPY --from=builder /worker /worker
 COPY --from=builder /build/prod.env /
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /docs /docs
 
 # Set Timezone
 ENV TZ="America/Montevideo"
