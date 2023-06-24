@@ -19,16 +19,8 @@ COPY go.mod .
 COPY go.sum .
 RUN go mod download
 
-# Copy only the necessary files for building
-COPY cmd/api/main.go ./cmd/api/
-COPY cmd/worker/main.go ./cmd/worker/
-COPY internal/infra/api ./internal/infra/api
-COPY internal/infra/worker ./internal/infra/worker
-COPY internal/infra/repositories/postgresql ./internal/infra/repositories/postgresql
-COPY config ./config
-
-# Copy the Swagger documentation
-COPY docs /docs
+# Copy the code into the container
+COPY . .
 
 # Build the application
 RUN go build -o /api ./cmd/api/main.go
@@ -46,7 +38,6 @@ COPY --from=builder /worker /worker
 COPY --from=builder /build/prod.env /
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /docs /docs
 
 # Set Timezone
 ENV TZ="America/Montevideo"
