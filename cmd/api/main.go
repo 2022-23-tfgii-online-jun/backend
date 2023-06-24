@@ -41,7 +41,7 @@ func main() {
 	}
 
 	// Create the address string with the defaultPort.
-	address := fmt.Sprintf(":%s", defaultPort)
+	address := fmt.Sprintf(": %s", defaultPort)
 
 	// Start the API server with the address.
 	api.Start(address)
