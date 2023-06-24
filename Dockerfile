@@ -5,7 +5,7 @@ RUN apk add git
 RUN apk --no-cache add tzdata
 RUN apk add --no-cache --upgrade ffmpeg
 
-# Set necessary environmet variables needed for our image
+# Set necessary environment variables needed for our image
 ENV GO111MODULE=on \
     CGO_ENABLED=0 \
     GOOS=linux \
@@ -14,7 +14,7 @@ ENV GO111MODULE=on \
 # Move to working directory /build
 WORKDIR /build
 
-# Copy and download dependency using go mod
+# Copy and download dependencies using go mod
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
@@ -23,14 +23,8 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN go build -o ../cmd/api/main .
-
-# Move to /dist directory as the place for resulting binary folder
-WORKDIR /dist
-
-# Copy binary from build to main folder
-RUN cp ../cmd/api/main .
-RUN cp /build/prod.env .
+RUN go build -o /api ./cmd/api/main.go
+RUN go build -o /worker ./cmd/worker/main.go
 
 # Build a small image
 FROM alpine
@@ -39,8 +33,9 @@ FROM alpine
 RUN apk add --no-cache --upgrade ffmpeg
 
 # Copy from builder
-COPY --from=builder /dist/main /
-COPY --from=builder /build/prod.env .
+COPY --from=builder /api /api
+COPY --from=builder /worker /worker
+COPY --from=builder /build/prod.env /
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
@@ -50,5 +45,5 @@ ENV TZ="America/Montevideo"
 # Expose port out container
 EXPOSE 8080
 
-# Command to run
-CMD ["/main"]
+# Command to run both API and worker
+CMD ["/bin/sh", "-c", "/api & /worker"]
