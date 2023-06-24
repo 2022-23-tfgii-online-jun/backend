@@ -30,7 +30,8 @@ func RunServer(address string) {
 	RegisterRoutes(server)
 
 	// Start running the server on the specified address
-	err = server.Run(address)
+
+	err = server.Run(":" + address)
 	if err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

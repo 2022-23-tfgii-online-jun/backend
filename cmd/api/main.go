@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/emur-uy/backend/config"
@@ -40,9 +39,9 @@ func main() {
 		log.Fatalf("sentry.Init: %s", err)
 	}
 
-	// Create the address string with the defaultPort.
-	address := fmt.Sprintf(": %s", defaultPort)
+	// // Create the address string with the defaultPort.
+	// address := fmt.Sprintf(":%s", defaultPort)
 
 	// Start the API server with the address.
-	api.Start(address)
+	api.Start(defaultPort)
 }
