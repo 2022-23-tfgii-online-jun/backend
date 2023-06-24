@@ -156,8 +156,15 @@ func (u *userHandler) GetUser(c *gin.Context) {
 
 // SetActiveStatus handles the HTTP request for updating the user's is_active status
 func (u *userHandler) SetActiveStatus(c *gin.Context) {
-	//  Get user uuid from context
-	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+	// Get user UUID from the URL parameter
+	userUUID := c.Param("uuid")
+
+	// Parse the user UUID string to a UUID type
+	uuidObj, err := uuid.Parse(userUUID)
+	if err != nil {
+		handleUserError(c, http.StatusBadRequest, "invalid user UUID", err)
+		return
+	}
 
 	// Define a struct to hold the request body data.
 	type RequestBody struct {
@@ -172,7 +179,7 @@ func (u *userHandler) SetActiveStatus(c *gin.Context) {
 	}
 
 	// Update the user's is_active status in the database.
-	statusCode, err := u.userService.UpdateActiveStatus(userUUID, requestBody.IsActive)
+	statusCode, err := u.userService.UpdateActiveStatus(uuidObj, requestBody.IsActive)
 	if err != nil {
 		handleUserError(c, statusCode, "an error occurred while updating the user's active status", err)
 		return
@@ -188,8 +195,15 @@ func (u *userHandler) SetActiveStatus(c *gin.Context) {
 
 // SetBannedStatus handles the HTTP request for updating the user's is_banned status
 func (u *userHandler) SetBannedStatus(c *gin.Context) {
-	// Get user uuid from context
-	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+	// Get user UUID from the URL parameter
+	userUUID := c.Param("uuid")
+
+	// Parse the user UUID string to a UUID type
+	uuidObj, err := uuid.Parse(userUUID)
+	if err != nil {
+		handleUserError(c, http.StatusBadRequest, "invalid user UUID", err)
+		return
+	}
 
 	// Define a struct to hold the request body data.
 	type RequestBody struct {
@@ -204,7 +218,7 @@ func (u *userHandler) SetBannedStatus(c *gin.Context) {
 	}
 
 	// Update the user's is_banned status in the database.
-	statusCode, err := u.userService.UpdateBannedStatus(userUUID, requestBody.IsBanned)
+	statusCode, err := u.userService.UpdateBannedStatus(uuidObj, requestBody.IsBanned)
 	if err != nil {
 		handleUserError(c, statusCode, "an error occurred while updating the user's banned status", err)
 		return
