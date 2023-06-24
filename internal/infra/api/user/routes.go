@@ -22,16 +22,16 @@ func RegisterRoutes(e *gin.Engine) {
 	handler := newHandler(service)
 
 	// Register the SignUp and Login routes with the handler.
-	e.GET("/api/v1/users/login", handler.Login)
-	e.POST("/api/v1/users", handler.SignUp)
+	e.POST("/api/v1/users/login", handler.Login)
+	e.POST("/api/v1/users/signup", handler.SignUp)
 
 	// Group the user routes together.
 	userRoutes := e.Group("/api/v1/users")
 
 	// Register admin routes requiring authentication and authorization for admin role.
 	adminRoutes := userRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
-	adminRoutes.PUT("/active", handler.SetActiveStatus)
-	adminRoutes.PUT("/banned", handler.SetBannedStatus)
+	adminRoutes.PUT("/active/:uuid", handler.SetActiveStatus)
+	adminRoutes.PUT("/banned/:uuid", handler.SetBannedStatus)
 
 	// Register user routes requiring authentication and authorization for user role.
 	userRoutes.PATCH("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser), handler.UpdateUser)

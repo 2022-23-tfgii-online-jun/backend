@@ -1,0 +1,3196 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/articles": {
+            "get": {
+                "description": "Get all articles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Get all articles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Articles retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Article"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while getting the articles",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create an article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Create article",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the user",
+                        "name": "userUUID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Body of the article",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateArticle"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/articles/add-to-category": {
+            "post": {
+                "description": "Add an article to a category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Add article to category",
+                "parameters": [
+                    {
+                        "description": "Request to add article to category",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.AddArticleToCategoryRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article added to Category successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/articles/{uuid}": {
+            "delete": {
+                "description": "Delete an article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Delete article",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the article",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while deleting the article",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update an article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Articles"
+                ],
+                "summary": "Update article",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the article",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body of the article",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestUpdateArticle"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Article updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Article"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/categories": {
+            "get": {
+                "description": "Get all categories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Get all categories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Categories retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Category"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Create category",
+                "parameters": [
+                    {
+                        "description": "Category object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/categories/{uuid}": {
+            "put": {
+                "description": "Update an existing category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Update category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the category",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Category object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing category",
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Delete category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the category",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted successfully"
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Category"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/healthservices": {
+            "get": {
+                "description": "Get all health services",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health Services"
+                ],
+                "summary": "Get all health services",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Health services retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.HealthService"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new health service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health Services"
+                ],
+                "summary": "Create health service",
+                "parameters": [
+                    {
+                        "description": "Health service object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateHealthService"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Health service created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HealthService"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HealthService"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/healthservices/rating": {
+            "post": {
+                "description": "Add a rating to a health service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health Services"
+                ],
+                "summary": "Add rating to health service",
+                "parameters": [
+                    {
+                        "description": "Rating object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.HealthServiceRating"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rating added successfully"
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HealthService"
+                        }
+                    },
+                    "404": {
+                        "description": "Health service not found",
+                        "schema": {
+                            "$ref": "#/definitions/entity.HealthService"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/maps": {
+            "get": {
+                "description": "Get all maps",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Maps"
+                ],
+                "summary": "Get all maps",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Maps retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Map"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new map",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Maps"
+                ],
+                "summary": "Create map",
+                "parameters": [
+                    {
+                        "description": "Map object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateUpdateMap"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Map created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Map"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Map"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/maps/{uuid}": {
+            "put": {
+                "description": "Update an existing map",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Maps"
+                ],
+                "summary": "Update map",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the map",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Map object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateUpdateMap"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Map updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Map"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Map"
+                        }
+                    },
+                    "404": {
+                        "description": "Map not found",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Map"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing map",
+                "tags": [
+                    "Maps"
+                ],
+                "summary": "Delete map",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the map",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Map deleted successfully"
+                    },
+                    "404": {
+                        "description": "Map not found",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Map"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medical": {
+            "get": {
+                "description": "Get all medical records",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medical"
+                ],
+                "summary": "Get all medical records",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medical records retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Medical"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medical/rating": {
+            "post": {
+                "description": "Add a rating to a medical record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medical"
+                ],
+                "summary": "Add rating to medical record",
+                "parameters": [
+                    {
+                        "description": "Rating object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRating"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rating added successfully"
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Medical"
+                        }
+                    },
+                    "404": {
+                        "description": "Medical record not found",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Medical"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medicalrecords": {
+            "get": {
+                "description": "Get the medical record for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medical Record"
+                ],
+                "summary": "Get medical record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medical record retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user UUID",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new medical record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medical Record"
+                ],
+                "summary": "Create medical record",
+                "parameters": [
+                    {
+                        "description": "Medical record object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medical record created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/medicalrecords/{uuid}": {
+            "put": {
+                "description": "Update an existing medical record",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Medical Record"
+                ],
+                "summary": "Update medical record",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Medical record UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Medical record object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medical record updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.MedicalRecord"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/monitorings": {
+            "get": {
+                "description": "Get all monitorings for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Monitoring"
+                ],
+                "summary": "Get monitorings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Monitorings retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Monitoring"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user UUID",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Monitoring"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new monitoring",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Monitoring"
+                ],
+                "summary": "Create monitoring",
+                "parameters": [
+                    {
+                        "description": "Monitoring object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateMonitoring"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Monitoring created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Monitoring"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Monitoring"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/questions": {
+            "get": {
+                "description": "Get all questions",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Question"
+                ],
+                "summary": "Get questions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Questions retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Question"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Question"
+                ],
+                "summary": "Create question",
+                "parameters": [
+                    {
+                        "description": "Question object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateQuestion"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Question created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Question"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Question"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/questions/{question_uuid}/answer": {
+            "post": {
+                "description": "Create a answer for a specific question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Answers"
+                ],
+                "summary": "Create answer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the question",
+                        "name": "question_uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID of the user",
+                        "name": "userUUID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Body of the answer",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateAnswer"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Answer created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Answer"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Answer"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/questions/{uuid}": {
+            "get": {
+                "description": "Get all questions and their answers",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Question"
+                ],
+                "summary": "Get questions and answers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Questions and answers retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Question"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/recipes": {
+            "get": {
+                "description": "Get all recipes",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recipe"
+                ],
+                "summary": "Get recipes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipes retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Recipe"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new recipe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recipe"
+                ],
+                "summary": "Create recipe",
+                "parameters": [
+                    {
+                        "description": "Recipe object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestCreateRecipe"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipe created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/recipes/{uuid}": {
+            "put": {
+                "description": "Update an existing recipe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recipe"
+                ],
+                "summary": "Update recipe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Recipe object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestUpdateRecipe"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipe updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or UUID format",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing recipe",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recipe"
+                ],
+                "summary": "Delete recipe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipe deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/recipes/{uuid}/vote": {
+            "post": {
+                "description": "Vote a recipe",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recipe"
+                ],
+                "summary": "Vote recipe",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Recipe UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Vote object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestVoteRecipe"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Recipe voted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format or input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Recipe"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/reminders": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Get all reminders",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reminder"
+                ],
+                "summary": "Get reminders",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reminders fetched successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Reminder"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing reminder",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reminder"
+                ],
+                "summary": "Update reminder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reminder UUID",
+                        "name": "uuid",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name of the reminder",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Type of the reminder",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date of the reminder (format: dd/MM/yyyy)",
+                        "name": "date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Additional note for the reminder",
+                        "name": "note",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Notification details (JSON array)",
+                        "name": "notification",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Task details (JSON array)",
+                        "name": "task",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reminder updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Reminder"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format, input, or date format",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Reminder"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new reminder",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reminder"
+                ],
+                "summary": "Create reminder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Name of the reminder",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Type of the reminder",
+                        "name": "type",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date of the reminder (format: dd/MM/yyyy)",
+                        "name": "date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Additional note for the reminder",
+                        "name": "note",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Notification details (JSON array)",
+                        "name": "notification",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Task details (JSON array)",
+                        "name": "task",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reminder created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Reminder"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input or date format",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Reminder"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete an existing reminder",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reminder"
+                ],
+                "summary": "Delete reminder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reminder UUID",
+                        "name": "uuid",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reminder deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Reminder"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid UUID format",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Reminder"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/symptoms/admin": {
+            "get": {
+                "description": "Get all symptoms",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Symptom"
+                ],
+                "summary": "Get symptoms",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Symptoms retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Symptom"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new symptom",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Symptom"
+                ],
+                "summary": "Create symptom",
+                "parameters": [
+                    {
+                        "description": "Name of the symptom",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Symptom created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Symptom"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Symptom"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/symptoms/user": {
+            "get": {
+                "description": "Get all symptoms related to a user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Symptom"
+                ],
+                "summary": "Get symptoms by user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Symptoms retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Symptom"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/symptoms/user/add": {
+            "post": {
+                "description": "Add a user to a symptom",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Symptom"
+                ],
+                "summary": "Add user to symptom",
+                "parameters": [
+                    {
+                        "description": "User UUID",
+                        "name": "userUUID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Symptom UUID",
+                        "name": "symptomUUID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User added to symptom successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Symptom"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user UUID, input, or symptom UUID",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Symptom"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/symptoms/user/remove": {
+            "post": {
+                "description": "Remove a user from a symptom",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Symptom"
+                ],
+                "summary": "Remove user from symptom",
+                "parameters": [
+                    {
+                        "description": "User UUID",
+                        "name": "userUUID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Symptom UUID",
+                        "name": "symptomUUID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User removed from symptom successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Symptom"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid user UUID, input, or symptom UUID",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Symptom"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/treatments": {
+            "get": {
+                "description": "Get all treatments of a user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Get treatments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Treatments retrieved successfully",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.Treatment"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new treatment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Create treatment",
+                "parameters": [
+                    {
+                        "description": "Name of the treatment",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Description of the treatment",
+                        "name": "description",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Treatment created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/treatments/{uuid}": {
+            "put": {
+                "description": "Update a treatment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Update treatment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the treatment",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Name of the treatment",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "Description of the treatment",
+                        "name": "description",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Treatment updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while updating the treatment",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a treatment",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Treatment"
+                ],
+                "summary": "Delete treatment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID of the treatment",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Treatment deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while deleting the treatment",
+                        "schema": {
+                            "$ref": "#/definitions/entity.Treatment"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users": {
+            "get": {
+                "description": "Get user information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get user information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User information retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/entity.User"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while getting the user",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update existing user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user",
+                "parameters": [
+                    {
+                        "description": "User update data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.UpdateUser"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/user.ResponseUserData"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/active/{uuid}": {
+            "patch": {
+                "description": "Set user's active status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Set user active status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Set user active status",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.SetStatusRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User active status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/user.ResponseUserData"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while updating the user's active status",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/banned/{uuid}": {
+            "patch": {
+                "description": "Set user's banned status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Set user banned status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User UUID",
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Set user banned status",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.SetStatusRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User banned status updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/user.ResponseUserData"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "An error occurred while updating the user's banned status",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/login": {
+            "post": {
+                "description": "Authenticate user and generate JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "User login",
+                "parameters": [
+                    {
+                        "description": "User credentials",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.DefaultCredentials"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token generated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/user.TokenResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/users/signup": {
+            "post": {
+                "description": "Register a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "User Sign Up",
+                "parameters": [
+                    {
+                        "description": "User Sign Up data",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.SignUp"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully",
+                        "schema": {
+                            "$ref": "#/definitions/user.ResponseUserData"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/user.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.AddArticleToCategoryRequest": {
+            "type": "object",
+            "properties": {
+                "article": {
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Answer": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Article": {
+            "type": "object",
+            "required": [
+                "content",
+                "image",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "is_published": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Category": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.DefaultCredentials": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Frequency": {
+            "type": "object",
+            "properties": {
+                "day": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "entity.HealthService": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.HealthServiceRating": {
+            "type": "object",
+            "properties": {
+                "health_service_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "reminder_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.HoursAvailability": {
+            "type": "object",
+            "properties": {
+                "close_time": {
+                    "type": "string"
+                },
+                "day": {
+                    "type": "string"
+                },
+                "open_time": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Map": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "hours_availability": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.HoursAvailability"
+                    }
+                },
+                "is_published": {
+                    "type": "boolean"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Phone"
+                    }
+                },
+                "type": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Medical": {
+            "type": "object",
+            "properties": {
+                "cjppu_number": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "profession_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.MedicalRating": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "medical_id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer"
+                },
+                "reminder_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.MedicalRecord": {
+            "type": "object",
+            "properties": {
+                "conmorbidity": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "educational_level": {
+                    "type": "string"
+                },
+                "emergency_medical_service": {
+                    "type": "string"
+                },
+                "health_care_provider": {
+                    "type": "string"
+                },
+                "is_disabled": {
+                    "type": "boolean"
+                },
+                "laboral_condition": {
+                    "type": "string"
+                },
+                "multiple_sclerosis_type": {
+                    "type": "string"
+                },
+                "support_network": {
+                    "type": "boolean"
+                },
+                "treating_neurologist": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Monitoring": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "scale": {
+                    "type": "integer"
+                },
+                "symptom": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.Notification": {
+            "type": "object",
+            "properties": {
+                "days_or_hours": {
+                    "type": "string"
+                },
+                "hours_before": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.Phone": {
+            "type": "object",
+            "properties": {
+                "number": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Question": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Recipe": {
+            "type": "object",
+            "required": [
+                "category",
+                "elaboration",
+                "ingredients",
+                "name",
+                "time"
+            ],
+            "properties": {
+                "category": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "elaboration": {
+                    "type": "string"
+                },
+                "ingredients": {
+                    "type": "string"
+                },
+                "is_published": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Reminder": {
+            "type": "object",
+            "required": [
+                "date",
+                "name",
+                "type"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "medical": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "notification": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Notification"
+                    }
+                },
+                "task": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Task"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestCreateAnswer": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "question_uuid": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestCreateArticle": {
+            "type": "object",
+            "required": [
+                "content",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestCreateHealthService": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestCreateMonitoring": {
+            "type": "object",
+            "properties": {
+                "scale": {
+                    "type": "integer"
+                },
+                "symptom": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestCreateQuestion": {
+            "type": "object",
+            "required": [
+                "text"
+            ],
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestCreateRecipe": {
+            "type": "object",
+            "required": [
+                "category",
+                "elaboration",
+                "ingredients",
+                "name",
+                "time"
+            ],
+            "properties": {
+                "category": {
+                    "type": "integer"
+                },
+                "elaboration": {
+                    "type": "string"
+                },
+                "ingredients": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.RequestCreateUpdateMap": {
+            "type": "object",
+            "properties": {
+                "hours_availability": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.HoursAvailability"
+                    }
+                },
+                "is_published": {
+                    "type": "boolean"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Phone"
+                    }
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.RequestUpdateArticle": {
+            "type": "object",
+            "required": [
+                "content",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestUpdateRecipe": {
+            "type": "object",
+            "required": [
+                "category",
+                "elaboration",
+                "ingredients",
+                "name",
+                "time"
+            ],
+            "properties": {
+                "category": {
+                    "type": "integer"
+                },
+                "elaboration": {
+                    "type": "string"
+                },
+                "ingredients": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.RequestVoteRecipe": {
+            "type": "object",
+            "required": [
+                "vote"
+            ],
+            "properties": {
+                "vote": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                }
+            }
+        },
+        "entity.Shot": {
+            "type": "object",
+            "properties": {
+                "dose": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.SignUp": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Symptom": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "scale": {
+                    "type": "integer"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Task": {
+            "type": "object",
+            "properties": {
+                "checked": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Treatment": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "date_start": {
+                    "type": "string"
+                },
+                "frequency": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Frequency"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "shots": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.Shot"
+                    }
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.UpdateUser": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "date_of_birth": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "string"
+                },
+                "user_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.User": {
+            "type": "object",
+            "required": [
+                "city",
+                "country",
+                "email",
+                "first_name",
+                "last_name",
+                "password",
+                "sex",
+                "user_type"
+            ],
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "date_of_birth": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_banned": {
+                    "type": "boolean"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 3
+                },
+                "password": {
+                    "type": "string"
+                },
+                "profile_image": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "string"
+                },
+                "user_type": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.ResponseUserData": {
+            "type": "object",
+            "properties": {
+                "message": {}
+            }
+        },
+        "user.SetStatusRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "user.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

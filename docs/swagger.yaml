@@ -1,0 +1,2139 @@
+definitions:
+  entity.AddArticleToCategoryRequest:
+    properties:
+      article:
+        type: string
+      category:
+        type: string
+    type: object
+  entity.Answer:
+    properties:
+      created_at:
+        type: string
+      is_public:
+        type: boolean
+      text:
+        type: string
+      uuid:
+        type: string
+    required:
+    - text
+    type: object
+  entity.Article:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      image:
+        type: string
+      is_published:
+        type: boolean
+      title:
+        type: string
+      uuid:
+        type: string
+    required:
+    - content
+    - image
+    - title
+    type: object
+  entity.Category:
+    properties:
+      created_at:
+        type: string
+      name:
+        type: string
+      uuid:
+        type: string
+    required:
+    - name
+    type: object
+  entity.DefaultCredentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entity.Frequency:
+    properties:
+      day:
+        type: string
+      time:
+        items:
+          type: string
+        type: array
+    type: object
+  entity.HealthService:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - name
+    type: object
+  entity.HealthServiceRating:
+    properties:
+      health_service_id:
+        type: integer
+      rating:
+        type: integer
+      reminder_id:
+        type: integer
+    type: object
+  entity.HoursAvailability:
+    properties:
+      close_time:
+        type: string
+      day:
+        type: string
+      open_time:
+        type: string
+    type: object
+  entity.Map:
+    properties:
+      created_at:
+        type: string
+      hours_availability:
+        items:
+          $ref: '#/definitions/entity.HoursAvailability'
+        type: array
+      is_published:
+        type: boolean
+      latitude:
+        type: string
+      longitude:
+        type: string
+      name:
+        type: string
+      phone:
+        items:
+          $ref: '#/definitions/entity.Phone'
+        type: array
+      type:
+        type: integer
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.Medical:
+    properties:
+      cjppu_number:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      profession_number:
+        type: string
+    type: object
+  entity.MedicalRating:
+    properties:
+      id:
+        type: integer
+      medical_id:
+        type: integer
+      rating:
+        type: integer
+      reminder_id:
+        type: integer
+    type: object
+  entity.MedicalRecord:
+    properties:
+      conmorbidity:
+        type: boolean
+      created_at:
+        type: string
+      educational_level:
+        type: string
+      emergency_medical_service:
+        type: string
+      health_care_provider:
+        type: string
+      is_disabled:
+        type: boolean
+      laboral_condition:
+        type: string
+      multiple_sclerosis_type:
+        type: string
+      support_network:
+        type: boolean
+      treating_neurologist:
+        type: string
+      updated_at:
+        type: string
+      uuid:
+        type: string
+    type: object
+  entity.Monitoring:
+    properties:
+      date:
+        type: string
+      scale:
+        type: integer
+      symptom:
+        type: integer
+    type: object
+  entity.Notification:
+    properties:
+      days_or_hours:
+        type: string
+      hours_before:
+        type: integer
+    type: object
+  entity.Phone:
+    properties:
+      number:
+        type: string
+    type: object
+  entity.Question:
+    properties:
+      created_at:
+        type: string
+      text:
+        type: string
+      uuid:
+        type: string
+    required:
+    - text
+    type: object
+  entity.Recipe:
+    properties:
+      category:
+        type: integer
+      created_at:
+        type: string
+      elaboration:
+        type: string
+      ingredients:
+        type: string
+      is_published:
+        type: boolean
+      name:
+        type: string
+      time:
+        type: integer
+      uuid:
+        type: string
+    required:
+    - category
+    - elaboration
+    - ingredients
+    - name
+    - time
+    type: object
+  entity.Reminder:
+    properties:
+      created_at:
+        type: string
+      date:
+        type: string
+      is_active:
+        type: boolean
+      medical:
+        type: integer
+      name:
+        type: string
+      note:
+        type: string
+      notification:
+        items:
+          $ref: '#/definitions/entity.Notification'
+        type: array
+      task:
+        items:
+          $ref: '#/definitions/entity.Task'
+        type: array
+      type:
+        type: string
+      uuid:
+        type: string
+    required:
+    - date
+    - name
+    - type
+    type: object
+  entity.RequestCreateAnswer:
+    properties:
+      question_uuid:
+        type: string
+      text:
+        type: string
+    required:
+    - text
+    type: object
+  entity.RequestCreateArticle:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  entity.RequestCreateHealthService:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  entity.RequestCreateMonitoring:
+    properties:
+      scale:
+        type: integer
+      symptom:
+        type: string
+    type: object
+  entity.RequestCreateQuestion:
+    properties:
+      text:
+        type: string
+    required:
+    - text
+    type: object
+  entity.RequestCreateRecipe:
+    properties:
+      category:
+        type: integer
+      elaboration:
+        type: string
+      ingredients:
+        type: string
+      name:
+        type: string
+      time:
+        type: integer
+    required:
+    - category
+    - elaboration
+    - ingredients
+    - name
+    - time
+    type: object
+  entity.RequestCreateUpdateMap:
+    properties:
+      hours_availability:
+        items:
+          $ref: '#/definitions/entity.HoursAvailability'
+        type: array
+      is_published:
+        type: boolean
+      latitude:
+        type: string
+      longitude:
+        type: string
+      name:
+        type: string
+      phone:
+        items:
+          $ref: '#/definitions/entity.Phone'
+        type: array
+      type:
+        type: integer
+    type: object
+  entity.RequestUpdateArticle:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  entity.RequestUpdateRecipe:
+    properties:
+      category:
+        type: integer
+      elaboration:
+        type: string
+      ingredients:
+        type: string
+      name:
+        type: string
+      time:
+        type: integer
+    required:
+    - category
+    - elaboration
+    - ingredients
+    - name
+    - time
+    type: object
+  entity.RequestVoteRecipe:
+    properties:
+      vote:
+        maximum: 5
+        minimum: 1
+        type: integer
+    required:
+    - vote
+    type: object
+  entity.Shot:
+    properties:
+      dose:
+        type: integer
+      name:
+        type: string
+    type: object
+  entity.SignUp:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entity.Symptom:
+    properties:
+      created_at:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      scale:
+        type: integer
+      uuid:
+        type: string
+    required:
+    - name
+    type: object
+  entity.Task:
+    properties:
+      checked:
+        type: boolean
+      name:
+        type: string
+    type: object
+  entity.Treatment:
+    properties:
+      created_at:
+        type: string
+      date_start:
+        type: string
+      frequency:
+        items:
+          $ref: '#/definitions/entity.Frequency'
+        type: array
+      name:
+        type: string
+      notes:
+        type: string
+      shots:
+        items:
+          $ref: '#/definitions/entity.Shot'
+        type: array
+      type:
+        type: string
+    required:
+    - name
+    - type
+    type: object
+  entity.UpdateUser:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      date_of_birth:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      sex:
+        type: string
+      user_type:
+        type: string
+    type: object
+  entity.User:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      date_of_birth:
+        type: string
+      email:
+        type: string
+      first_name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      is_active:
+        type: boolean
+      is_banned:
+        type: boolean
+      last_name:
+        maxLength: 100
+        minLength: 3
+        type: string
+      password:
+        type: string
+      profile_image:
+        type: string
+      sex:
+        type: string
+      user_type:
+        type: string
+      uuid:
+        type: string
+    required:
+    - city
+    - country
+    - email
+    - first_name
+    - last_name
+    - password
+    - sex
+    - user_type
+    type: object
+  user.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  user.ResponseUserData:
+    properties:
+      message: {}
+    type: object
+  user.SetStatusRequest:
+    properties:
+      status:
+        type: boolean
+    type: object
+  user.TokenResponse:
+    properties:
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/articles:
+    get:
+      consumes:
+      - application/json
+      description: Get all articles
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Articles retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Article'
+            type: array
+        "500":
+          description: An error occurred while getting the articles
+          schema:
+            $ref: '#/definitions/entity.Article'
+      summary: Get all articles
+      tags:
+      - Articles
+    post:
+      consumes:
+      - application/json
+      description: Create an article
+      parameters:
+      - description: UUID of the user
+        in: query
+        name: userUUID
+        required: true
+        type: string
+      - description: Body of the article
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateArticle'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article created successfully
+          schema:
+            $ref: '#/definitions/entity.Article'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Article'
+      summary: Create article
+      tags:
+      - Articles
+  /api/v1/articles/{uuid}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an article
+      parameters:
+      - description: UUID of the article
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article deleted successfully
+          schema:
+            $ref: '#/definitions/entity.Article'
+        "500":
+          description: An error occurred while deleting the article
+          schema:
+            $ref: '#/definitions/entity.Article'
+      summary: Delete article
+      tags:
+      - Articles
+    patch:
+      consumes:
+      - application/json
+      description: Update an article
+      parameters:
+      - description: UUID of the article
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Body of the article
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestUpdateArticle'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article updated successfully
+          schema:
+            $ref: '#/definitions/entity.Article'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Article'
+      summary: Update article
+      tags:
+      - Articles
+  /api/v1/articles/add-to-category:
+    post:
+      consumes:
+      - application/json
+      description: Add an article to a category
+      parameters:
+      - description: Request to add article to category
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.AddArticleToCategoryRequest'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Article added to Category successfully
+          schema:
+            $ref: '#/definitions/entity.Article'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Article'
+      summary: Add article to category
+      tags:
+      - Articles
+  /api/v1/categories:
+    get:
+      description: Get all categories
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Categories retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Category'
+            type: array
+      summary: Get all categories
+      tags:
+      - Categories
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Category'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category created successfully
+          schema:
+            $ref: '#/definitions/entity.Category'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.Category'
+      summary: Create category
+      tags:
+      - Categories
+  /api/v1/categories/{uuid}:
+    delete:
+      description: Delete an existing category
+      parameters:
+      - description: UUID of the category
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Category deleted successfully
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/entity.Category'
+      summary: Delete category
+      tags:
+      - Categories
+    put:
+      consumes:
+      - application/json
+      description: Update an existing category
+      parameters:
+      - description: UUID of the category
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Category object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Category'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Category updated successfully
+          schema:
+            $ref: '#/definitions/entity.Category'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.Category'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/entity.Category'
+      summary: Update category
+      tags:
+      - Categories
+  /api/v1/healthservices:
+    get:
+      description: Get all health services
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Health services retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.HealthService'
+            type: array
+      summary: Get all health services
+      tags:
+      - Health Services
+    post:
+      consumes:
+      - application/json
+      description: Create a new health service
+      parameters:
+      - description: Health service object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateHealthService'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Health service created successfully
+          schema:
+            $ref: '#/definitions/entity.HealthService'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.HealthService'
+      summary: Create health service
+      tags:
+      - Health Services
+  /api/v1/healthservices/rating:
+    post:
+      consumes:
+      - application/json
+      description: Add a rating to a health service
+      parameters:
+      - description: Rating object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.HealthServiceRating'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rating added successfully
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.HealthService'
+        "404":
+          description: Health service not found
+          schema:
+            $ref: '#/definitions/entity.HealthService'
+      summary: Add rating to health service
+      tags:
+      - Health Services
+  /api/v1/maps:
+    get:
+      description: Get all maps
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Maps retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Map'
+            type: array
+      summary: Get all maps
+      tags:
+      - Maps
+    post:
+      consumes:
+      - application/json
+      description: Create a new map
+      parameters:
+      - description: Map object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateUpdateMap'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Map created successfully
+          schema:
+            $ref: '#/definitions/entity.Map'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.Map'
+      summary: Create map
+      tags:
+      - Maps
+  /api/v1/maps/{uuid}:
+    delete:
+      description: Delete an existing map
+      parameters:
+      - description: UUID of the map
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Map deleted successfully
+        "404":
+          description: Map not found
+          schema:
+            $ref: '#/definitions/entity.Map'
+      summary: Delete map
+      tags:
+      - Maps
+    put:
+      consumes:
+      - application/json
+      description: Update an existing map
+      parameters:
+      - description: UUID of the map
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Map object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateUpdateMap'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Map updated successfully
+          schema:
+            $ref: '#/definitions/entity.Map'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.Map'
+        "404":
+          description: Map not found
+          schema:
+            $ref: '#/definitions/entity.Map'
+      summary: Update map
+      tags:
+      - Maps
+  /api/v1/medical:
+    get:
+      description: Get all medical records
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medical records retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Medical'
+            type: array
+      summary: Get all medical records
+      tags:
+      - Medical
+  /api/v1/medical/rating:
+    post:
+      consumes:
+      - application/json
+      description: Add a rating to a medical record
+      parameters:
+      - description: Rating object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MedicalRating'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rating added successfully
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Medical'
+        "404":
+          description: Medical record not found
+          schema:
+            $ref: '#/definitions/entity.Medical'
+      summary: Add rating to medical record
+      tags:
+      - Medical
+  /api/v1/medicalrecords:
+    get:
+      description: Get the medical record for the authenticated user
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medical record retrieved successfully
+          schema:
+            $ref: '#/definitions/entity.MedicalRecord'
+        "400":
+          description: Invalid user UUID
+          schema:
+            $ref: '#/definitions/entity.MedicalRecord'
+      summary: Get medical record
+      tags:
+      - Medical Record
+    post:
+      consumes:
+      - application/json
+      description: Create a new medical record
+      parameters:
+      - description: Medical record object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MedicalRecord'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medical record created successfully
+          schema:
+            $ref: '#/definitions/entity.MedicalRecord'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.MedicalRecord'
+      summary: Create medical record
+      tags:
+      - Medical Record
+  /api/v1/medicalrecords/{uuid}:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing medical record
+      parameters:
+      - description: Medical record UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Medical record object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.MedicalRecord'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medical record updated successfully
+          schema:
+            $ref: '#/definitions/entity.MedicalRecord'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.MedicalRecord'
+      summary: Update medical record
+      tags:
+      - Medical Record
+  /api/v1/monitorings:
+    get:
+      description: Get all monitorings for the authenticated user
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monitorings retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Monitoring'
+            type: array
+        "400":
+          description: Invalid user UUID
+          schema:
+            $ref: '#/definitions/entity.Monitoring'
+      summary: Get monitorings
+      tags:
+      - Monitoring
+    post:
+      consumes:
+      - application/json
+      description: Create a new monitoring
+      parameters:
+      - description: Monitoring object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateMonitoring'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monitoring created successfully
+          schema:
+            $ref: '#/definitions/entity.Monitoring'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Monitoring'
+      summary: Create monitoring
+      tags:
+      - Monitoring
+  /api/v1/questions:
+    get:
+      description: Get all questions
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Questions retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Question'
+            type: array
+      summary: Get questions
+      tags:
+      - Question
+    post:
+      consumes:
+      - application/json
+      description: Create a new question
+      parameters:
+      - description: Question object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateQuestion'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Question created successfully
+          schema:
+            $ref: '#/definitions/entity.Question'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Question'
+      summary: Create question
+      tags:
+      - Question
+  /api/v1/questions/{question_uuid}/answer:
+    post:
+      consumes:
+      - application/json
+      description: Create a answer for a specific question
+      parameters:
+      - description: UUID of the question
+        in: path
+        name: question_uuid
+        required: true
+        type: string
+      - description: UUID of the user
+        in: query
+        name: userUUID
+        required: true
+        type: string
+      - description: Body of the answer
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateAnswer'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Answer created successfully
+          schema:
+            $ref: '#/definitions/entity.Answer'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/entity.Answer'
+      summary: Create answer
+      tags:
+      - Answers
+  /api/v1/questions/{uuid}:
+    get:
+      description: Get all questions and their answers
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Questions and answers retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Question'
+            type: array
+      summary: Get questions and answers
+      tags:
+      - Question
+  /api/v1/recipes:
+    get:
+      description: Get all recipes
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipes retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Recipe'
+            type: array
+      summary: Get recipes
+      tags:
+      - Recipe
+    post:
+      consumes:
+      - application/json
+      description: Create a new recipe
+      parameters:
+      - description: Recipe object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestCreateRecipe'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipe created successfully
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+      summary: Create recipe
+      tags:
+      - Recipe
+  /api/v1/recipes/{uuid}:
+    delete:
+      description: Delete an existing recipe
+      parameters:
+      - description: Recipe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipe deleted successfully
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+        "400":
+          description: Invalid UUID format
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+      summary: Delete recipe
+      tags:
+      - Recipe
+    put:
+      consumes:
+      - application/json
+      description: Update an existing recipe
+      parameters:
+      - description: Recipe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Recipe object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestUpdateRecipe'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipe updated successfully
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+        "400":
+          description: Invalid input or UUID format
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+      summary: Update recipe
+      tags:
+      - Recipe
+  /api/v1/recipes/{uuid}/vote:
+    post:
+      consumes:
+      - application/json
+      description: Vote a recipe
+      parameters:
+      - description: Recipe UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Vote object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestVoteRecipe'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recipe voted successfully
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+        "400":
+          description: Invalid UUID format or input
+          schema:
+            $ref: '#/definitions/entity.Recipe'
+      summary: Vote recipe
+      tags:
+      - Recipe
+  /api/v1/reminders:
+    delete:
+      description: Delete an existing reminder
+      parameters:
+      - description: Reminder UUID
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reminder deleted successfully
+          schema:
+            $ref: '#/definitions/entity.Reminder'
+        "400":
+          description: Invalid UUID format
+          schema:
+            $ref: '#/definitions/entity.Reminder'
+      summary: Delete reminder
+      tags:
+      - Reminder
+    get:
+      description: Get all reminders
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reminders fetched successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Reminder'
+            type: array
+      security:
+      - Bearer: []
+      summary: Get reminders
+      tags:
+      - Reminder
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new reminder
+      parameters:
+      - description: Name of the reminder
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Type of the reminder
+        in: formData
+        name: type
+        required: true
+        type: string
+      - description: 'Date of the reminder (format: dd/MM/yyyy)'
+        in: formData
+        name: date
+        required: true
+        type: string
+      - description: Additional note for the reminder
+        in: formData
+        name: note
+        type: string
+      - description: Notification details (JSON array)
+        in: formData
+        name: notification
+        required: true
+        type: string
+      - description: Task details (JSON array)
+        in: formData
+        name: task
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reminder created successfully
+          schema:
+            $ref: '#/definitions/entity.Reminder'
+        "400":
+          description: Invalid input or date format
+          schema:
+            $ref: '#/definitions/entity.Reminder'
+      security:
+      - Bearer: []
+      summary: Create reminder
+      tags:
+      - Reminder
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update an existing reminder
+      parameters:
+      - description: Reminder UUID
+        in: query
+        name: uuid
+        required: true
+        type: string
+      - description: Name of the reminder
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Type of the reminder
+        in: formData
+        name: type
+        required: true
+        type: string
+      - description: 'Date of the reminder (format: dd/MM/yyyy)'
+        in: formData
+        name: date
+        required: true
+        type: string
+      - description: Additional note for the reminder
+        in: formData
+        name: note
+        type: string
+      - description: Notification details (JSON array)
+        in: formData
+        name: notification
+        required: true
+        type: string
+      - description: Task details (JSON array)
+        in: formData
+        name: task
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Reminder updated successfully
+          schema:
+            $ref: '#/definitions/entity.Reminder'
+        "400":
+          description: Invalid UUID format, input, or date format
+          schema:
+            $ref: '#/definitions/entity.Reminder'
+      summary: Update reminder
+      tags:
+      - Reminder
+  /api/v1/symptoms/admin:
+    get:
+      description: Get all symptoms
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Symptoms retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Symptom'
+            type: array
+      summary: Get symptoms
+      tags:
+      - Symptom
+    post:
+      consumes:
+      - application/json
+      description: Create a new symptom
+      parameters:
+      - description: Name of the symptom
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Symptom created successfully
+          schema:
+            $ref: '#/definitions/entity.Symptom'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Symptom'
+      summary: Create symptom
+      tags:
+      - Symptom
+  /api/v1/symptoms/user:
+    get:
+      description: Get all symptoms related to a user
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Symptoms retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Symptom'
+            type: array
+      summary: Get symptoms by user
+      tags:
+      - Symptom
+  /api/v1/symptoms/user/add:
+    post:
+      consumes:
+      - application/json
+      description: Add a user to a symptom
+      parameters:
+      - description: User UUID
+        in: body
+        name: userUUID
+        required: true
+        schema:
+          type: string
+      - description: Symptom UUID
+        in: body
+        name: symptomUUID
+        required: true
+        schema:
+          type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User added to symptom successfully
+          schema:
+            $ref: '#/definitions/entity.Symptom'
+        "400":
+          description: Invalid user UUID, input, or symptom UUID
+          schema:
+            $ref: '#/definitions/entity.Symptom'
+      summary: Add user to symptom
+      tags:
+      - Symptom
+  /api/v1/symptoms/user/remove:
+    post:
+      consumes:
+      - application/json
+      description: Remove a user from a symptom
+      parameters:
+      - description: User UUID
+        in: body
+        name: userUUID
+        required: true
+        schema:
+          type: string
+      - description: Symptom UUID
+        in: body
+        name: symptomUUID
+        required: true
+        schema:
+          type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User removed from symptom successfully
+          schema:
+            $ref: '#/definitions/entity.Symptom'
+        "400":
+          description: Invalid user UUID, input, or symptom UUID
+          schema:
+            $ref: '#/definitions/entity.Symptom'
+      summary: Remove user from symptom
+      tags:
+      - Symptom
+  /api/v1/treatments:
+    get:
+      description: Get all treatments of a user
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Treatments retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/entity.Treatment'
+            type: array
+      summary: Get treatments
+      tags:
+      - Treatment
+    post:
+      consumes:
+      - application/json
+      description: Create a new treatment
+      parameters:
+      - description: Name of the treatment
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Description of the treatment
+        in: body
+        name: description
+        schema:
+          type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Treatment created successfully
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+      summary: Create treatment
+      tags:
+      - Treatment
+  /api/v1/treatments/{uuid}:
+    delete:
+      description: Delete a treatment
+      parameters:
+      - description: UUID of the treatment
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Treatment deleted successfully
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+        "500":
+          description: An error occurred while deleting the treatment
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+      summary: Delete treatment
+      tags:
+      - Treatment
+    put:
+      consumes:
+      - application/json
+      description: Update a treatment
+      parameters:
+      - description: UUID of the treatment
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Name of the treatment
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: Description of the treatment
+        in: body
+        name: description
+        schema:
+          type: string
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Treatment updated successfully
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+        "500":
+          description: An error occurred while updating the treatment
+          schema:
+            $ref: '#/definitions/entity.Treatment'
+      summary: Update treatment
+      tags:
+      - Treatment
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get user information
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User information retrieved successfully
+          schema:
+            $ref: '#/definitions/entity.User'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: An error occurred while getting the user
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Get user information
+      tags:
+      - Users
+    patch:
+      consumes:
+      - application/json
+      description: Update existing user
+      parameters:
+      - description: User update data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UpdateUser'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/user.ResponseUserData'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Update user
+      tags:
+      - Users
+  /api/v1/users/active/{uuid}:
+    patch:
+      consumes:
+      - application/json
+      description: Set user's active status
+      parameters:
+      - description: User UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Set user active status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/user.SetStatusRequest'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User active status updated successfully
+          schema:
+            $ref: '#/definitions/user.ResponseUserData'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: An error occurred while updating the user's active status
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Set user active status
+      tags:
+      - Users
+  /api/v1/users/banned/{uuid}:
+    patch:
+      consumes:
+      - application/json
+      description: Set user's banned status
+      parameters:
+      - description: User UUID
+        in: path
+        name: uuid
+        required: true
+        type: string
+      - description: Set user banned status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/user.SetStatusRequest'
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User banned status updated successfully
+          schema:
+            $ref: '#/definitions/user.ResponseUserData'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "500":
+          description: An error occurred while updating the user's banned status
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Set user banned status
+      tags:
+      - Users
+  /api/v1/users/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and generate JWT token
+      parameters:
+      - description: User credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.DefaultCredentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token generated successfully
+          schema:
+            $ref: '#/definitions/user.TokenResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: User login
+      tags:
+      - Users
+  /api/v1/users/signup:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User Sign Up data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.SignUp'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/user.ResponseUserData'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: User Sign Up
+      tags:
+      - Users
+swagger: "2.0"

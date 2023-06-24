@@ -2,6 +2,7 @@ package api
 
 import (
 	healthcheck "github.com/RaMin0/gin-health-check" // Importing health check package for gin
+	"github.com/emur-uy/backend/docs"
 	"github.com/emur-uy/backend/internal/infra/api/answer"
 	"github.com/emur-uy/backend/internal/infra/api/article"
 	"github.com/emur-uy/backend/internal/infra/api/category"
@@ -16,6 +17,8 @@ import (
 	"github.com/emur-uy/backend/internal/infra/api/treatment"
 	"github.com/emur-uy/backend/internal/infra/api/user"
 	"github.com/gin-gonic/gin" // Importing gin package for http web framework
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // RegisterRoutes registers all the application routes.
@@ -41,4 +44,15 @@ func RegisterRoutes(e *gin.Engine) {
 	symptom.RegisterRoutes(e)
 	monitoring.RegisterRoutes(e)
 	medicalrecord.RegisterRoutes(e)
+
+	// use ginSwagger middleware to serve the API docs
+	e.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	docs.SwaggerInfo.Title = "Emur API Backend"
+	docs.SwaggerInfo.Description = "This is an API for the EMUR mobile application microservice."
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.BasePath = ""
+	docs.SwaggerInfo.Schemes = []string{"http"}
+
 }
