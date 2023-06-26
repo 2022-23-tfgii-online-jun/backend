@@ -25,12 +25,12 @@ func RegisterRoutes(e *gin.Engine) {
 	symptomRoutes := e.Group("/api/v1/symptoms")
 
 	// Register routes requiring authentication and authorization for admin role.
-	adminRoutes := symptomRoutes.Group("/admin", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
+	adminRoutes := symptomRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
 	adminRoutes.POST("", handler.CreateSymptom)
 	adminRoutes.GET("", handler.GetAllSymptoms)
 
 	// Register routes requiring authentication and authorization for user role.
-	userRoutes := symptomRoutes.Group("/user", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
+	userRoutes := symptomRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
 	userRoutes.POST("/add", handler.AddUserToSymptom)
 	userRoutes.POST("/remove", handler.RemoveUserFromSymptom)
 	userRoutes.GET("", handler.GetSymptomsByUser)
