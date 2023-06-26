@@ -100,6 +100,8 @@ func (u *userHandler) SignUp(c *gin.Context) {
 func (u *userHandler) UpdateUser(c *gin.Context) {
 	updateData := &entity.UpdateUser{}
 
+	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
+
 	// Step 1: Bind incoming JSON payload to the updateData struct.
 	if err := c.ShouldBindJSON(updateData); err != nil {
 		handleError(c, http.StatusBadRequest, "invalid input", err)
@@ -113,7 +115,7 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 	}
 
 	// Step 3: Update the user in the database.
-	resCode, err := u.userService.UpdateUser(updateData)
+	resCode, err := u.userService.UpdateUser(userUUID, updateData)
 	if err != nil {
 		handleUserError(c, resCode, "an error occurred while updating the user", err)
 		return

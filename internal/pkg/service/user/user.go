@@ -155,26 +155,43 @@ func encryptPassword(password string) (string, error) {
 
 // UpdateUser is a method that updates an existing user in the database,
 // performing data validation and transformations before persisting the updated record.
-func (s *service) UpdateUser(updateData *entity.UpdateUser) (int, error) {
+func (s *service) UpdateUser(userUUID uuid.UUID, updateData *entity.UpdateUser) (int, error) {
+	user := &entity.User{}
+
+	// Find user by UUID
+	foundUser, err := s.repo.FindByUUID(userUUID, user)
+	if err != nil {
+		// Return error if the user is not found
+		return http.StatusInternalServerError, err
+	}
+
+	// Perform type assertion to convert foundUser to *entity.User
+	user, ok := foundUser.(*entity.User)
+	if !ok {
+		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+	}
 
 	if updateData == nil || updateData.City == nil || updateData.Country == nil {
 		return http.StatusInternalServerError, fmt.Errorf("invalid data to update")
 	}
 
-	// Step 2: Modify data before saving to the database.
-	user := &entity.User{
-		ID:          updateData.ID,
-		FirstName:   *updateData.FirstName,
-		LastName:    *updateData.LastName,
-		DateOfBirth: updateData.DateOfBirth,
-		Sex:         *updateData.Sex,
-		UserType:    *updateData.UserType,
-		City:        *updateData.City,
-		Country:     *updateData.Country,
+	layout := "02-01-2006"
+	dateOfBirth, err := time.Parse(layout, updateData.DateOfBirth)
+	if err != nil {
+		// Manejar el error de análisis de fecha
 	}
 
-	// Step 3: Save the user record to the database.
-	err := s.repo.Update(user)
+	// Modify data before saving to the database.
+	user.FirstName = *updateData.FirstName
+	user.LastName = *updateData.LastName
+	user.DateOfBirth = dateOfBirth
+	user.Sex = *updateData.Sex
+	user.UserType = *updateData.UserType
+	user.City = *updateData.City
+	user.Country = *updateData.Country
+
+	// Save the user record to the database.
+	err = s.repo.Update(user)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

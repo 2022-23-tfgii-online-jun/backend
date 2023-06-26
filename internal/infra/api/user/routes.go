@@ -31,7 +31,7 @@ func RegisterRoutes(e *gin.Engine) {
 
 	// Register the GET route for both admin and user.
 	userRoutes.GET("", handler.GetUser)
-	userRoutes.PATCH("", handler.UpdateUser)
+	userRoutes.PUT("", handler.UpdateUser)
 
 	// Register admin routes requiring authorization for admin role.
 	adminRoutes := userRoutes.Group("")

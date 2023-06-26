@@ -44,7 +44,7 @@ type UserService interface {
 
 	// UpdateUser updates an existing user record with the provided user data.
 	// Returns an HTTP status code and an error (if any).
-	UpdateUser(updateData *entity.UpdateUser) (int, error)
+	UpdateUser(userUUID uuid.UUID, updateData *entity.UpdateUser) (int, error)
 
 	// GetUser retrieves user information for the user with the provided UUID.
 	// If the user is not found in the database, the error returned should be `ports.ErrUserNotFound`.
