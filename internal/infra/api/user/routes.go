@@ -37,5 +37,5 @@ func RegisterRoutes(e *gin.Engine) {
 	adminRoutes := userRoutes.Group("")
 	adminRoutes.Use(middlewares.Authorize(constants.RoleAdmin))
 	adminRoutes.PUT("/active/:uuid", handler.SetActiveStatus)
-	adminRoutes.PUT("/banned/:uuid", handler.SetBannedStatus))
+	adminRoutes.PUT("/banned/:uuid", handler.SetBannedStatus)
 }
