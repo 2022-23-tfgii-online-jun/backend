@@ -23,7 +23,7 @@ type User struct {
 	DateOfBirth  *time.Time `gorm:"Column:date_of_birth;default:NULL" json:"date_of_birth"`
 	Sex          string     `gorm:"Column:sex" json:"sex" binding:"required"`
 	Email        string     `gorm:"Column:email" binding:"required,email" json:"email"`
-	Password     string     `gorm:"Column:password" validate:"required" binding:"required" json:"password"`
+	Password     string     `gorm:"Column:password" validate:"required" binding:"required" json:"-"`
 	UserType     string     `gorm:"Column:user_type" json:"user_type" binding:"required"`
 	IsActive     bool       `gorm:"column:is_active" json:"is_active"`
 	IsBanned     bool       `gorm:"Column:is_banned" json:"is_banned"`

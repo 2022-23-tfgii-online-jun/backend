@@ -31,13 +31,11 @@ func RegisterRoutes(e *gin.Engine) {
 
 	// Register the GET route for both admin and user.
 	userRoutes.GET("", handler.GetUser)
+	userRoutes.PATCH("", handler.UpdateUser)
 
 	// Register admin routes requiring authorization for admin role.
 	adminRoutes := userRoutes.Group("")
 	adminRoutes.Use(middlewares.Authorize(constants.RoleAdmin))
 	adminRoutes.PUT("/active/:uuid", handler.SetActiveStatus)
-	adminRoutes.PUT("/banned/:uuid", handler.SetBannedStatus)
-
-	// Register user routes requiring authorization for user role.
-	userRoutes.PATCH("", middlewares.Authorize(constants.RoleUser), handler.UpdateUser)
+	adminRoutes.PUT("/banned/:uuid", handler.SetBannedStatus))
 }
