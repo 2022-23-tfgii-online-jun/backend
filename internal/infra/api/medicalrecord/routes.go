@@ -27,11 +27,9 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register routes requiring authentication and authorization for user and admin roles.
 	medicalRecordRoutes.Use(middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser, constants.RoleAdmin))
 
-	// GET endpoint accessible for user and admin roles.
-	medicalRecordRoutes.GET("/", handler.GetMedicalRecord)
-
 	// POST and PUT endpoints accessible only for user role.
 	userRoutes := medicalRecordRoutes.Group("", middlewares.Authorize(constants.RoleUser))
+	userRoutes.GET("/", handler.GetMedicalRecord)
 	userRoutes.PUT("/:uuid", handler.UpdateMedicalRecord)
 	userRoutes.POST("/", handler.CreateMedicalRecord)
 }
