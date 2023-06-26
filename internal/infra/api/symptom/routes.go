@@ -31,5 +31,5 @@ func RegisterRoutes(e *gin.Engine) {
 	// Register routes for user role.
 	symptomRoutes.POST("/add", middlewares.Authorize(constants.RoleUser), handler.AddUserToSymptom)
 	symptomRoutes.POST("/remove", middlewares.Authorize(constants.RoleUser), handler.RemoveUserFromSymptom)
-	symptomRoutes.GET("", middlewares.Authorize(constants.RoleUser), handler.GetSymptomsByUser)
+	symptomRoutes.GET("/all", middlewares.Authorize(constants.RoleUser), handler.GetSymptomsByUser)
 }
