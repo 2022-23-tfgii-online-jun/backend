@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"errors"
+
 	"github.com/emur-uy/backend/internal/pkg/ports"
 	"github.com/google/uuid"
 )
@@ -28,12 +29,6 @@ func (r *ReminderRepository) CreateWithOmit(omitColumns string, value interface{
 	return r.client.CreateWithOmit(omitColumns, value)
 }
 
-// // Find return records that match given conditions.
-// func (r *ReminderRepository) Find(dest interface{}, conditions ...interface{}) error {
-// 	return r.client.Find(dest, conditions...)
-// }
-
-// Find return records that match given conditions.
 // Find return records that match given conditions.
 func (r *ReminderRepository) Find(model interface{}, dest interface{}, conditions ...interface{}) error {
 	return r.client.db.Model(model).Find(dest, conditions...).Error

@@ -16,9 +16,7 @@ func (*Article) TableName() string {
 type Article struct {
 	ID          int       `gorm:"Column:id;PRIMARY_KEY" json:"-"`
 	UUID        uuid.UUID `gorm:"Column:uuid" json:"uuid"`
-	UserID      int       `gorm:"Column:user_id" json:"-"`
 	Title       string    `gorm:"Column:title" binding:"required" json:"title"`
-	Image       string    `gorm:"Column:image" binding:"required" json:"image"`
 	Content     string    `gorm:"Column:content" binding:"required" json:"content"`
 	IsPublished bool      `gorm:"Column:is_published" sql:"DEFAULT:0" json:"is_published"`
 	CreatedAt   time.Time `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
@@ -34,4 +32,10 @@ type RequestCreateArticle struct {
 type RequestUpdateArticle struct {
 	Title   string `form:"title" binding:"required"`
 	Content string `form:"content" binding:"required"`
+}
+
+// ArticleWithMediaURLs represents a recipe with associated media URLs.
+type ArticleWithMediaURLs struct {
+	Article   *Article `json:"article"`
+	MediaURLs []string `json:"media"`
 }

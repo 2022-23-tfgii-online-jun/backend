@@ -31,9 +31,6 @@ func newHandler(articleService ports.ArticleService) *articleHandler {
 func (a *articleHandler) CreateArticle(c *gin.Context) {
 	reqCreate := &entity.RequestCreateArticle{}
 
-	// Get user UUID from context
-	userUUID, _ := uuid.Parse(fmt.Sprintf("%v", c.MustGet("userUUID")))
-
 	// Bind incoming form-data payload to the reqCreate struct.
 	if err := c.ShouldBind(reqCreate); err != nil {
 		handleError(c, http.StatusBadRequest, "Invalid input", err)
@@ -41,7 +38,7 @@ func (a *articleHandler) CreateArticle(c *gin.Context) {
 	}
 
 	// Create the article and store it in the database.
-	createdArticle, err := a.articleService.CreateArticle(c, userUUID, reqCreate)
+	createdArticle, err := a.articleService.CreateArticle(c, reqCreate)
 	if err != nil {
 		handleError(c, http.StatusInternalServerError, "An error occurred while creating the article", err)
 		return
@@ -95,7 +92,7 @@ func (a *articleHandler) UpdateArticle(c *gin.Context) {
 	}
 
 	// Update the article in the database.
-	updatedArticle, err := a.articleService.UpdateArticle(articleUUID, reqUpdate)
+	updatedArticle, err := a.articleService.UpdateArticle(c, articleUUID, reqUpdate)
 	if err != nil {
 		handleError(c, http.StatusInternalServerError, "An error occurred while updating the article", err)
 		return
