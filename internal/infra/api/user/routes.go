@@ -27,13 +27,17 @@ func RegisterRoutes(e *gin.Engine) {
 
 	// Group the user routes together.
 	userRoutes := e.Group("/api/v1/users")
+	userRoutes.Use(middlewares.Authenticate())
 
-	// Register admin routes requiring authentication and authorization for admin role.
-	adminRoutes := userRoutes.Group("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
+	// Register the GET route for both admin and user.
+	userRoutes.GET("", handler.GetUser)
+
+	// Register admin routes requiring authorization for admin role.
+	adminRoutes := userRoutes.Group("")
+	adminRoutes.Use(middlewares.Authorize(constants.RoleAdmin))
 	adminRoutes.PUT("/active/:uuid", handler.SetActiveStatus)
 	adminRoutes.PUT("/banned/:uuid", handler.SetBannedStatus)
 
-	// Register user routes requiring authentication and authorization for user role.
-	userRoutes.PATCH("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser), handler.UpdateUser)
-	userRoutes.GET("", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser), handler.GetUser)
+	// Register user routes requiring authorization for user role.
+	userRoutes.PATCH("", middlewares.Authorize(constants.RoleUser), handler.UpdateUser)
 }
