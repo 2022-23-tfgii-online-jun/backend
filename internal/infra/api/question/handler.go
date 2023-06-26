@@ -80,8 +80,16 @@ func (q *questionHandler) GetAllQuestions(c *gin.Context) {
 // If any error occurs during this process, it returns the corresponding status code and error message.
 // If the questions and answers are retrieved successfully, it returns a 200 OK status with the retrieved questions and answers.
 func (q *questionHandler) GetAllQuestionsAndAnswers(c *gin.Context) {
+
+	// Parse the recipe UUID from the URL parameter.
+	questionUUID, err := uuid.Parse(c.Param("uuid"))
+	if err != nil {
+		handleError(c, http.StatusBadRequest, "Invalid UUID format", err)
+		return
+	}
+
 	// Get all questions and their answers from the database.
-	questions, err := q.questionService.GetAllQuestionsAndAnswers()
+	questions, err := q.questionService.GetAllQuestionsAndAnswers(questionUUID)
 	if err != nil {
 		handleError(c, http.StatusInternalServerError, "An error occurred while getting the questions and answers", err)
 		return
