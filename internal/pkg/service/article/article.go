@@ -65,7 +65,7 @@ func (s *service) CreateArticle(c *gin.Context, createReq *entity.RequestCreateA
 	}
 
 	// Save the article to the database
-	err = s.repo.Create(article)
+	err = s.repo.CreateWithOmit("uuid", article)
 	if err != nil {
 		return nil, ErrCreatingArticle
 	}
