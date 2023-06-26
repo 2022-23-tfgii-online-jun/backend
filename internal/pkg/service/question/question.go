@@ -73,9 +73,10 @@ func (s *service) GetAllQuestions() ([]*entity.Question, error) {
 	return questions, nil
 }
 
+// GetAllQuestionsAndAwnswers returns all questions stored in the database with relation to answers.
 func (s *service) GetAllQuestionsAndAnswers(questionUUID uuid.UUID) ([]*entity.QuestionAndAnswers, error) {
 	// Get the question from the database based on the UUID
-	var question entity.QuestionAndAnswers
+	var question entity.Question
 	if err := s.repo.Find(&question, "uuid = ?", questionUUID); err != nil {
 		return nil, err
 	}
@@ -86,9 +87,12 @@ func (s *service) GetAllQuestionsAndAnswers(questionUUID uuid.UUID) ([]*entity.Q
 		return nil, err
 	}
 
-	// Assign the answers to the question
-	question.Answers = answers
+	// Create the QuestionAndAnswers object
+	qa := &entity.QuestionAndAnswers{
+		Question: &question,
+		Answers:  answers,
+	}
 
 	// Return the question with answers
-	return []*entity.QuestionAndAnswers{&question}, nil
+	return []*entity.QuestionAndAnswers{qa}, nil
 }
