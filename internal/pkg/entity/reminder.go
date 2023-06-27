@@ -119,7 +119,7 @@ type RequestCreateReminder struct {
 	Date         time.Time      `gorm:"Column:date" binding:"required" form:"date" time_format:"02/01/2006"`
 	Notification []Notification `gorm:"Column:notification" form:"notification"`
 	Task         []Task         `gorm:"Column:task" form:"task"`
-	Medical      int            `gorm:"Column:medical" json:"medical"`
+	Medical      int            `gorm:"Column:medical" form:"medical"`
 	Note         string         `gorm:"Column:note" form:"note"`
 }
 
@@ -151,4 +151,5 @@ type RequestUpdateReminder struct {
 	Notification []Notification `form:"notification"`
 	Task         []Task         `form:"task"`
 	Note         string         `form:"note"`
+	Medical      string         `form:"medical"`
 }
