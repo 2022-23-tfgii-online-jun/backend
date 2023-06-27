@@ -73,21 +73,26 @@ func (s *service) GetAllQuestions() ([]*entity.Question, error) {
 	return questions, nil
 }
 
-func (s *service) GetAllQuestionsAndAnswers() ([]*entity.QuestionAndAnswers, error) {
-	// Get all questions from the database
-	var questions []*entity.QuestionAndAnswers
-	if err := s.repo.Find(&questions); err != nil {
+// GetAllQuestionsAndAwnswers returns all questions stored in the database with relation to answers.
+func (s *service) GetAllQuestionsAndAnswers(questionUUID uuid.UUID) ([]*entity.QuestionAndAnswers, error) {
+	// Get the question from the database based on the UUID
+	var question entity.Question
+	if err := s.repo.Find(&question, "uuid = ?", questionUUID); err != nil {
 		return nil, err
 	}
 
-	// Get answers for each question
-	for _, question := range questions {
-		var answers []*entity.Answer
-		if err := s.repo.Find(&answers, question.ID); err != nil {
-			return nil, err
-		}
-		question.Answers = answers
+	// Get answers for the question
+	var answers []*entity.Answer
+	if err := s.repo.Find(&answers, "question_id = ?", question.ID); err != nil {
+		return nil, err
 	}
 
-	return questions, nil
+	// Create the QuestionAndAnswers object
+	qa := &entity.QuestionAndAnswers{
+		Question: &question,
+		Answers:  answers,
+	}
+
+	// Return the question with answers
+	return []*entity.QuestionAndAnswers{qa}, nil
 }

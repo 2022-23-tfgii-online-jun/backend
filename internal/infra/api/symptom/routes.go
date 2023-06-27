@@ -22,16 +22,14 @@ func RegisterRoutes(e *gin.Engine) {
 	handler := newHandler(service)
 
 	// Group the symptom routes together.
-	symptomRoutes := e.Group("/api/v1/symptoms")
+	symptomRoutes := e.Group("/api/v1/symptoms", middlewares.Authenticate())
 
-	// Register routes requiring authentication and authorization for admin role.
-	adminRoutes := symptomRoutes.Group("/admin", middlewares.Authenticate(), middlewares.Authorize(constants.RoleAdmin))
-	adminRoutes.POST("", handler.CreateSymptom)
-	adminRoutes.GET("", handler.GetAllSymptoms)
+	// Register routes for admin role.
+	symptomRoutes.POST("", middlewares.Authorize(constants.RoleAdmin), handler.CreateSymptom)
+	symptomRoutes.GET("", middlewares.Authorize(constants.RoleAdmin, constants.RoleUser), handler.GetAllSymptoms)
 
-	// Register routes requiring authentication and authorization for user role.
-	userRoutes := symptomRoutes.Group("/user", middlewares.Authenticate(), middlewares.Authorize(constants.RoleUser))
-	userRoutes.POST("/add", handler.AddUserToSymptom)
-	userRoutes.POST("/remove", handler.RemoveUserFromSymptom)
-	userRoutes.GET("", handler.GetSymptomsByUser)
+	// Register routes for user role.
+	symptomRoutes.POST("/add", middlewares.Authorize(constants.RoleUser), handler.AddUserToSymptom)
+	symptomRoutes.POST("/remove", middlewares.Authorize(constants.RoleUser), handler.RemoveUserFromSymptom)
+	symptomRoutes.GET("/all", middlewares.Authorize(constants.RoleUser), handler.GetSymptomsByUser)
 }

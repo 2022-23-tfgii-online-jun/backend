@@ -104,3 +104,35 @@ type RecipeMediaService interface {
 	// Returns an error if the operation fails.
 	FindByRecipeID(id int, i *[]*entity.RecipeMedia) error
 }
+
+// ArticleMediaRepository defines an interface for accessing the article_media data store.
+// It is a contract for all database operations related to ArticleMedia data.
+type ArticleMediaRepository interface {
+	// Create creates a new ArticleMedia record in the data store.
+	// Returns an error if the operation fails.
+	Create(value interface{}) error
+
+	// Delete removes an ArticleMedia record from the data store.
+	// Returns an error if the operation fails.
+	Delete(value interface{}) error
+
+	// Find retrieves all ArticleMedia records that match the given conditions.
+	// Returns an error if the operation fails.
+	Find(model interface{}, dest interface{}, conditions ...interface{}) error
+}
+
+// ArticleMediaService is an interface defining a contract for business logic operators related to ArticleMedia.
+// It works with the entity layer to manipulate ArticleMedia data.
+type ArticleMediaService interface {
+	// CreateArticleMedia creates a new ArticleMedia entity.
+	// Returns an error if the operation fails.
+	CreateArticleMedia(articleMedia *entity.ArticleMedia) error
+
+	// DeleteArticleMedia removes an existing ArticleMedia entity.
+	// Returns an error if the operation fails.
+	DeleteArticleMedia(articleMedia *entity.ArticleMedia) error
+
+	// FindByArticleID retrieves ArticleMedia entities based on the Article ID.
+	// Returns an error if the operation fails.
+	FindByArticleID(id int, i *[]*entity.ArticleMedia) error
+}

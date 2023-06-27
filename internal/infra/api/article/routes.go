@@ -5,6 +5,7 @@ import (
 	"github.com/emur-uy/backend/internal/infra/api/middlewares/constants"
 	"github.com/emur-uy/backend/internal/infra/repositories/postgresql"
 	"github.com/emur-uy/backend/internal/pkg/service/article"
+	"github.com/emur-uy/backend/internal/pkg/service/media"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,13 +14,20 @@ import (
 // to handle article-related operations in a hexagonal architecture.
 func RegisterRoutes(e *gin.Engine) {
 	// Initialize the repository by creating a new PostgreSQL client.
-	repo := postgresql.NewClient()
+	client := postgresql.NewClient()
 
-	// Create a new ArticleService instance by injecting the repository.
-	service := article.NewService(repo)
+	// Create new repository instances for each repository interface
+	articleRepo := postgresql.NewArticleRepository(client)
+	mediaRepo := postgresql.NewMediaRepository(client)
+	articleMediaRepo := postgresql.NewArticleMediaRepository(client)
+
+	// Create new services
+	mediaService := media.NewService(mediaRepo)
+	articleMediaService := article.NewArticleMediaService(articleMediaRepo)
+	articleService := article.NewService(articleRepo, mediaService, articleMediaService)
 
 	// Create a new articleHandler instance by injecting the ArticleService.
-	handler := newHandler(service)
+	handler := newHandler(articleService)
 
 	// Group the article routes together.
 	articleRoutes := e.Group("/api/v1/articles")
@@ -29,7 +37,7 @@ func RegisterRoutes(e *gin.Engine) {
 	adminRoutes.POST("", handler.CreateArticle)
 	adminRoutes.DELETE("/:uuid", handler.DeleteArticle)
 	adminRoutes.PUT("/:uuid", handler.UpdateArticle)
-	adminRoutes.POST("/categories", handler.AddArticleToCategory)
+	adminRoutes.POST("/:uuid/categories", handler.AddArticleToCategory)
 
 	// Register route for getting all articles accessible to both admin and user roles.
 	allowedRoles := []string{constants.RoleAdmin, constants.RoleUser}

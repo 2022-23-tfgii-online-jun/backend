@@ -43,11 +43,11 @@ type ArticleRepository interface {
 type ArticleService interface {
 	// CreateArticle takes the user's UUID and a request to create an Article.
 	// Returns the status and an error if any occurred.
-	CreateArticle(c *gin.Context, userUUID uuid.UUID, createReq *entity.RequestCreateArticle) (int, error)
+	CreateArticle(c *gin.Context, createReq *entity.RequestCreateArticle) (*entity.Article, error)
 
 	// UpdateArticle updates an existing Article using the provided update request.
 	// Returns the status and an error if any occurred.
-	UpdateArticle(articleUUID uuid.UUID, updateReq *entity.RequestUpdateArticle) (int, error)
+	UpdateArticle(c *gin.Context, articleUUID uuid.UUID, updateReq *entity.RequestUpdateArticle) (int, error)
 
 	// DeleteArticle removes an existing Article using the provided article UUID.
 	// Returns the status and an error if any occurred.
@@ -55,7 +55,7 @@ type ArticleService interface {
 
 	// GetAllArticles retrieves all articles from the data store.
 	// Returns a slice of Article entities and an error if any occurred.
-	GetAllArticles() ([]*entity.Article, error)
+	GetAllArticles() ([]*entity.ArticleWithMediaURLs, error)
 
 	// AddArticleToCategory associates an article with a category using their UUIDs.
 	// Returns an error if the operation fails.
