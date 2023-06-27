@@ -95,7 +95,7 @@ type Reminder struct {
 	Notification NotificationSlice `gorm:"Column:notification;type:json" json:"notification"`
 	Task         TaskSlice         `gorm:"Column:task;type:json" json:"task"`
 	Note         string            `gorm:"Column:note" json:"note"`
-	Medical      int               `gorm:"Column:medical" json:"medical"`
+	Medical      int               `gorm:"Column:medical_id" json:"medical_id"`
 	IsActive     bool              `gorm:"Column:is_active" sql:"DEFAULT:1" json:"is_active"`
 	CreatedAt    time.Time         `gorm:"Column:created_at" sql:"DEFAULT:current_timestamp" json:"created_at"`
 }
