@@ -35,6 +35,7 @@ type Config struct {
 	AwsEndpoint      string `mapstructure:"AWS_ENDPOINT"`
 	ForecastKey      string `mapstructure:"FORECAST_KEY"`
 	ForecastAPI      string `mapstructure:"FORECAST_API"`
+	EncryptionKey    string `mapstructure:"ENCRYPTION_KEY"`
 }
 
 func Get() Config {
