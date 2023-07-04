@@ -1,6 +1,10 @@
 package user
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,7 +22,9 @@ import (
 )
 
 // JWTCost is the cost factor for hashing passwords using bcrypt.
-const JWTCost = 8
+const (
+	JWTCost = 8
+)
 
 // service is a private struct implementing the ports.UserService interface, which
 // encapsulates the business logic related to user operations.
@@ -115,25 +121,42 @@ func (s *service) generateJWTToken(user *entity.User) (string, error) {
 // CreateUser is a method that creates a new user in the database, performing data validation
 // and transformations before persisting the new user record.
 func (s *service) CreateUser(user *entity.User) (int, error) {
-	// Step 1: Validate email address format.
 	_, err := mail.ParseAddress(user.Email)
 	if err != nil {
 		log.Printf("error parsing email: %s", err.Error())
 		return http.StatusInternalServerError, err
 	}
 
-	// Step 2: Encrypt the user's password using bcrypt.
 	encryptedPass, err := encryptPassword(user.Password)
 	if err != nil {
 		log.Printf("error while encrypting the password: %s", err.Error())
 		return http.StatusInternalServerError, err
 	}
 
-	// Step 3: Modify data before saving to the database.
+	encryptedFirstName, err := encryptString(user.FirstName)
+	if err != nil {
+		log.Printf("error while encrypting the first name: %s", err.Error())
+		return http.StatusInternalServerError, err
+	}
+
+	encryptedLastName, err := encryptString(user.LastName)
+	if err != nil {
+		log.Printf("error while encrypting the last name: %s", err.Error())
+		return http.StatusInternalServerError, err
+	}
+
+	encryptedProfileImage, err := encryptString(user.ProfileImage)
+	if err != nil {
+		log.Printf("error while encrypting the profile image: %s", err.Error())
+		return http.StatusInternalServerError, err
+	}
+
 	user.Password = encryptedPass
+	user.FirstName = encryptedFirstName
+	user.LastName = encryptedLastName
+	user.ProfileImage = encryptedProfileImage
 	user.IsActive = true
 
-	// Step 4: Save the user record to the database.
 	err = s.repo.CreateWithOmit("uuid", user)
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -158,14 +181,11 @@ func encryptPassword(password string) (string, error) {
 func (s *service) UpdateUser(userUUID uuid.UUID, updateData *entity.UpdateUser) (int, error) {
 	user := &entity.User{}
 
-	// Find user by UUID
 	foundUser, err := s.repo.FindByUUID(userUUID, user)
 	if err != nil {
-		// Return error if the user is not found
 		return http.StatusInternalServerError, err
 	}
 
-	// Perform type assertion to convert foundUser to *entity.User
 	user, ok := foundUser.(*entity.User)
 	if !ok {
 		return http.StatusInternalServerError, fmt.Errorf("type assertion failed")
@@ -178,19 +198,30 @@ func (s *service) UpdateUser(userUUID uuid.UUID, updateData *entity.UpdateUser) 
 	layout := "02-01-2006"
 	dateOfBirth, err := time.Parse(layout, updateData.DateOfBirth)
 	if err != nil {
-		// Manejar el error de análisis de fecha
+		// Handle date parsing error
 	}
 
-	// Modify data before saving to the database.
-	user.FirstName = *updateData.FirstName
-	user.LastName = *updateData.LastName
+	// Encrypt the updated fields
+	encryptedFirstName, err := encryptString(*updateData.FirstName)
+	if err != nil {
+		log.Printf("error while encrypting the first name: %s", err.Error())
+		return http.StatusInternalServerError, err
+	}
+	encryptedLastName, err := encryptString(*updateData.LastName)
+	if err != nil {
+		log.Printf("error while encrypting the last name: %s", err.Error())
+		return http.StatusInternalServerError, err
+	}
+
+	// Update the user fields with the encrypted values
+	user.FirstName = encryptedFirstName
+	user.LastName = encryptedLastName
 	user.DateOfBirth = dateOfBirth
 	user.Sex = *updateData.Sex
 	user.UserType = *updateData.UserType
 	user.City = *updateData.City
 	user.Country = *updateData.Country
 
-	// Save the user record to the database.
 	err = s.repo.Update(user)
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -201,17 +232,34 @@ func (s *service) UpdateUser(userUUID uuid.UUID, updateData *entity.UpdateUser) 
 
 // GetUser is the service for retrieving information about a user.
 func (s *service) GetUser(userUUID uuid.UUID) (*entity.User, error) {
-	// Initialize an empty User entity.
 	user := &entity.User{}
 
-	// Search for a user with the given UUID in the repository.
-	// If a matching user is found, its data will be stored in the `user` variable.
 	if err := s.repo.First(user, "uuid= ?", userUUID); err != nil {
-		// If there's an error during the search, return a nil User pointer and the error.
 		return nil, err
 	}
 
-	// If the user is found successfully, return the User pointer and a nil error.
+	decryptedFirstName, err := decryptString(user.FirstName)
+	if err != nil {
+		log.Printf("error while decrypting the first name: %s", err.Error())
+		return nil, err
+	}
+
+	decryptedLastName, err := decryptString(user.LastName)
+	if err != nil {
+		log.Printf("error while decrypting the last name: %s", err.Error())
+		return nil, err
+	}
+
+	decryptedProfileImage, err := decryptString(user.ProfileImage)
+	if err != nil {
+		log.Printf("error while decrypting the profile image: %s", err.Error())
+		return nil, err
+	}
+
+	user.FirstName = decryptedFirstName
+	user.LastName = decryptedLastName
+	user.ProfileImage = decryptedProfileImage
+
 	return user, nil
 }
 
@@ -299,4 +347,47 @@ func (s *service) GetRole(roleID int) (*entity.Role, error) {
 
 	// If the role is found successfully, return the role pointer and a nil error.
 	return role, nil
+}
+
+func encryptString(text string) (string, error) {
+	plaintext := []byte(text)
+	block, err := aes.NewCipher([]byte(config.Get().EncryptionKey))
+	if err != nil {
+		return "", err
+	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+	if _, err := rand.Read(iv); err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
+}
+
+func decryptString(ciphertext string) (string, error) {
+	data, err := base64.URLEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return "", err
+	}
+
+	block, err := aes.NewCipher([]byte(config.Get().EncryptionKey))
+	if err != nil {
+		return "", err
+	}
+
+	if len(data) < aes.BlockSize {
+		return "", fmt.Errorf("ciphertext too short")
+	}
+
+	iv := data[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(data[aes.BlockSize:], data[aes.BlockSize:])
+
+	return string(data[aes.BlockSize:]), nil
 }
