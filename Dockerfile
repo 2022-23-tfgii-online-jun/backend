@@ -39,6 +39,7 @@ COPY --from=builder /build/prod.env /
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
+
 # Set Timezone
 ENV TZ="America/Montevideo"
 
