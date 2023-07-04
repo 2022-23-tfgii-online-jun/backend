@@ -41,7 +41,7 @@ type Config struct {
 func Get() Config {
 	viper.AddConfigPath(".")
 	viper.SetConfigType("env")
-	viper.SetConfigName("dev")
+	viper.SetConfigName("prod")
 
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
