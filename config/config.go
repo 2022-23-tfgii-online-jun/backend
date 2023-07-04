@@ -41,20 +41,12 @@ type Config struct {
 func Get() Config {
 	viper.AddConfigPath(".")
 	viper.SetConfigType("env")
-	viper.SetConfigName("dev")
+	viper.SetConfigName("prod")
 
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Printf("[ReadENV]: cannot read env file: %v", err)
-	}
-
-	if viper.ConfigFileUsed() == "" {
-		log.Println("dev.env not found, using environment variables")
-		err := viper.Unmarshal(&cfg)
-		if err != nil {
-			log.Fatalln("error unmarshalling config", err)
-		}
+		log.Printf("[ReadENV]: cannot read env file")
 	}
 
 	doOnce.Do(func() {

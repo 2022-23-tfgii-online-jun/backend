@@ -23,6 +23,9 @@ func NewService(mapRepo ports.MapRepository) ports.MapService {
 
 // CreateMap is the service for creating a map and saving it in the database.
 func (s *service) CreateMap(c *gin.Context, createReq *entity.RequestCreateUpdateMap) (*entity.Map, int, error) {
+	if createReq == nil {
+		return nil, http.StatusBadRequest, fmt.Errorf("invalid request payload")
+	}
 	// Create a new map entity from the request data.
 	newMap := &entity.Map{
 		Name:              createReq.Name,
@@ -55,6 +58,10 @@ func (s *service) UpdateMap(c *gin.Context, mapUUID uuid.UUID, updateReq *entity
 	mapEntity, ok := foundMap.(*entity.Map)
 	if !ok {
 		return nil, http.StatusInternalServerError, fmt.Errorf("type assertion failed")
+	}
+
+	if updateReq == nil {
+		return nil, http.StatusBadRequest, fmt.Errorf("invalid request payload")
 	}
 
 	// Update the map fields with the new data from the update request.
