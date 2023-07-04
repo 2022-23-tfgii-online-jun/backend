@@ -16,3 +16,5 @@ migrate-up:  ### create new migration
 	migrate -path ./migrations -database "postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require" -verbose up
 
 
+
+
